@@ -1,4 +1,4 @@
-const CACHE_NAME = 'santa-helper-v1';
+const CACHE_NAME = 'santa-helper-v2';
 const urlsToCache = [
   './',
   './index.html',
@@ -28,7 +28,7 @@ self.addEventListener('fetch', event => {
         }
         return fetch(event.request);
       }
-    )
+      )
   );
 });
 
