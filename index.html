@@ -139,9 +139,9 @@
             z-index: 2;
         }
 
-        /* TV View (Top 60%) */
+        /* TV View (Top 70%) */
         #tv-view {
-            flex: 60;
+            flex: 70;
             position: relative;
             display: flex;
             justify-content: center;
@@ -178,7 +178,7 @@
 
         #status-text {
             position: absolute;
-            top: 80px;
+            top: 60px;
             /* Moved down to avoid overlap */
             left: 50%;
             transform: translateX(-50%);
@@ -196,13 +196,17 @@
 
         #combo-display {
             position: absolute;
-            top: 80px;
-            left: 30px;
+            top: 10px;
+            right: 10px;
+            left: auto;
             font-size: 1.5rem;
-            color: #f39c12;
+            color: #f1c40f;
             text-shadow: 0 3px 6px rgba(0, 0, 0, 0.5);
-            opacity: 0;
-            transition: opacity 0.3s;
+            z-index: 10;
+        }
+
+        #combo-step-indicator {
+            display: none;
         }
 
         #mode-indicator {
@@ -755,8 +759,8 @@
 
             #status-text {
                 font-size: 1.2rem;
-                top: 80px;
-                /* Moved down */
+                top: 60px;
+                /* Adjusted */
                 left: 50%;
                 transform: translateX(-50%);
                 width: 100%;
@@ -764,26 +768,17 @@
             }
 
             #combo-display {
-                font-size: 0.9rem;
-                top: 90px;
-                /* Moved down */
-                left: 10px;
+                font-size: 1rem;
+                top: 10px;
+                right: 10px;
+                /* Move to top right */
+                left: auto;
+                text-align: right;
             }
 
             #combo-step-indicator {
-                top: 110px;
-                /* Moved down */
-                font-size: 0.9rem;
-                width: 100%;
-                text-align: center;
-                left: 0;
-                transform: none;
-                padding: 0;
-                background: transparent;
-                backdrop-filter: none;
-                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-                /* Ensure readability */
-                z-index: 20;
+                display: none;
+                /* Hide as requested */
             }
 
             #mode-indicator {
@@ -1625,12 +1620,24 @@
                 });
                 updateComboStepIndicator(1, 'Choose number');
             } else if (step === 1) {
-                // Show colors
+                // Show colors (Random 6)
                 grid.className = 'controls-grid grid-6';
-                comboConfig.colors.forEach(colorObj => {
+
+                const currentTarget = state.comboSequence[state.playerInputIndex];
+                const correctColor = currentTarget.color; // This is a string (hex) or object? 
+                // Wait, state.comboSequence stores objects with {number, color, animal}
+                // color is the hex string? No, let's check generateComboSequence.
+                // It pushes { number: num, color: col, animal: ani }
+                // col is the color OBJECT from comboConfig.colors.
+
+                const otherColors = comboConfig.colors.filter(c => c.name !== correctColor.name);
+                const shuffledOthers = otherColors.sort(() => 0.5 - Math.random()).slice(0, 5);
+                const displayColors = [correctColor, ...shuffledOthers].sort(() => 0.5 - Math.random());
+
+                displayColors.forEach(colorObj => {
                     grid.appendChild(createColorButton(colorObj));
                 });
-                updateComboStepIndicator(2, 'Choose color');
+                // updateComboStepIndicator(2, 'Choose color'); // Hidden
             } else if (step === 2) {
                 // Show animals (Random 6)
                 grid.className = 'controls-grid grid-6';
