@@ -47,10 +47,16 @@
             padding: 0;
             width: 100%;
             height: 100%;
+            /* Fallback */
+            height: 100dvh;
+            /* Dynamic Viewport Height */
             overflow: hidden;
             background-color: var(--bg-color);
             font-family: 'Fredoka One', cursive;
             color: var(--text-color);
+            /* Safe Area Support */
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
         }
 
         /* --- Aurora & Snowfall Effect --- */
@@ -724,8 +730,8 @@
             #controls-view {
                 flex: 30;
                 /* Smaller controls */
-                padding-bottom: 2px;
-                /* Reduced padding */
+                padding-bottom: max(2px, env(safe-area-inset-bottom));
+                /* Safe area aware */
                 display: flex;
                 align-items: center;
                 /* Center vertically */
@@ -738,7 +744,7 @@
                 /* Remove vertical padding */
                 gap: 5px;
                 /* Tighter gap */
-                transform: scale(0.85);
+                transform: scale(0.8);
                 /* Scale down more to prevent cutoff */
                 transform-origin: center center;
                 max-height: 100%;
@@ -749,8 +755,8 @@
                 max-height: 50vh !important;
                 /* More space available */
                 max-width: 200px !important;
-                animation: santa-breathe 3s ease-in-out infinite;
-                /* Ensure animation on both */
+                animation: santa-breathe 3s ease-in-out infinite !important;
+                /* Force animation */
             }
 
             #bubble {
