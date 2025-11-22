@@ -1141,11 +1141,20 @@
 
             setVoice: function () {
                 const voices = this.synth.getVoices();
-                // Try to find a male English voice first, or just a good English voice
-                // "Google US English" is often female. "Samantha" is female. "Daniel" is male.
-                // Let's look for "Male" or specific names, otherwise default.
-                this.voice = voices.find(v => v.lang.includes('en') && (v.name.includes('Male') || v.name.includes('Daniel') || v.name.includes('David'))) ||
-                    voices.find(v => v.lang.includes('en'));
+                // Try to find a male English voice
+                const maleKeywords = ['Male', 'Daniel', 'David', 'Rishi', 'Fred', 'Google US English Male', 'Microsoft David'];
+
+                this.voice = voices.find(v => v.lang.includes('en') && maleKeywords.some(k => v.name.includes(k)));
+
+                if (this.voice) {
+                    this.isMaleVoice = true;
+                } else {
+                    // Fallback to any English voice
+                    this.voice = voices.find(v => v.lang.includes('en'));
+                    this.isMaleVoice = false;
+                }
+
+                console.log("Selected voice:", this.voice ? this.voice.name : "Default", "Is Male:", this.isMaleVoice);
             },
 
             playToneADSR: function (freq, duration, type = 'sine', vol = 0.2) {
@@ -1198,8 +1207,16 @@
                 const utter = new SpeechSynthesisUtterance(text);
                 utter.lang = lang;
                 if (this.voice) utter.voice = this.voice;
+
                 utter.rate = 0.7; // Slower
-                utter.pitch = 1.3; // Higher pitch for "little boy" effect
+
+                // Adjust pitch based on voice gender to simulate "child"
+                if (this.isMaleVoice) {
+                    utter.pitch = 1.4; // Male voice pitched up -> Boy
+                } else {
+                    utter.pitch = 1.1; // Female voice pitched slightly up -> Girl/Child (avoiding chipmunk)
+                }
+
                 this.synth.speak(utter);
             },
 
