@@ -713,15 +713,16 @@
 
         @media screen and (orientation: landscape) and (max-height: 800px) {
             #tv-view {
-                flex: 40;
-                /* Even smaller top section */
-                align-items: flex-end;
+                flex: 70;
+                /* Larger top section */
+                align-items: center;
+                /* Center vertically */
                 padding-bottom: 2px;
             }
 
             #controls-view {
-                flex: 60;
-                /* More space for controls */
+                flex: 30;
+                /* Smaller controls */
                 padding-bottom: 5px;
                 display: flex;
                 align-items: center;
@@ -739,17 +740,18 @@
 
             #santa-svg,
             #character-img {
-                max-height: 30vh !important;
-                /* Even smaller */
-                max-width: 180px !important;
+                max-height: 50vh !important;
+                /* More space available */
+                max-width: 200px !important;
             }
 
             #bubble {
-                width: 60px;
-                height: 60px;
-                left: 60%;
-                top: -10%;
-                /* Move up slightly */
+                width: 70px;
+                height: 70px;
+                left: 80%;
+                /* Move further right */
+                top: 10%;
+                /* Move down slightly */
                 padding: 5px;
             }
 
