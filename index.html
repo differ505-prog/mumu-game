@@ -140,8 +140,14 @@
             flex-direction: column;
             width: 100%;
             height: 100%;
+            height: 100dvh;
+            /* Dynamic Viewport Height */
             display: none;
-            position: relative;
+            position: fixed;
+            /* Force fixed to viewport */
+            inset: 0;
+            /* Fill screen */
+            overflow: hidden;
             z-index: 2;
         }
 
@@ -727,16 +733,25 @@
                 padding-bottom: 2px;
             }
 
+            #game-container {
+                position: fixed;
+                inset: 0;
+                width: 100%;
+                height: 100dvh;
+                overflow: hidden;
+            }
+
             #controls-view {
                 flex: 30;
                 /* Smaller controls */
-                padding-bottom: max(2px, env(safe-area-inset-bottom));
+                padding-bottom: max(5px, env(safe-area-inset-bottom));
                 /* Safe area aware */
                 display: flex;
                 align-items: center;
                 /* Center vertically */
                 overflow: hidden;
                 /* Prevent scroll */
+                min-height: 0;
             }
 
             .controls-grid {
@@ -752,11 +767,14 @@
 
             #santa-svg,
             #character-img {
+                display: block;
+                margin: 0 auto;
                 max-height: 50vh !important;
                 /* More space available */
                 max-width: 200px !important;
                 animation: santa-breathe 3s ease-in-out infinite !important;
                 /* Force animation */
+                transform-origin: center bottom;
             }
 
             #bubble {
