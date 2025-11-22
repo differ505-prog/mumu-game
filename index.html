@@ -70,8 +70,12 @@
             right: 10%;
             width: 100px;
             height: 100px;
-            background: radial-gradient(circle at 30% 30%, #fff, #fdfcdc 50%, transparent 80%);
-            filter: drop-shadow(0 0 20px #fff);
+            border-radius: 50%;
+            /* Fix square look */
+            background: radial-gradient(circle at 30% 30%, #fff, #fdfcdc 50%, transparent 70%);
+            /* Tweak gradient */
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.6);
+            /* Use box-shadow instead of drop-shadow for better performance/rendering */
             opacity: 0.8;
             z-index: 0;
         }
