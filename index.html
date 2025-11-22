@@ -630,6 +630,66 @@
             aspect-ratio: 1;
         }
 
+        @media screen and (orientation: landscape) and (max-height: 600px) {
+            #tv-view {
+                flex: 55;
+            }
+
+            #controls-view {
+                flex: 45;
+            }
+
+            #santa-svg,
+            #character-img {
+                max-height: 35vh !important;
+                /* Force smaller height */
+                max-width: 200px !important;
+            }
+
+            #bubble {
+                width: 70px;
+                height: 70px;
+                left: 65%;
+                /* Closer to Santa */
+                top: 0%;
+                padding: 5px;
+            }
+
+            .prompt-content {
+                font-size: 2rem;
+            }
+
+            #status-text {
+                font-size: 1.2rem;
+                top: 10px;
+                left: 15px;
+            }
+
+            #combo-display {
+                font-size: 1rem;
+                top: 40px;
+                left: 15px;
+            }
+
+            #mode-indicator {
+                font-size: 0.8rem;
+                padding: 5px 10px;
+                bottom: 10px;
+                left: 15px;
+            }
+
+            #scoreboard-container {
+                transform: scale(0.7);
+                transform-origin: top right;
+                top: 10px;
+                right: 15px;
+            }
+
+            #santa-container {
+                transform: translateY(5px);
+            }
+        }
+
         @media screen and (orientation: portrait) {
             #orientation-overlay {
                 display: flex !important;
