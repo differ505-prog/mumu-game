@@ -718,6 +718,28 @@
                 display: none !important;
             }
         }
+
+        /* Debug Controls */
+        #debug-controls {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+            opacity: 0.7;
+        }
+
+        .debug-btn {
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: 1px solid white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -726,6 +748,11 @@
     <div id="sky-bg"></div>
     <div id="moon"></div>
     <div id="aurora"></div>
+
+    <div id="debug-controls">
+        <div class="debug-btn">v2.1</div>
+        <button class="debug-btn" onclick="forceReload()">🔄 Fix/Reload</button>
+    </div>
 
     <div id="orientation-overlay">
         <div class="overlay-icon">📱➡️</div>
@@ -1885,6 +1912,16 @@
 
         init();
 
+        // Force Reload for PWA updates
+        async function forceReload() {
+            if ('serviceWorker' in navigator) {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                for (const registration of registrations) {
+                    await registration.unregister();
+                }
+            }
+            window.location.reload(true);
+        }
     </script>
 </body>
 
