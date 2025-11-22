@@ -152,10 +152,11 @@
         #scoreboard-container {
             position: absolute;
             top: 20px;
-            right: 30px;
+            left: 20px;
+            right: auto;
             display: flex;
             flex-direction: column;
-            align-items: flex-end;
+            align-items: flex-start;
             z-index: 10;
         }
 
@@ -175,10 +176,15 @@
         #status-text {
             position: absolute;
             top: 20px;
-            left: 30px;
+            left: 50%;
+            transform: translateX(-50%);
             font-size: 2rem;
             color: #fff;
+            text-align: center;
+            width: 100%;
+            pointer-events: none;
             text-shadow: 0 3px 6px rgba(0, 0, 0, 0.5);
+            z-index: 10;
             opacity: 0;
             transition: opacity 0.3s;
             letter-spacing: 1px;
@@ -746,18 +752,21 @@
             #status-text {
                 font-size: 1rem;
                 top: 5px;
-                left: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 100%;
+                text-align: center;
             }
 
             #combo-display {
                 font-size: 0.9rem;
-                top: 25px;
+                top: 50px;
                 left: 10px;
             }
 
             #combo-step-indicator {
-                top: 50px;
-                /* Move up */
+                top: 25px;
+                /* High up */
                 font-size: 0.9rem;
                 width: 100%;
                 text-align: center;
@@ -778,9 +787,11 @@
 
             #scoreboard-container {
                 transform: scale(0.6);
-                transform-origin: top right;
+                transform-origin: top left;
                 top: 5px;
-                right: 10px;
+                left: 10px;
+                right: auto;
+                align-items: flex-start;
             }
 
             .controls-grid.grid-6 {
