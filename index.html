@@ -151,8 +151,8 @@
         /* Scoreboard */
         #scoreboard-container {
             position: absolute;
-            top: 20px;
-            left: 20px;
+            top: 10px;
+            left: 10px;
             right: auto;
             display: flex;
             flex-direction: column;
@@ -161,21 +161,25 @@
         }
 
         #level-display {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
+            /* Slightly smaller */
             color: #f1c40f;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
             text-shadow: 0 3px 6px rgba(0, 0, 0, 0.5);
             letter-spacing: 1px;
         }
 
         #scoreboard {
-            font-size: 2.5rem;
+            font-size: 2rem;
+            /* Smaller for numbers */
             text-shadow: 0 3px 6px rgba(0, 0, 0, 0.5);
+            color: white;
         }
 
         #status-text {
             position: absolute;
-            top: 20px;
+            top: 80px;
+            /* Moved down to avoid overlap */
             left: 50%;
             transform: translateX(-50%);
             font-size: 2rem;
@@ -750,8 +754,9 @@
             }
 
             #status-text {
-                font-size: 1rem;
-                top: 5px;
+                font-size: 1.2rem;
+                top: 80px;
+                /* Moved down */
                 left: 50%;
                 transform: translateX(-50%);
                 width: 100%;
@@ -760,13 +765,14 @@
 
             #combo-display {
                 font-size: 0.9rem;
-                top: 50px;
+                top: 90px;
+                /* Moved down */
                 left: 10px;
             }
 
             #combo-step-indicator {
-                top: 25px;
-                /* High up */
+                top: 110px;
+                /* Moved down */
                 font-size: 0.9rem;
                 width: 100%;
                 text-align: center;
@@ -2173,11 +2179,8 @@
 
         function updateScoreboard() {
             ui.levelDisplay.textContent = "Level " + state.level;
-            let stars = '';
-            for (let i = 0; i < state.maxScore; i++) {
-                stars += i < state.score ? '⭐' : '☆';
-            }
-            ui.scoreboard.textContent = stars;
+            // Change to numeric score
+            ui.scoreboard.textContent = `${state.score} / ${state.maxScore}`;
         }
 
         function createFirework(x, y) {
