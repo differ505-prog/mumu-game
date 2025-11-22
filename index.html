@@ -1141,20 +1141,12 @@
 
             setVoice: function () {
                 const voices = this.synth.getVoices();
-                // Try to find a male English voice
-                const maleKeywords = ['Male', 'Daniel', 'David', 'Rishi', 'Fred', 'Google US English Male', 'Microsoft David'];
+                // Prefer a female/default English voice
+                // "Google US English" is often female. "Samantha" is female.
+                this.voice = voices.find(v => v.lang.includes('en') && (v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Google US English'))) ||
+                    voices.find(v => v.lang.includes('en'));
 
-                this.voice = voices.find(v => v.lang.includes('en') && maleKeywords.some(k => v.name.includes(k)));
-
-                if (this.voice) {
-                    this.isMaleVoice = true;
-                } else {
-                    // Fallback to any English voice
-                    this.voice = voices.find(v => v.lang.includes('en'));
-                    this.isMaleVoice = false;
-                }
-
-                console.log("Selected voice:", this.voice ? this.voice.name : "Default", "Is Male:", this.isMaleVoice);
+                console.log("Selected voice:", this.voice ? this.voice.name : "Default");
             },
 
             playToneADSR: function (freq, duration, type = 'sine', vol = 0.2) {
@@ -1209,13 +1201,7 @@
                 if (this.voice) utter.voice = this.voice;
 
                 utter.rate = 0.7; // Slower
-
-                // Adjust pitch based on voice gender to simulate "child"
-                if (this.isMaleVoice) {
-                    utter.pitch = 1.4; // Male voice pitched up -> Boy
-                } else {
-                    utter.pitch = 1.1; // Female voice pitched slightly up -> Girl/Child (avoiding chipmunk)
-                }
+                utter.pitch = 1.1; // Slightly higher but natural female pitch
 
                 this.synth.speak(utter);
             },
@@ -2014,10 +2000,33 @@
             state.score++;
             updateScoreboard();
 
-            if (state.score >= state.maxScore) {
-                setTimeout(handleLevelUp, 1000);
-            } else {
-                setTimeout(startRound, 1500);
+            state.score++;
+            updateScoreboard();
+
+            // Manual Progression for ALL situations (win round or level up)
+            setTimeout(() => {
+                const btn = document.getElementById('next-level-btn');
+                if (btn) {
+                    btn.style.display = 'block';
+                    audioSys.speak("Next Level!");
+                }
+
+                if (state.score >= state.maxScore) {
+                    // Optional: Play special level up effect, but still wait for user to click next
+                    handleLevelUpEffectOnly();
+                }
+            }, 1500);
+        }
+
+        function handleLevelUpEffectOnly() {
+            audioSys.playWin();
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    createFirework(
+                        Math.random() * window.innerWidth,
+                        Math.random() * (window.innerHeight * 0.6)
+                    );
+                }, i * 200);
             }
         }
 
