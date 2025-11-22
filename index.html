@@ -746,26 +746,70 @@
             }
         }
 
-        /* Debug Controls */
-        #debug-controls {
+        /* Replay Button */
+        #replay-btn {
             position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
+            top: 20px;
+            left: 20px;
+            /* Moved from status text position */
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            font-size: 1.5rem;
             display: flex;
-            gap: 10px;
-            opacity: 0.7;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 20;
+            backdrop-filter: blur(5px);
+            transition: transform 0.2s, background 0.2s;
         }
 
-        .debug-btn {
-            background: rgba(0, 0, 0, 0.5);
+        #replay-btn:active {
+            transform: scale(0.9);
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Turn Signal (Green Light) */
+        #turn-signal {
+            position: absolute;
+            top: 20px;
+            right: 50%;
+            transform: translateX(50%);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #333;
+            border: 4px solid #555;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            z-index: 20;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        #turn-signal.active {
+            background: #2ecc71;
+            /* Green */
+            border-color: #27ae60;
+            box-shadow: 0 0 30px #2ecc71, inset 0 0 20px rgba(255, 255, 255, 0.5);
+            transform: translateX(50%) scale(1.1);
+        }
+
+        #turn-signal::after {
+            content: 'GO';
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: rgba(0, 0, 0, 0.5);
+        }
+
+        #turn-signal.active::after {
             color: white;
-            border: 1px solid white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 0.8rem;
-            cursor: pointer;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
         }
     </style>
 </head>
@@ -869,7 +913,11 @@
     <div id="game-container">
         <div id="tv-view">
             <div id="snow-container"></div>
-            <div id="status-text">Listen...</div>
+
+            <button id="replay-btn" onclick="replaySequence()">🔄</button>
+            <div id="turn-signal"></div>
+
+            <div id="status-text" style="left: 80px;">Listen...</div> <!-- Shifted right -->
             <div id="combo-display">🔥 Combo: 0</div>
             <div id="combo-step-indicator">Step 1/3: Choose number</div>
             <div id="mode-indicator">🎨 Colors</div>
@@ -1584,7 +1632,8 @@
                 if (state.currentMode === 'combo') {
                     if (i >= state.comboSequence.length) {
                         state.isInputLocked = false;
-                        setStatus("👆 輪到你了！ Your Turn!");
+                        setStatus("Your Turn!");
+                        toggleTurnSignal(true); // Green light on
                         ui.bubble.classList.remove('show');
                         updateComboControls(0);  // Show numbers for first selection
                         return;
@@ -1602,7 +1651,8 @@
                 } else {
                     if (i >= state.sequence.length) {
                         state.isInputLocked = false;
-                        setStatus("👆 輪到你了！ Your Turn!");
+                        setStatus("Your Turn!");
+                        toggleTurnSignal(true); // Green light on
                         ui.bubble.classList.remove('show');
                         return;
                     }
@@ -1622,6 +1672,23 @@
             }
 
             setTimeout(showNext, 1000);
+        }
+
+        function replaySequence() {
+            if (state.isPlaying && !state.isInputLocked) {
+                // Only allow replay if it's player's turn (input unlocked)
+                // Lock input, turn off green light, and play again
+                toggleTurnSignal(false);
+                playSequence();
+            }
+        }
+
+        function toggleTurnSignal(active) {
+            const signal = document.getElementById('turn-signal');
+            if (signal) {
+                if (active) signal.classList.add('active');
+                else signal.classList.remove('active');
+            }
         }
 
         function showPrompt(item) {
@@ -1939,16 +2006,6 @@
 
         init();
 
-        // Force Reload for PWA updates
-        async function forceReload() {
-            if ('serviceWorker' in navigator) {
-                const registrations = await navigator.serviceWorker.getRegistrations();
-                for (const registration of registrations) {
-                    await registration.unregister();
-                }
-            }
-            window.location.reload(true);
-        }
     </script>
 </body>
 
