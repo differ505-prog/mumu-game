@@ -632,14 +632,22 @@
 
         @media screen and (orientation: landscape) and (max-height: 800px) {
             #tv-view {
-                flex: 50;
+                flex: 45;
+                /* Reduce height to give more space to controls */
                 align-items: flex-end;
-                /* Align content to bottom of TV view */
-                padding-bottom: 10px;
+                padding-bottom: 5px;
             }
 
             #controls-view {
-                flex: 50;
+                flex: 55;
+                /* Increase height */
+                padding-bottom: 10px;
+                /* Ensure bottom padding */
+            }
+
+            .controls-grid {
+                padding: 5px 20px;
+                /* Reduce vertical padding */
             }
 
             #santa-svg,
@@ -744,73 +752,86 @@
             #mode-select-overlay {
                 display: none !important;
             }
-        }
 
-        /* Replay Button */
-        #replay-btn {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            /* Moved from status text position */
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            border: 2px solid white;
-            color: white;
-            font-size: 1.5rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            z-index: 20;
-            backdrop-filter: blur(5px);
-            transition: transform 0.2s, background 0.2s;
-        }
+            /* Replay Button */
+            #replay-btn {
+                position: absolute;
+                top: 15px;
+                left: 15px;
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                background: #f39c12;
+                /* Orange cartoonish color */
+                border: 3px solid #fff;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+                color: white;
+                font-size: 2rem;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+                z-index: 30;
+                transition: transform 0.2s;
+            }
 
-        #replay-btn:active {
-            transform: scale(0.9);
-            background: rgba(255, 255, 255, 0.4);
-        }
+            #replay-btn:active {
+                transform: scale(0.9);
+            }
 
-        /* Turn Signal (Green Light) */
-        #turn-signal {
-            position: absolute;
-            top: 20px;
-            right: 50%;
-            transform: translateX(50%);
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: #333;
-            border: 4px solid #555;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-            z-index: 20;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.3s;
-        }
+            /* Turn Signal (Green Light) */
+            #turn-signal {
+                position: absolute;
+                top: 15px;
+                left: 90px;
+                /* Next to replay button */
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                background: #333;
+                border: 4px solid #555;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+                z-index: 20;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                transition: all 0.3s;
+                opacity: 0.5;
+                /* Dim when off */
+            }
 
-        #turn-signal.active {
-            background: #2ecc71;
-            /* Green */
-            border-color: #27ae60;
-            box-shadow: 0 0 30px #2ecc71, inset 0 0 20px rgba(255, 255, 255, 0.5);
-            transform: translateX(50%) scale(1.1);
-        }
+            #turn-signal.active {
+                background: #2ecc71;
+                /* Green */
+                border-color: #27ae60;
+                box-shadow: 0 0 30px #2ecc71, inset 0 0 20px rgba(255, 255, 255, 0.5);
+                transform: scale(1.1);
+                opacity: 1;
+            }
 
-        #turn-signal::after {
-            content: 'GO';
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: rgba(0, 0, 0, 0.5);
-        }
+            #turn-signal::after {
+                content: 'GO';
+                font-size: 1.2rem;
+                font-weight: bold;
+                color: rgba(255, 255, 255, 0.3);
+            }
 
-        #turn-signal.active::after {
-            color: white;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
-        }
+            #turn-signal.active::after {
+                color: white;
+                text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+            }
+
+            #scoreboard-container {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                text-align: right;
+                background: transparent;
+                /* Remove background */
+                padding: 10px;
+                border-radius: 15px;
+                /* backdrop-filter: blur(5px); Removed to fix "weird box" look */
+            }
     </style>
 </head>
 
@@ -914,7 +935,7 @@
         <div id="tv-view">
             <div id="snow-container"></div>
 
-            <button id="replay-btn" onclick="replaySequence()">🔄</button>
+            <button id="replay-btn" onclick="replaySequence()">🔊</button>
             <div id="turn-signal"></div>
 
             <div id="status-text" style="left: 80px;">Listen...</div> <!-- Shifted right -->
@@ -1125,8 +1146,10 @@
             },
 
             playCorrect: function () {
-                this.playToneADSR(523.25, 0.15, 'sine', 0.25);
-                setTimeout(() => this.playToneADSR(659.25, 0.25, 'sine', 0.25), 100);
+                // Ding-Dong sound
+                const now = this.ctx.currentTime;
+                this.playToneADSR(659.25, 0.1, 'sine', 0.3); // E5
+                setTimeout(() => this.playToneADSR(830.61, 0.4, 'sine', 0.3), 100); // G#5
             },
 
             playWrong: function () {
@@ -1147,10 +1170,15 @@
             },
 
             playWin: function () {
-                [523, 659, 783, 1046].forEach((f, i) => {
-                    setTimeout(() => this.playToneADSR(f, 0.5, 'square', 0.2), i * 150);
+                // Victory Fanfare!
+                const notes = [523.25, 659.25, 783.99, 1046.50, 783.99, 1046.50]; // C E G C G C
+                const times = [0, 150, 300, 450, 600, 800];
+                const durations = [0.15, 0.15, 0.15, 0.15, 0.2, 0.6];
+
+                notes.forEach((f, i) => {
+                    setTimeout(() => this.playToneADSR(f, durations[i], 'square', 0.2), times[i]);
                 });
-                setTimeout(() => this.speak("Amazing!"), 600);
+                setTimeout(() => this.speak("Amazing!"), 1000);
             }
         };
 
@@ -1761,14 +1789,17 @@
             // Store selection based on step
             if (state.comboStep === 0) {
                 state.currentComboSelection.number = obj;
+                audioSys.speak(obj.value.toString()); // Speak number
                 state.comboStep = 1;
                 updateComboControls(1);  // Show colors
             } else if (state.comboStep === 1) {
                 state.currentComboSelection.color = obj;
+                audioSys.speak(obj.name); // Speak color
                 state.comboStep = 2;
                 updateComboControls(2);  // Show animals
             } else if (state.comboStep === 2) {
                 state.currentComboSelection.animal = obj;
+                audioSys.speak(obj.name); // Speak animal
 
                 // Now validate the whole combo
                 const expectedCombo = state.comboSequence[state.playerInputIndex];
@@ -1837,7 +1868,10 @@
         function handleRoundWin(lastItem) {
             state.isInputLocked = true;
             setStatus("✅ 棒！ Good Job!");
-            audioSys.playCorrect();
+
+            // Exciting Reward Sound!
+            audioSys.playWin();
+
             santaAnim.nod();
             achievements.addStar();
 
