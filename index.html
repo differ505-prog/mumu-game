@@ -644,7 +644,7 @@
         }
 
         .control-btn.animal-btn {
-            font-size: 4.5rem;
+            font-size: 6rem;
             /* Larger for animals */
         }
 
@@ -1087,7 +1087,16 @@
                     { name: 'rabbit', emoji: '🐰', plural: 'rabbits' },
                     { name: 'panda', emoji: '🐼', plural: 'pandas' },
                     { name: 'frog', emoji: '🐸', plural: 'frogs' },
-                    { name: 'elephant', emoji: '🐘', plural: 'elephants' }
+                    { name: 'elephant', emoji: '🐘', plural: 'elephants' },
+                    { name: 'lion', emoji: '🦁', plural: 'lions' },
+                    { name: 'tiger', emoji: '🐯', plural: 'tigers' },
+                    { name: 'monkey', emoji: '🐵', plural: 'monkeys' },
+                    { name: 'pig', emoji: '🐷', plural: 'pigs' },
+                    { name: 'cow', emoji: '🐮', plural: 'cows' },
+                    { name: 'sheep', emoji: '🐑', plural: 'sheep' },
+                    { name: 'horse', emoji: '🐴', plural: 'horses' },
+                    { name: 'duck', emoji: '🦆', plural: 'ducks' },
+                    { name: 'chicken', emoji: '🐔', plural: 'chickens' }
                 ]
             }
         };
@@ -2000,22 +2009,20 @@
             state.score++;
             updateScoreboard();
 
-            state.score++;
-            updateScoreboard();
-
-            // Manual Progression for ALL situations (win round or level up)
-            setTimeout(() => {
-                const btn = document.getElementById('next-level-btn');
-                if (btn) {
-                    btn.style.display = 'block';
-                    audioSys.speak("Next Level!");
-                }
-
-                if (state.score >= state.maxScore) {
-                    // Optional: Play special level up effect, but still wait for user to click next
+            if (state.score >= state.maxScore) {
+                // Level Completed! Show Next Level button
+                setTimeout(() => {
+                    const btn = document.getElementById('next-level-btn');
+                    if (btn) {
+                        btn.style.display = 'block';
+                        audioSys.speak("Next Level!");
+                    }
                     handleLevelUpEffectOnly();
-                }
-            }, 1500);
+                }, 1500);
+            } else {
+                // Just next round
+                setTimeout(startRound, 2000);
+            }
         }
 
         function handleLevelUpEffectOnly() {
@@ -2028,6 +2035,19 @@
                     );
                 }, i * 200);
             }
+        }
+
+        function nextLevel() {
+            const btn = document.getElementById('next-level-btn');
+            if (btn) btn.style.display = 'none';
+
+            state.level++;
+            if (state.level > 5) state.level = 1; // Loop back
+
+            state.score = 0; // Reset score for new level
+            updateScoreboard();
+
+            startRound();
         }
 
         function handleWrong(item) {
