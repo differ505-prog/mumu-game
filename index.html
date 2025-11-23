@@ -1646,7 +1646,7 @@
             const modeConfig = GAME_MODES[mode];
             ui.modeIndicator.textContent = `${modeConfig.icon} ${modeConfig.name}`;
 
-            createControls(mode);
+            // Note: Don't call updateControls() here, it will be called after playSequence
 
             state.score = 0;
             state.level = 1;
@@ -1722,7 +1722,7 @@
                     content = `<div style="width: 60px; height: 60px; border-radius: 50%; background-color: ${colorInfo.color}; box-shadow: 0 5px 15px rgba(0,0,0,0.2);"></div>`;
                 } else if (state.currentMode === 'shape') {
                     const shapeInfo = modeConfig.display[itemName];
-                    content = createShapeSVG(shapeInfo.shape, shapeInfo.color);
+                    content = createShapeSVG(shapeInfo.shape);
                 }
 
                 btn.innerHTML = `<div class="control-content">${content}</div>`;
@@ -2047,7 +2047,7 @@
                         promptHTML = `<div class="prompt-content color-prompt" style="background-color: ${colorInfo.color};"></div>`;
                     } else if (state.currentMode === 'shape') {
                         const shapeInfo = GAME_MODES.shape.display[item];
-                        promptHTML = `<div class="prompt-content">${createShapeSVG(shapeInfo.shape, shapeInfo.color)}</div>`;
+                        promptHTML = `<div class="prompt-content">${createShapeSVG(shapeInfo.shape)}</div>`;
                     } else if (state.currentMode === 'pitch') {
                         // Pitch logic remains as is for now, as the instruction only specified color/shape fix
                         promptHTML = `<div class="prompt-content">${createPitchSVG(item)}</div>`;
