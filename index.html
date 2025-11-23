@@ -354,12 +354,15 @@
         .control-content {
             width: 100%;
             height: 100%;
-            display: flex;
+            display: flex !important;
             flex-direction: column;
-            justify-content: flex-end;
+            justify-content: center !important;
+            /* Center instead of flex-end */
             align-items: center;
             filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3));
             transition: filter 0.2s;
+            background: rgba(255, 0, 0, 0.1) !important;
+            /* Debug background */
         }
 
         /* Fishing Mode Styles */
@@ -747,9 +750,12 @@
         }
 
         .animal-emoji {
-            font-size: 5rem;
-            /* Base size */
+            font-size: 5rem !important;
+            /* Force large size */
             line-height: 1;
+            display: block !important;
+            background: rgba(0, 255, 0, 0.3) !important;
+            /* Green debug background */
         }
 
         #level-complete-container {
