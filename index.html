@@ -2389,9 +2389,13 @@
             audioSys.playWrong();
             achievements.breakCombo();
 
-            const btn = document.querySelector(`[data-item="${item}"]`);
-            btn.classList.add('shake');
-            setTimeout(() => btn.classList.remove('shake'), 500);
+            // Handle both string and object items
+            const itemName = typeof item === 'object' ? item.name : item;
+            const btn = document.querySelector(`[data-item="${itemName}"]`);
+            if (btn) {
+                btn.classList.add('shake');
+                setTimeout(() => btn.classList.remove('shake'), 500);
+            }
 
             setTimeout(() => {
                 state.playerInputIndex = 0;
