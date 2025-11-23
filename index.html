@@ -709,12 +709,16 @@
         }
 
         .controls-grid {
-            display: grid;
+            display: grid !important;
             gap: 10px;
             padding: 20px;
             width: 100%;
             max-width: 800px;
             margin: 0 auto;
+            min-height: 200px;
+            /* Ensure minimum height */
+            border: 2px solid red !important;
+            /* Debug border */
         }
 
         .controls-grid.grid-5 {
@@ -731,6 +735,10 @@
             height: auto;
             aspect-ratio: 1;
             font-size: 3rem;
+            border: 2px solid blue !important;
+            /* Debug border */
+            min-height: 80px !important;
+            /* Minimum height */
             /* Default size */
         }
 
