@@ -1586,10 +1586,22 @@
             }
         }
 
-        function init() {
+        function initGame() {
+            // Add version indicator
+            const versionDisplay = document.createElement('div');
+            versionDisplay.style.position = 'fixed';
+            versionDisplay.style.bottom = '5px';
+            versionDisplay.style.right = '5px';
+            versionDisplay.style.color = 'rgba(255,255,255,0.5)';
+            versionDisplay.style.fontSize = '12px';
+            versionDisplay.style.zIndex = '9999';
+            versionDisplay.textContent = 'v44.0';
+            document.body.appendChild(versionDisplay);
+
             createSnow();
             achievements.load();
 
+            // Initialize audio context on first interaction and show character select
             ui.startOverlay.addEventListener('click', showCharacterSelect);
 
             // Character selection
