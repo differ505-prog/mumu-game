@@ -1597,7 +1597,7 @@
             versionDisplay.style.color = 'rgba(255,255,255,0.5)';
             versionDisplay.style.fontSize = '12px';
             versionDisplay.style.zIndex = '9999';
-            versionDisplay.textContent = 'v50.0';
+            versionDisplay.textContent = 'v51.0';
             document.body.appendChild(versionDisplay);
 
             createSnow();
@@ -1693,23 +1693,26 @@
                 ui.controlsView.classList.add('water-bg');
                 grid.className = 'controls-grid grid-6';
 
-                // Add fishing rod
-                const rod = document.createElement('div');
-                rod.className = 'fishing-rod-container';
-                // Make container cover the whole view
-                rod.style.position = 'absolute';
-                rod.style.top = '0';
-                rod.style.left = '0';
-                rod.style.width = '100%';
-                rod.style.height = '100%';
-                rod.style.pointerEvents = 'none';
-                rod.style.zIndex = '1'; // Behind buttons but above bg
+                // Add fishing rod (Fixed position to ensure visibility)
+                // Remove existing rod if any (to prevent duplicates on redraw)
+                const existingRod = document.getElementById('fishing-rod-visual');
+                if (existingRod) existingRod.remove();
 
+                const rod = document.createElement('div');
+                rod.id = 'fishing-rod-visual';
+                rod.style.position = 'fixed';
+                rod.style.top = '150px'; // Lower it down
+                rod.style.right = '-40px';
+                rod.style.zIndex = '100';
+                rod.style.pointerEvents = 'none';
+                rod.style.transition = 'transform 0.3s';
                 rod.innerHTML = `
-                    <div class="fishing-rod" style="position: absolute; top: -100px; right: 20px; font-size: 120px; transform: rotate(-20deg); filter: drop-shadow(0 10px 10px rgba(0,0,0,0.3));">🎣</div>
-                    <div class="bubbles" style="position: absolute; bottom: 0; width: 100%; height: 50px;"></div>
+                    <div class="rod-emoji" style="font-size: 100px; transform: rotate(-45deg); filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));">🎣</div>
+                    <svg id="fishing-line-svg" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 99;">
+                        <line id="fishing-line" x1="0" y1="0" x2="0" y2="0" stroke="white" stroke-width="2" style="opacity: 0;" />
+                    </svg>
                 `;
-                ui.controlsView.appendChild(rod);
+                document.body.appendChild(rod); // Append to body for fixed positioning
 
                 const currentTarget = state.sequence[state.playerInputIndex];
                 if (!currentTarget) return;
@@ -1724,12 +1727,55 @@
                     btn.className = 'control-btn fish-item';
                     btn.setAttribute('data-item', item.name);
                     btn.setAttribute('data-type', 'fishing');
-                    btn.style.zIndex = '10'; // Ensure buttons are clickable
+                    btn.style.zIndex = '10';
 
                     btn.innerHTML = `<div class="control-content"><div class="animal-emoji" style="font-size: 6rem !important; line-height: 1; display: inline-block;">${item.emoji}</div></div>`;
 
-                    const handler = (e) => {
+                    const handler = async (e) => {
                         e.preventDefault();
+
+                        // Fishing animation
+                        const rodElem = document.querySelector('.rod-emoji');
+                        const lineElem = document.getElementById('fishing-line');
+                        const btnRect = btn.getBoundingClientRect();
+                        const rodRect = rodElem.getBoundingClientRect();
+
+                        // Rod tip position (approximate based on emoji rotation)
+                        const startX = rodRect.left + rodRect.width * 0.2;
+                        const startY = rodRect.top + rodRect.height * 0.2;
+                        const endX = btnRect.left + btnRect.width / 2;
+                        const endY = btnRect.top + btnRect.height / 2;
+
+                        // 1. Cast rod
+                        rodElem.style.transform = 'rotate(-60deg)';
+
+                        // 2. Show line
+                        lineElem.setAttribute('x1', startX);
+                        lineElem.setAttribute('y1', startY);
+                        lineElem.setAttribute('x2', startX); // Start from rod
+                        lineElem.setAttribute('y2', startY);
+                        lineElem.style.opacity = '1';
+
+                        // Animate line to target
+                        await new Promise(r => requestAnimationFrame(r));
+                        lineElem.style.transition = 'all 0.3s ease-out';
+                        lineElem.setAttribute('x2', endX);
+                        lineElem.setAttribute('y2', endY);
+
+                        await new Promise(r => setTimeout(r, 300));
+
+                        // 3. Catch effect
+                        btn.style.transition = 'transform 0.2s';
+                        btn.style.transform = 'translateY(-20px) scale(1.1)';
+
+                        await new Promise(r => setTimeout(r, 200));
+
+                        // 4. Reset
+                        lineElem.style.opacity = '0';
+                        rodElem.style.transform = 'rotate(-45deg)';
+                        btn.style.transform = '';
+                        lineElem.style.transition = 'none';
+
                         handleInput(item);
                     };
                     btn.addEventListener('touchstart', handler);
@@ -1740,6 +1786,10 @@
             }
 
             // Handle Color/Shape Modes
+            // Remove fishing rod if switching modes
+            const existingRod = document.getElementById('fishing-rod-visual');
+            if (existingRod) existingRod.remove();
+
             const modeConfig = GAME_MODES[state.currentMode];
             if (!modeConfig || !modeConfig.items) return;
 

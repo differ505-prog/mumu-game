@@ -1,4 +1,4 @@
-const CACHE_NAME = 'santa-helper-v50';
+const CACHE_NAME = 'santa-helper-v51';
 const urlsToCache = [
   './',
   './index.html',
