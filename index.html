@@ -2020,15 +2020,23 @@
         }
 
         function playSequence() {
+            console.log('=== playSequence called ===');
+            console.log('Current mode:', state.currentMode);
+            console.log('Sequence:', state.sequence);
+            console.log('Sequence length:', state.sequence.length);
+
             state.isInputLocked = true;
             setStatus("Listen...");
 
             let i = 0;
 
             function showNext() {
+                console.log(`showNext called, i=${i}`);
+
                 if (state.currentMode === 'combo') {
                     // ... (combo logic)
                     if (i >= state.comboSequence.length) {
+                        console.log('Combo sequence finished');
                         state.isInputLocked = false;
                         setStatus("Your Turn!");
                         toggleTurnSignal(true); // Green light on
@@ -2049,18 +2057,23 @@
                 }
 
                 if (i >= state.sequence.length) {
+                    console.log('=== Sequence playback finished ===');
+                    console.log('About to call updateControls()');
                     state.isInputLocked = false;
                     setStatus("Your Turn!");
                     toggleTurnSignal(true); // Green light on
                     ui.bubble.classList.remove('show');
                     updateControls(); // Show the control buttons!
+                    console.log('updateControls() called');
                     return;
                 }
 
                 const item = state.sequence[i];
+                console.log('Current item:', item);
 
                 // Show prompt based on mode
                 if (state.currentMode === 'fishing') {
+                    console.log('Showing fishing prompt');
                     ui.bubbleContent.innerHTML = '<div style="font-size: 3rem;">👂</div>'; // Ear icon for listening
                     ui.bubble.classList.add('show');
                     audioSys.speak(item.name);
