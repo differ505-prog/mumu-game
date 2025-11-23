@@ -732,6 +732,8 @@
             height: auto;
             aspect-ratio: 1;
             font-size: 3rem;
+            min-height: 100px;
+            /* Ensure minimum size */
         }
 
         .control-btn.animal-btn {
@@ -740,8 +742,10 @@
 
         .animal-emoji {
             font-size: 5rem !important;
-            /* Force large size */
             line-height: 1;
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
 
         #level-complete-container {
