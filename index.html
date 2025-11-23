@@ -2039,23 +2039,26 @@
                     ui.bubble.classList.add('show');
                     audioSys.speak(item.name);
                 } else {
-                    // Color/Shape/Pitch logic
+                    // Color/Shape logic - item is a string (item name)
                     let promptHTML = '';
                     if (state.currentMode === 'color') {
-                        promptHTML = `<div class="prompt-content color-prompt" style="background-color: ${item.color};"></div>`;
+                        const colorInfo = GAME_MODES.color.display[item];
+                        promptHTML = `<div class="prompt-content color-prompt" style="background-color: ${colorInfo.color};"></div>`;
                     } else if (state.currentMode === 'shape') {
-                        promptHTML = `<div class="prompt-content">${createShapeSVG(item.name, item.color)}</div>`;
+                        const shapeInfo = GAME_MODES.shape.display[item];
+                        promptHTML = `<div class="prompt-content">${createShapeSVG(shapeInfo.shape, shapeInfo.color)}</div>`;
                     } else if (state.currentMode === 'pitch') {
-                        promptHTML = `<div class="prompt-content">${createPitchSVG(item.name)}</div>`;
+                        // Pitch logic remains as is for now, as the instruction only specified color/shape fix
+                        promptHTML = `<div class="prompt-content">${createPitchSVG(item)}</div>`;
                     }
                     ui.bubbleContent.innerHTML = promptHTML;
                     ui.bubble.classList.add('show');
 
-                    // Play sound
+                    // Play sound - item is the name (string)
                     if (state.currentMode === 'color' || state.currentMode === 'shape') {
-                        audioSys.speak(item.name);
+                        audioSys.speak(item);
                     } else if (state.currentMode === 'pitch') {
-                        audioSys.playItem(item.name); // Play pitch tone
+                        audioSys.playItem(item); // Play pitch tone
                     }
                 }
 
