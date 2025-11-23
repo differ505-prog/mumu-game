@@ -791,10 +791,7 @@
         }
 
         @media screen and (orientation: landscape) and (max-height: 800px) {
-            .animal-emoji {
-                font-size: 4rem;
-                /* Smaller on landscape mobile */
-            }
+            /* Removed animal-emoji font-size reduction - keep it at 5rem */
 
             #level-complete-container {
                 flex-direction: row;
@@ -2270,14 +2267,25 @@
         function handleInput(item) {
             if (state.isInputLocked) return;
 
-            const btn = document.querySelector(`[data-item="${item}"]`);
-            btn.classList.add('pop');
-            setTimeout(() => btn.classList.remove('pop'), 200);
+            // Handle both string and object items
+            const itemName = typeof item === 'object' ? item.name : item;
+            console.log('handleInput called with:', item, 'itemName:', itemName);
+
+            const btn = document.querySelector(`[data-item="${itemName}"]`);
+            if (btn) {
+                btn.classList.add('pop');
+                setTimeout(() => btn.classList.remove('pop'), 200);
+            } else {
+                console.error('Button not found for item:', itemName);
+            }
 
             const expectedItem = state.sequence[state.playerInputIndex];
+            const expectedName = typeof expectedItem === 'object' ? expectedItem.name : expectedItem;
 
-            if (item === expectedItem) {
-                audioSys.playItem(item);
+            console.log('Expected:', expectedName, 'Got:', itemName);
+
+            if (itemName === expectedName) {
+                audioSys.playItem(itemName);
                 state.playerInputIndex++;
 
                 if (state.playerInputIndex >= state.sequence.length) {
