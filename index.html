@@ -1597,7 +1597,7 @@
             versionDisplay.style.color = 'rgba(255,255,255,0.5)';
             versionDisplay.style.fontSize = '12px';
             versionDisplay.style.zIndex = '9999';
-            versionDisplay.textContent = 'v49.0';
+            versionDisplay.textContent = 'v50.0';
             document.body.appendChild(versionDisplay);
 
             createSnow();
@@ -1706,7 +1706,7 @@
                 rod.style.zIndex = '1'; // Behind buttons but above bg
 
                 rod.innerHTML = `
-                    <div class="fishing-rod" style="position: absolute; top: -60px; right: 10px; font-size: 80px; transform: rotate(-15deg);">🎣</div>
+                    <div class="fishing-rod" style="position: absolute; top: -100px; right: 20px; font-size: 120px; transform: rotate(-20deg); filter: drop-shadow(0 10px 10px rgba(0,0,0,0.3));">🎣</div>
                     <div class="bubbles" style="position: absolute; bottom: 0; width: 100%; height: 50px;"></div>
                 `;
                 ui.controlsView.appendChild(rod);
@@ -1753,7 +1753,7 @@
                 if (state.currentMode === 'color') {
                     const colorInfo = modeConfig.display[itemName];
                     // Use fixed pixel size to ensure visibility
-                    content = `<div style="width: 80px; height: 80px; border-radius: 50%; background-color: ${colorInfo.color}; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 4px solid white;"></div>`;
+                    content = `<div style="width: 100px; height: 100px; border-radius: 50%; background-color: ${colorInfo.color}; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 4px solid white;"></div>`;
                 } else if (state.currentMode === 'shape') {
                     const shapeInfo = modeConfig.display[itemName];
                     content = createShapeSVG(shapeInfo.shape);
