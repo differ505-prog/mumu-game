@@ -1715,7 +1715,8 @@
                     btn.className = 'control-btn fish-item'; // Add fish animation
                     btn.setAttribute('data-item', item.name); // Add data-item for consistency
                     btn.setAttribute('data-type', 'fishing'); // Add data-type for consistency
-                    btn.innerHTML = `<div class="control-content"><div class="animal-emoji">${item.emoji}</div></div>`;
+                    // Brute force font-size to ensure it works
+                    btn.innerHTML = `<div class="control-content"><div class="animal-emoji" style="font-size: 8rem !important; line-height: 1; display: inline-block;">${item.emoji}</div></div>`;
 
                     const handler = (e) => {
                         e.preventDefault();
