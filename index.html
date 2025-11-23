@@ -1759,8 +1759,13 @@
 
         // Combo mode button creation functions
         function updateComboControls(step) {
-            const grid = ui.controlsView.querySelector('.controls-grid');
-            if (!grid) return;
+            let grid = ui.controlsView.querySelector('.controls-grid');
+            if (!grid) {
+                // Create grid if it doesn't exist
+                grid = document.createElement('div');
+                grid.className = 'controls-grid';
+                ui.controlsView.appendChild(grid);
+            }
 
             grid.innerHTML = '';
             const comboConfig = GAME_MODES.combo;
