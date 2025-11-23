@@ -1595,7 +1595,7 @@
             versionDisplay.style.color = 'rgba(255,255,255,0.5)';
             versionDisplay.style.fontSize = '12px';
             versionDisplay.style.zIndex = '9999';
-            versionDisplay.textContent = 'v46.0';
+            versionDisplay.textContent = 'v47.0';
             document.body.appendChild(versionDisplay);
 
             // Add On-Screen Debug Console
@@ -1724,40 +1724,33 @@
             setTimeout(startRound, 1000);
         }
 
-        function updateControls() { // Renamed from createControls, now takes no arguments
-            console.log('updateControls called. Mode:', state.currentMode);
+        function updateControls() {
+            console.log('[v47] updateControls START. Mode:', state.currentMode);
+
+            // Step 1: Clear view
             ui.controlsView.innerHTML = '';
-
-            // Ensure controls-grid exists for modes that use it, or create it if not
-            let grid = ui.controlsView.querySelector('.controls-grid');
-            if (!grid) {
-                grid = document.createElement('div');
-                grid.className = 'controls-grid';
-                ui.controlsView.appendChild(grid);
-            } else {
-                grid.className = 'controls-grid'; // Reset class for grid
-            }
-            grid.innerHTML = ''; // Clear grid content
-
-            // Reset water background for all modes initially
             ui.controlsView.classList.remove('water-bg');
 
+            // Step 2: Create grid
+            let grid = document.createElement('div');
+            grid.className = 'controls-grid';
+            ui.controlsView.appendChild(grid);
+            console.log('[v47] Grid created');
+
+            // Step 3: Handle Combo Mode
             if (state.currentMode === 'combo') {
+                console.log('[v47] Handling Combo Mode');
                 updateComboControls(state.comboStep);
                 return;
             }
 
+            // Step 4: Handle Fishing Mode
             if (state.currentMode === 'fishing') {
-                console.log('Fishing mode activated in updateControls');
-                console.log('Grid exists:', grid);
-                console.log('Grid class:', grid.className);
-                console.log('Player input index:', state.playerInputIndex);
-                console.log('Sequence:', state.sequence);
-
+                console.log('[v47] Handling Fishing Mode');
                 ui.controlsView.classList.add('water-bg');
-                grid.className = 'controls-grid grid-6'; // Use grid-6 for fishing
+                grid.className = 'controls-grid grid-6';
 
-                // Add fishing rod visual
+                // Add fishing rod
                 const rod = document.createElement('div');
                 rod.className = 'fishing-rod-container';
                 rod.innerHTML = `
@@ -1765,33 +1758,27 @@
                     <div class="bubbles" style="position: absolute; bottom: 0; width: 100%; height: 50px; pointer-events: none;"></div>
                 `;
                 ui.controlsView.appendChild(rod);
-                console.log('Fishing rod added');
+                console.log('[v47] Fishing rod added');
 
                 const currentTarget = state.sequence[state.playerInputIndex];
                 if (!currentTarget) {
-                    console.error('No current target found!');
+                    console.error('[v47] Error: No current target');
                     return;
                 }
-                console.log('Current target:', currentTarget);
 
                 const allItems = GAME_MODES.fishing.items;
-
-                // Filter out correct item to pick distractors
                 const distractors = allItems.filter(item => item.name !== currentTarget.name);
-                // Shuffle and pick 5 distractors
                 const selectedDistractors = distractors.sort(() => 0.5 - Math.random()).slice(0, 5);
-                // Combine and shuffle
                 const displayItems = [currentTarget, ...selectedDistractors].sort(() => 0.5 - Math.random());
 
-                console.log('Display items:', displayItems);
-                console.log('Creating buttons...');
+                console.log('[v47] Creating fishing buttons:', displayItems.length);
 
                 displayItems.forEach((item, index) => {
                     const btn = document.createElement('button');
-                    btn.className = 'control-btn fish-item'; // Add fish animation
-                    btn.setAttribute('data-item', item.name); // Add data-item for consistency
-                    btn.setAttribute('data-type', 'fishing'); // Add data-type for consistency
-                    // Brute force font-size to ensure it works
+                    btn.className = 'control-btn fish-item';
+                    btn.setAttribute('data-item', item.name);
+                    btn.setAttribute('data-type', 'fishing');
+                    // Inline style to force size
                     btn.innerHTML = `<div class="control-content"><div class="animal-emoji" style="font-size: 8rem !important; line-height: 1; display: inline-block;">${item.emoji}</div></div>`;
 
                     const handler = (e) => {
@@ -1800,29 +1787,31 @@
                     };
                     btn.addEventListener('touchstart', handler);
                     btn.addEventListener('click', handler);
-                    grid.appendChild(btn); // CRITICAL: Add button to grid!
-                    console.log(`Button ${index + 1} added:`, item.name);
+                    grid.appendChild(btn);
                 });
-
-                console.log('Grid children count:', grid.children.length);
-                console.log('Grid innerHTML length:', grid.innerHTML.length);
                 return;
             }
 
-            // Handle color and shape modes
+            // Step 5: Handle Color/Shape Modes
+            console.log('[v47] Handling Standard Mode:', state.currentMode);
             const modeConfig = GAME_MODES[state.currentMode];
-            if (!modeConfig || !modeConfig.items) return;
+
+            if (!modeConfig || !modeConfig.items) {
+                console.error('[v47] Error: Invalid mode config', modeConfig);
+                return;
+            }
+
+            console.log('[v47] Creating standard buttons:', modeConfig.items.length);
 
             modeConfig.items.forEach(itemName => {
                 const btn = document.createElement('button');
                 btn.className = 'control-btn';
-                btn.setAttribute('data-item', itemName); // Fix: Add data-item
-                btn.setAttribute('data-type', state.currentMode); // Fix: Add data-type
+                btn.setAttribute('data-item', itemName);
+                btn.setAttribute('data-type', state.currentMode);
 
                 let content = '';
                 if (state.currentMode === 'color') {
                     const colorInfo = modeConfig.display[itemName];
-                    // Increase size and use percentage for responsiveness
                     content = `<div style="width: 80%; height: 80%; border-radius: 50%; background-color: ${colorInfo.color}; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 4px solid white;"></div>`;
                 } else if (state.currentMode === 'shape') {
                     const shapeInfo = modeConfig.display[itemName];
@@ -1839,6 +1828,35 @@
                 btn.addEventListener('click', handler);
                 grid.appendChild(btn);
             });
+            console.log('[v47] updateControls FINISHED');
+        }
+
+        modeConfig.items.forEach(itemName => {
+            const btn = document.createElement('button');
+            btn.className = 'control-btn';
+            btn.setAttribute('data-item', itemName); // Fix: Add data-item
+            btn.setAttribute('data-type', state.currentMode); // Fix: Add data-type
+
+            let content = '';
+            if (state.currentMode === 'color') {
+                const colorInfo = modeConfig.display[itemName];
+                // Increase size and use percentage for responsiveness
+                content = `<div style="width: 80%; height: 80%; border-radius: 50%; background-color: ${colorInfo.color}; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 4px solid white;"></div>`;
+            } else if (state.currentMode === 'shape') {
+                const shapeInfo = modeConfig.display[itemName];
+                content = createShapeSVG(shapeInfo.shape);
+            }
+
+            btn.innerHTML = `<div class="control-content">${content}</div>`;
+
+            const handler = (e) => {
+                e.preventDefault();
+                handleInput(itemName);
+            };
+            btn.addEventListener('touchstart', handler);
+            btn.addEventListener('click', handler);
+            grid.appendChild(btn);
+        });
         }
 
         function createChimneySVG(color) {
