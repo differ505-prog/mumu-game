@@ -309,6 +309,8 @@
 
         /* Controls View (Bottom 40%) - Glassmorphism */
         #controls-view {
+            position: relative;
+            /* Fix for absolute positioning inside */
             flex: 40;
             display: flex;
             background: rgba(255, 255, 255, 0.1);
@@ -1595,61 +1597,8 @@
             versionDisplay.style.color = 'rgba(255,255,255,0.5)';
             versionDisplay.style.fontSize = '12px';
             versionDisplay.style.zIndex = '9999';
-            versionDisplay.textContent = 'v48.0';
+            versionDisplay.textContent = 'v49.0';
             document.body.appendChild(versionDisplay);
-
-            // Add On-Screen Debug Console
-            const debugConsole = document.createElement('div');
-            debugConsole.id = 'debug-console';
-            debugConsole.style.position = 'fixed';
-            debugConsole.style.top = '0';
-            debugConsole.style.left = '0';
-            debugConsole.style.width = '100%';
-            debugConsole.style.height = '150px';
-            debugConsole.style.backgroundColor = 'rgba(0,0,0,0.7)';
-            debugConsole.style.color = '#0f0';
-            debugConsole.style.fontSize = '10px';
-            debugConsole.style.overflowY = 'scroll';
-            debugConsole.style.zIndex = '10000';
-            debugConsole.style.pointerEvents = 'none'; // Let clicks pass through
-            debugConsole.style.display = 'none'; // Hidden by default, toggle with triple click
-            document.body.appendChild(debugConsole);
-
-            // Override console.log
-            const originalLog = console.log;
-            const originalError = console.error;
-
-            function logToScreen(msg, type = 'log') {
-                const line = document.createElement('div');
-                line.textContent = `[${type}] ${msg}`;
-                if (type === 'error') line.style.color = '#f00';
-                debugConsole.appendChild(line);
-                debugConsole.scrollTop = debugConsole.scrollHeight;
-            }
-
-            console.log = function (...args) {
-                originalLog.apply(console, args);
-                logToScreen(args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '));
-            };
-
-            console.error = function (...args) {
-                originalError.apply(console, args);
-                logToScreen(args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '), 'error');
-            };
-
-            // Toggle debug console on triple click on version display
-            let clickCount = 0;
-            versionDisplay.addEventListener('click', () => {
-                clickCount++;
-                if (clickCount === 3) {
-                    debugConsole.style.display = debugConsole.style.display === 'none' ? 'block' : 'none';
-                    clickCount = 0;
-                }
-                setTimeout(() => clickCount = 0, 1000);
-            });
-
-            // Force show debug console for now
-            debugConsole.style.display = 'block';
 
             createSnow();
             achievements.load();
@@ -1725,61 +1674,59 @@
         }
 
         function updateControls() {
-            console.log('[v47] updateControls START. Mode:', state.currentMode);
-
-            // Step 1: Clear view
             ui.controlsView.innerHTML = '';
             ui.controlsView.classList.remove('water-bg');
 
-            // Step 2: Create grid
+            // Create grid
             let grid = document.createElement('div');
             grid.className = 'controls-grid';
             ui.controlsView.appendChild(grid);
-            console.log('[v47] Grid created');
 
-            // Step 3: Handle Combo Mode
+            // Handle Combo Mode
             if (state.currentMode === 'combo') {
-                console.log('[v47] Handling Combo Mode');
                 updateComboControls(state.comboStep);
                 return;
             }
 
-            // Step 4: Handle Fishing Mode
+            // Handle Fishing Mode
             if (state.currentMode === 'fishing') {
-                console.log('[v47] Handling Fishing Mode');
                 ui.controlsView.classList.add('water-bg');
                 grid.className = 'controls-grid grid-6';
 
                 // Add fishing rod
                 const rod = document.createElement('div');
                 rod.className = 'fishing-rod-container';
+                // Make container cover the whole view
+                rod.style.position = 'absolute';
+                rod.style.top = '0';
+                rod.style.left = '0';
+                rod.style.width = '100%';
+                rod.style.height = '100%';
+                rod.style.pointerEvents = 'none';
+                rod.style.zIndex = '1'; // Behind buttons but above bg
+
                 rod.innerHTML = `
-                    <div class="fishing-rod" style="position: absolute; top: -150px; right: 20px; font-size: 100px; transform: rotate(-15deg); z-index: 10;">🎣</div>
-                    <div class="bubbles" style="position: absolute; bottom: 0; width: 100%; height: 50px; pointer-events: none;"></div>
+                    <div class="fishing-rod" style="position: absolute; top: -60px; right: 10px; font-size: 80px; transform: rotate(-15deg);">🎣</div>
+                    <div class="bubbles" style="position: absolute; bottom: 0; width: 100%; height: 50px;"></div>
                 `;
                 ui.controlsView.appendChild(rod);
-                console.log('[v47] Fishing rod added');
 
                 const currentTarget = state.sequence[state.playerInputIndex];
-                if (!currentTarget) {
-                    console.error('[v47] Error: No current target');
-                    return;
-                }
+                if (!currentTarget) return;
 
                 const allItems = GAME_MODES.fishing.items;
                 const distractors = allItems.filter(item => item.name !== currentTarget.name);
                 const selectedDistractors = distractors.sort(() => 0.5 - Math.random()).slice(0, 5);
                 const displayItems = [currentTarget, ...selectedDistractors].sort(() => 0.5 - Math.random());
 
-                console.log('[v47] Creating fishing buttons:', displayItems.length);
-
                 displayItems.forEach((item, index) => {
                     const btn = document.createElement('button');
                     btn.className = 'control-btn fish-item';
                     btn.setAttribute('data-item', item.name);
                     btn.setAttribute('data-type', 'fishing');
-                    // Inline style to force size
-                    btn.innerHTML = `<div class="control-content"><div class="animal-emoji" style="font-size: 8rem !important; line-height: 1; display: inline-block;">${item.emoji}</div></div>`;
+                    btn.style.zIndex = '10'; // Ensure buttons are clickable
+
+                    btn.innerHTML = `<div class="control-content"><div class="animal-emoji" style="font-size: 6rem !important; line-height: 1; display: inline-block;">${item.emoji}</div></div>`;
 
                     const handler = (e) => {
                         e.preventDefault();
@@ -1792,16 +1739,9 @@
                 return;
             }
 
-            // Step 5: Handle Color/Shape Modes
-            console.log('[v47] Handling Standard Mode:', state.currentMode);
+            // Handle Color/Shape Modes
             const modeConfig = GAME_MODES[state.currentMode];
-
-            if (!modeConfig || !modeConfig.items) {
-                console.error('[v47] Error: Invalid mode config', modeConfig);
-                return;
-            }
-
-            console.log('[v47] Creating standard buttons:', modeConfig.items.length);
+            if (!modeConfig || !modeConfig.items) return;
 
             modeConfig.items.forEach(itemName => {
                 const btn = document.createElement('button');
@@ -1812,7 +1752,8 @@
                 let content = '';
                 if (state.currentMode === 'color') {
                     const colorInfo = modeConfig.display[itemName];
-                    content = `<div style="width: 80%; height: 80%; border-radius: 50%; background-color: ${colorInfo.color}; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 4px solid white;"></div>`;
+                    // Use fixed pixel size to ensure visibility
+                    content = `<div style="width: 80px; height: 80px; border-radius: 50%; background-color: ${colorInfo.color}; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 4px solid white;"></div>`;
                 } else if (state.currentMode === 'shape') {
                     const shapeInfo = modeConfig.display[itemName];
                     content = createShapeSVG(shapeInfo.shape);
@@ -1828,7 +1769,6 @@
                 btn.addEventListener('click', handler);
                 grid.appendChild(btn);
             });
-            console.log('[v47] updateControls FINISHED');
         }
 
 
