@@ -362,6 +362,70 @@
             transition: filter 0.2s;
         }
 
+        /* Fishing Mode Styles */
+        .fishing-rod {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            top: 40%;
+            left: 55%;
+            z-index: 6;
+            pointer-events: none;
+            transform-origin: bottom left;
+            transform: rotate(-45deg);
+            transition: transform 0.3s;
+        }
+
+        .fishing-line {
+            position: absolute;
+            top: 40%;
+            left: 55%;
+            width: 2px;
+            height: 0;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 5;
+            transform-origin: top center;
+            pointer-events: none;
+        }
+
+        .water-bg {
+            background: linear-gradient(180deg, rgba(52, 152, 219, 0.4) 0%, rgba(41, 128, 185, 0.6) 100%) !important;
+            backdrop-filter: blur(5px);
+            border-top: 2px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 -10px 20px rgba(52, 152, 219, 0.3);
+        }
+
+        .fish-item {
+            animation: float-fish 3s ease-in-out infinite;
+        }
+
+        @keyframes float-fish {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .catch-animation {
+            animation: catch-fish 0.5s ease-out forwards;
+        }
+
+        @keyframes catch-fish {
+            0% {
+                transform: scale(1) translateY(0);
+            }
+
+            100% {
+                transform: scale(0) translateY(-200px);
+                opacity: 0;
+            }
+        }
+
         /* --- Overlays --- */
         .overlay {
             position: fixed;
@@ -1056,10 +1120,10 @@
                 <div class="mode-title">形狀配對</div>
                 <div class="mode-desc">Shapes</div>
             </div>
-            <div class="mode-option" data-mode="pitch">
-                <div class="mode-icon">🎵</div>
-                <div class="mode-title">音高配對</div>
-                <div class="mode-desc">Musical Notes</div>
+            <div class="mode-option" data-mode="fishing">
+                <div class="mode-icon">🎣</div>
+                <div class="mode-title">Fishing</div>
+                <div class="mode-desc">Fishing</div>
             </div>
             <div class="mode-option" data-mode="combo">
                 <div class="mode-icon">🎯</div>
@@ -1152,356 +1216,375 @@
                 icon: '🎵',
                 items: ['low', 'mid', 'high'],
                 display: {
-                    low: { note: '♩', color: '#e74c3c', freq: 261.63 },
-                    mid: { note: '♪', color: '#f39c12', freq: 329.63 },
-                    high: { note: '♫', color: '#3498db', freq: 392.00 }
-                }
-            },
-            combo: {
-                name: 'Combo Challenge',
-                icon: '🎯',
-                numbers: [
-                    { value: 1, name: 'one', emoji: '1️⃣', color: '#e74c3c' },
-                    { value: 2, name: 'two', emoji: '2️⃣', color: '#3498db' },
-                    { value: 3, name: 'three', emoji: '3️⃣', color: '#2ecc71' },
-                    { value: 4, name: 'four', emoji: '4️⃣', color: '#f39c12' },
-                    { value: 5, name: 'five', emoji: '5️⃣', color: '#9b59b6' }
-                ],
-                colors: [
-                    { name: 'red', color: '#c0392b', emoji: '🔴' },
-                    { name: 'green', color: '#27ae60', emoji: '🟢' },
-                    { name: 'blue', color: '#2980b9', emoji: '🔵' },
-                    { name: 'yellow', color: '#f1c40f', emoji: '🟡' },
-                    { name: 'purple', color: '#8e44ad', emoji: '🟣' },
-                    { name: 'orange', color: '#e67e22', emoji: '🟠' },
-                    { name: 'pink', color: '#e91e63', emoji: '🩷' },
-                    { name: 'brown', color: '#795548', emoji: '🟤' },
-                    { name: 'black', color: '#2c3e50', emoji: '⚫' },
-                    { name: 'white', color: '#ecf0f1', emoji: '⚪' },
-                    { name: 'gray', color: '#95a5a6', emoji: '🩶' },
-                    { name: 'cyan', color: '#1abc9c', emoji: '💠' }
-                ],
-                animals: [
-                    { name: 'crab', emoji: '🦀', plural: 'crabs' },
-                    { name: 'fish', emoji: '🐟', plural: 'fish' },
-                    { name: 'bird', emoji: '🐦', plural: 'birds' },
-                    { name: 'cat', emoji: '🐱', plural: 'cats' },
-                    { name: 'dog', emoji: '🐶', plural: 'dogs' },
-                    { name: 'rabbit', emoji: '🐰', plural: 'rabbits' },
-                    { name: 'panda', emoji: '🐼', plural: 'pandas' },
-                    { name: 'frog', emoji: '🐸', plural: 'frogs' },
-                    { name: 'elephant', emoji: '🐘', plural: 'elephants' },
-                    { name: 'lion', emoji: '🦁', plural: 'lions' },
-                    { name: 'tiger', emoji: '🐯', plural: 'tigers' },
-                    { name: 'monkey', emoji: '🐵', plural: 'monkeys' },
-                    { name: 'pig', emoji: '🐷', plural: 'pigs' },
-                    { name: 'cow', emoji: '🐮', plural: 'cows' },
-                    { name: 'sheep', emoji: '🐑', plural: 'sheep' },
-                    { name: 'horse', emoji: '🐴', plural: 'horses' },
-                    { name: 'duck', emoji: '🦆', plural: 'ducks' },
-                    { name: 'chicken', emoji: '🐔', plural: 'chickens' }
-                ]
-            }
-        };
-
-        const audioSys = {
-            ctx: null,
-            synth: window.speechSynthesis,
-            currentSong: 0,
-            bellInterval: null,
-            voice: null,
-
-            songs: [
-                // Jingle Bells
-                [
-                    { f: 329.63, d: 0.2 }, { f: 329.63, d: 0.2 }, { f: 329.63, d: 0.4 },
-                    { f: 0, d: 0.2 },
-                    { f: 329.63, d: 0.2 }, { f: 329.63, d: 0.2 }, { f: 329.63, d: 0.4 },
-                    { f: 0, d: 0.2 },
-                    { f: 329.63, d: 0.2 }, { f: 392.00, d: 0.2 }, { f: 261.63, d: 0.3 }, { f: 293.66, d: 0.2 }, { f: 329.63, d: 0.6 },
-                    { f: 0, d: 0.4 },
-                    { f: 349.23, d: 0.2 }, { f: 349.23, d: 0.2 }, { f: 349.23, d: 0.2 }, { f: 349.23, d: 0.2 },
-                    { f: 349.23, d: 0.2 }, { f: 329.63, d: 0.2 }, { f: 329.63, d: 0.2 }, { f: 329.63, d: 0.2 },
-                    { f: 329.63, d: 0.2 }, { f: 293.66, d: 0.2 }, { f: 293.66, d: 0.2 }, { f: 329.63, d: 0.2 },
-                    { f: 293.66, d: 0.4 }, { f: 392.00, d: 0.4 }
-                ],
-                // Silent Night (simplified)
-                [
-                    { f: 392.00, d: 0.6 }, { f: 440.00, d: 0.3 }, { f: 392.00, d: 0.3 },
-                    { f: 329.63, d: 0.9 }, { f: 0, d: 0.3 },
-                    { f: 392.00, d: 0.6 }, { f: 440.00, d: 0.3 }, { f: 392.00, d: 0.3 },
-                    { f: 329.63, d: 0.9 }, { f: 0, d: 0.3 },
-                    { f: 523.25, d: 0.6 }, { f: 523.25, d: 0.3 }, { f: 466.16, d: 0.3 },
-                    { f: 392.00, d: 0.9 }, { f: 0, d: 0.3 },
-                    { f: 440.00, d: 0.6 }, { f: 440.00, d: 0.3 }, { f: 392.00, d: 0.3 },
-                    { f: 329.63, d: 1.2 }
-                ]
-            ],
-
-            init: function () {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                this.ctx = new AudioContext();
-                // Procedural BGM removed - using real MP3 music instead
-                this.startBellSound();
-
-                // Init voices
-                if (speechSynthesis.onvoiceschanged !== undefined) {
-                    speechSynthesis.onvoiceschanged = () => this.setVoice();
-                }
-                this.setVoice();
-            },
-
-            setVoice: function () {
-                const voices = this.synth.getVoices();
-                // Prefer a female/default English voice
-                // "Google US English" is often female. "Samantha" is female.
-                this.voice = voices.find(v => v.lang.includes('en') && (v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Google US English'))) ||
-                    voices.find(v => v.lang.includes('en'));
-
-                console.log("Selected voice:", this.voice ? this.voice.name : "Default");
-            },
-
-            playToneADSR: function (freq, duration, type = 'sine', vol = 0.2) {
-                if (!this.ctx) return;
-
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                const filter = this.ctx.createBiquadFilter();
-
-                osc.type = type;
-                osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-
-                filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(freq * 2, this.ctx.currentTime);
-
-                const attack = 0.02;
-                const decay = 0.1;
-                const sustain = vol * 0.7;
-                const release = 0.2;
-
-                const now = this.ctx.currentTime;
-                gain.gain.setValueAtTime(0, now);
-                gain.gain.linearRampToValueAtTime(vol, now + attack);
-                gain.gain.linearRampToValueAtTime(sustain, now + attack + decay);
-                gain.gain.setValueAtTime(sustain, now + duration - release);
-                gain.gain.linearRampToValueAtTime(0, now + duration);
-
-                osc.connect(filter);
-                filter.connect(gain);
-                gain.connect(this.ctx.destination);
-
-                osc.start(now);
-                osc.stop(now + duration);
-            },
-
-
-
-            startBellSound: function () {
-                this.bellInterval = setInterval(() => {
-                    if (state.isPlaying && Math.random() > 0.8) {
-                        this.playToneADSR(1046.50, 0.1, 'triangle', 0.03);
+                    fishing: {
+                        name: 'Fishing',
+                        icon: '🎣',
+                        items: [
+                            { name: 'crab', emoji: '🦀', plural: 'crabs' },
+                            { name: 'fish', emoji: '🐟', plural: 'fish' },
+                            { name: 'bird', emoji: '🐦', plural: 'birds' },
+                            { name: 'cat', emoji: '🐱', plural: 'cats' },
+                            { name: 'dog', emoji: '🐶', plural: 'dogs' },
+                            { name: 'rabbit', emoji: '🐰', plural: 'rabbits' },
+                            { name: 'panda', emoji: '🐼', plural: 'pandas' },
+                            { name: 'frog', emoji: '🐸', plural: 'frogs' },
+                            { name: 'elephant', emoji: '🐘', plural: 'elephants' },
+                            { name: 'lion', emoji: '🦁', plural: 'lions' },
+                            { name: 'tiger', emoji: '🐯', plural: 'tigers' },
+                            { name: 'monkey', emoji: '🐵', plural: 'monkeys' },
+                            { name: 'pig', emoji: '🐷', plural: 'pigs' },
+                            { name: 'cow', emoji: '🐮', plural: 'cows' },
+                            { name: 'sheep', emoji: '🐑', plural: 'sheep' },
+                            { name: 'horse', emoji: '🐴', plural: 'horses' },
+                            { name: 'duck', emoji: '🦆', plural: 'ducks' },
+                            { name: 'chicken', emoji: '🐔', plural: 'chickens' }
+                        ]
+                    },
+                    combo: {
+                        name: 'Combo Challenge',
+                        icon: '🎯',
+                        numbers: [
+                            { value: 1, name: 'one', emoji: '1️⃣', color: '#e74c3c' },
+                            { value: 2, name: 'two', emoji: '2️⃣', color: '#3498db' },
+                            { value: 3, name: 'three', emoji: '3️⃣', color: '#2ecc71' },
+                            { value: 4, name: 'four', emoji: '4️⃣', color: '#f39c12' },
+                            { value: 5, name: 'five', emoji: '5️⃣', color: '#9b59b6' }
+                        ],
+                        colors: [
+                            { name: 'red', color: '#c0392b', emoji: '🔴' },
+                            { name: 'green', color: '#27ae60', emoji: '🟢' },
+                            { name: 'blue', color: '#2980b9', emoji: '🔵' },
+                            { name: 'yellow', color: '#f1c40f', emoji: '🟡' },
+                            { name: 'purple', color: '#8e44ad', emoji: '🟣' },
+                            { name: 'orange', color: '#e67e22', emoji: '🟠' },
+                            { name: 'pink', color: '#e91e63', emoji: '🩷' },
+                            { name: 'brown', color: '#795548', emoji: '🟤' },
+                            { name: 'black', color: '#2c3e50', emoji: '⚫' },
+                            { name: 'white', color: '#ecf0f1', emoji: '⚪' },
+                            { name: 'gray', color: '#95a5a6', emoji: '🩶' },
+                            { name: 'cyan', color: '#1abc9c', emoji: '💠' }
+                        ],
+                        animals: [
+                            { name: 'crab', emoji: '🦀', plural: 'crabs' },
+                            { name: 'fish', emoji: '🐟', plural: 'fish' },
+                            { name: 'bird', emoji: '🐦', plural: 'birds' },
+                            { name: 'cat', emoji: '🐱', plural: 'cats' },
+                            { name: 'dog', emoji: '🐶', plural: 'dogs' },
+                            { name: 'rabbit', emoji: '🐰', plural: 'rabbits' },
+                            { name: 'panda', emoji: '🐼', plural: 'pandas' },
+                            { name: 'frog', emoji: '🐸', plural: 'frogs' },
+                            { name: 'elephant', emoji: '🐘', plural: 'elephants' },
+                            { name: 'lion', emoji: '🦁', plural: 'lions' },
+                            { name: 'tiger', emoji: '🐯', plural: 'tigers' },
+                            { name: 'monkey', emoji: '🐵', plural: 'monkeys' },
+                            { name: 'pig', emoji: '🐷', plural: 'pigs' },
+                            { name: 'cow', emoji: '🐮', plural: 'cows' },
+                            { name: 'sheep', emoji: '🐑', plural: 'sheep' },
+                            { name: 'horse', emoji: '🐴', plural: 'horses' },
+                            { name: 'duck', emoji: '🦆', plural: 'ducks' },
+                            { name: 'chicken', emoji: '🐔', plural: 'chickens' }
+                        ]
                     }
-                }, 5000);
-            },
+                };
 
-            speak: function (text, lang = 'en-US') {
-                if (this.synth.speaking) {
-                    this.synth.cancel();
-                }
-                const utter = new SpeechSynthesisUtterance(text);
-                utter.lang = lang;
-                if (this.voice) utter.voice = this.voice;
+                const audioSys = {
+                    ctx: null,
+                    synth: window.speechSynthesis,
+                    currentSong: 0,
+                    bellInterval: null,
+                    voice: null,
 
-                utter.rate = 0.7; // Slower
-                utter.pitch = 1.1; // Slightly higher but natural female pitch
+                    songs: [
+                        // Jingle Bells
+                        [
+                            { f: 329.63, d: 0.2 }, { f: 329.63, d: 0.2 }, { f: 329.63, d: 0.4 },
+                            { f: 0, d: 0.2 },
+                            { f: 329.63, d: 0.2 }, { f: 329.63, d: 0.2 }, { f: 329.63, d: 0.4 },
+                            { f: 0, d: 0.2 },
+                            { f: 329.63, d: 0.2 }, { f: 392.00, d: 0.2 }, { f: 261.63, d: 0.3 }, { f: 293.66, d: 0.2 }, { f: 329.63, d: 0.6 },
+                            { f: 0, d: 0.4 },
+                            { f: 349.23, d: 0.2 }, { f: 349.23, d: 0.2 }, { f: 349.23, d: 0.2 }, { f: 349.23, d: 0.2 },
+                            { f: 349.23, d: 0.2 }, { f: 329.63, d: 0.2 }, { f: 329.63, d: 0.2 }, { f: 329.63, d: 0.2 },
+                            { f: 329.63, d: 0.2 }, { f: 293.66, d: 0.2 }, { f: 293.66, d: 0.2 }, { f: 329.63, d: 0.2 },
+                            { f: 293.66, d: 0.4 }, { f: 392.00, d: 0.4 }
+                        ],
+                        // Silent Night (simplified)
+                        [
+                            { f: 392.00, d: 0.6 }, { f: 440.00, d: 0.3 }, { f: 392.00, d: 0.3 },
+                            { f: 329.63, d: 0.9 }, { f: 0, d: 0.3 },
+                            { f: 392.00, d: 0.6 }, { f: 440.00, d: 0.3 }, { f: 392.00, d: 0.3 },
+                            { f: 329.63, d: 0.9 }, { f: 0, d: 0.3 },
+                            { f: 523.25, d: 0.6 }, { f: 523.25, d: 0.3 }, { f: 466.16, d: 0.3 },
+                            { f: 392.00, d: 0.9 }, { f: 0, d: 0.3 },
+                            { f: 440.00, d: 0.6 }, { f: 440.00, d: 0.3 }, { f: 392.00, d: 0.3 },
+                            { f: 329.63, d: 1.2 }
+                        ]
+                    ],
 
-                this.synth.speak(utter);
-            },
+                    init: function () {
+                        const AudioContext = window.AudioContext || window.webkitAudioContext;
+                        this.ctx = new AudioContext();
+                        // Procedural BGM removed - using real MP3 music instead
+                        this.startBellSound();
 
-            playItem: function (item) {
-                const mode = state.currentMode;
-                if (mode === 'pitch') {
-                    const freq = GAME_MODES.pitch.display[item].freq;
-                    this.playToneADSR(freq, 0.5, 'triangle', 0.3);
-                } else if (mode === 'color') {
-                    const freqs = {
-                        'red': 261.63,    // C4
-                        'green': 293.66,  // D4
-                        'blue': 329.63,   // E4
-                        'yellow': 349.23, // F4
-                        'purple': 392.00, // G4
-                        'orange': 440.00  // A4
-                    };
-                    this.playToneADSR(freqs[item], 0.3, 'triangle', 0.25);
-                } else if (mode === 'shape') {
-                    const freqs = { 'circle': 261.63, 'square': 329.63, 'triangle': 392.00 };
-                    this.playToneADSR(freqs[item], 0.3, 'triangle', 0.25);
-                }
+                        // Init voices
+                        if (speechSynthesis.onvoiceschanged !== undefined) {
+                            speechSynthesis.onvoiceschanged = () => this.setVoice();
+                        }
+                        this.setVoice();
+                    },
 
-                if (mode !== 'pitch') {
-                    setTimeout(() => this.speak(item), 100);
-                }
-            },
+                    setVoice: function () {
+                        const voices = this.synth.getVoices();
+                        // Prefer a female/default English voice
+                        // "Google US English" is often female. "Samantha" is female.
+                        this.voice = voices.find(v => v.lang.includes('en') && (v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Google US English'))) ||
+                            voices.find(v => v.lang.includes('en'));
 
-            playCorrect: function () {
-                // Ding-Dong sound
-                const now = this.ctx.currentTime;
-                this.playToneADSR(659.25, 0.1, 'sine', 0.3); // E5
-                setTimeout(() => this.playToneADSR(830.61, 0.4, 'sine', 0.3), 100); // G#5
-            },
+                        console.log("Selected voice:", this.voice ? this.voice.name : "Default");
+                    },
 
-            playWrong: function () {
-                this.playToneADSR(150, 0.4, 'sawtooth', 0.2);
-                this.speak("Oops!");
-            },
+                    playToneADSR: function (freq, duration, type = 'sine', vol = 0.2) {
+                        if (!this.ctx) return;
 
-            playCombo: function (numberObj, colorObj, animalObj) {
-                // Determine singular or plural form
-                const animalName = numberObj.value === 1 ? animalObj.name : animalObj.plural;
-                const phrase = `${numberObj.name} ${colorObj.name} ${animalName}`;
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        const filter = this.ctx.createBiquadFilter();
 
-                // Play a pleasant tone
-                this.playToneADSR(392.00, 0.3, 'triangle', 0.2);
+                        osc.type = type;
+                        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
 
-                // Speak the full phrase
-                setTimeout(() => this.speak(phrase), 100);
-            },
+                        filter.type = 'lowpass';
+                        filter.frequency.setValueAtTime(freq * 2, this.ctx.currentTime);
 
-            playWin: function () {
-                // Victory Fanfare!
-                const notes = [523.25, 659.25, 783.99, 1046.50, 783.99, 1046.50]; // C E G C G C
-                const times = [0, 150, 300, 450, 600, 800];
-                const durations = [0.15, 0.15, 0.15, 0.15, 0.2, 0.6];
+                        const attack = 0.02;
+                        const decay = 0.1;
+                        const sustain = vol * 0.7;
+                        const release = 0.2;
 
-                notes.forEach((f, i) => {
-                    setTimeout(() => this.playToneADSR(f, durations[i], 'square', 0.2), times[i]);
-                });
-                setTimeout(() => this.speak("Amazing!"), 1000);
-            }
-        };
+                        const now = this.ctx.currentTime;
+                        gain.gain.setValueAtTime(0, now);
+                        gain.gain.linearRampToValueAtTime(vol, now + attack);
+                        gain.gain.linearRampToValueAtTime(sustain, now + attack + decay);
+                        gain.gain.setValueAtTime(sustain, now + duration - release);
+                        gain.gain.linearRampToValueAtTime(0, now + duration);
 
-        const achievements = {
-            totalStars: 0,
-            combo: 0,
-            bestCombo: 0,
+                        osc.connect(filter);
+                        filter.connect(gain);
+                        gain.connect(this.ctx.destination);
 
-            load: function () {
-                const saved = localStorage.getItem('santaGameAchievements');
-                if (saved) {
-                    const data = JSON.parse(saved);
-                    this.totalStars = data.totalStars || 0;
-                    this.bestCombo = data.bestCombo || 0;
-                }
-            },
+                        osc.start(now);
+                        osc.stop(now + duration);
+                    },
 
-            save: function () {
-                localStorage.setItem('santaGameAchievements', JSON.stringify({
-                    totalStars: this.totalStars,
-                    bestCombo: this.bestCombo
-                }));
-            },
 
-            addStar: function () {
-                this.totalStars++;
-                this.combo++;
-                if (this.combo > this.bestCombo) {
-                    this.bestCombo = this.combo;
-                }
-                this.save();
-                this.updateUI();
-            },
 
-            breakCombo: function () {
-                this.combo = 0;
-                this.updateUI();
-            },
+                    startBellSound: function () {
+                        this.bellInterval = setInterval(() => {
+                            if (state.isPlaying && Math.random() > 0.8) {
+                                this.playToneADSR(1046.50, 0.1, 'triangle', 0.03);
+                            }
+                        }, 5000);
+                    },
 
-            updateUI: function () {
-                const comboDisplay = document.getElementById('combo-display');
-                if (this.combo >= 3) {
-                    comboDisplay.textContent = `🔥 Combo: ${this.combo}x`;
-                    comboDisplay.style.opacity = 1;
-                } else {
-                    comboDisplay.style.opacity = 0;
-                }
-            }
-        };
+                    speak: function (text, lang = 'en-US') {
+                        if (this.synth.speaking) {
+                            this.synth.cancel();
+                        }
+                        const utter = new SpeechSynthesisUtterance(text);
+                        utter.lang = lang;
+                        if (this.voice) utter.voice = this.voice;
 
-        const santaAnim = {
-            init: function () {
-                // PNG images don't have SVG eyes to animate
-                // Character animation is handled by CSS (santa-breathe)
-                console.log('Character animation initialized');
-            },
+                        utter.rate = 0.7; // Slower
+                        utter.pitch = 1.1; // Slightly higher but natural female pitch
 
-            nod: function () {
-                // Apply nod effect to the character image
+                        this.synth.speak(utter);
+                    },
+
+                    playItem: function (item) {
+                        const mode = state.currentMode;
+                        if (mode === 'pitch') {
+                            const freq = GAME_MODES.pitch.display[item].freq;
+                            this.playToneADSR(freq, 0.5, 'triangle', 0.3);
+                        } else if (mode === 'color') {
+                            const freqs = {
+                                'red': 261.63,    // C4
+                                'green': 293.66,  // D4
+                                'blue': 329.63,   // E4
+                                'yellow': 349.23, // F4
+                                'purple': 392.00, // G4
+                                'orange': 440.00  // A4
+                            };
+                            this.playToneADSR(freqs[item], 0.3, 'triangle', 0.25);
+                        } else if (mode === 'shape') {
+                            const freqs = { 'circle': 261.63, 'square': 329.63, 'triangle': 392.00 };
+                            this.playToneADSR(freqs[item], 0.3, 'triangle', 0.25);
+                        }
+
+                        if (mode !== 'pitch') {
+                            setTimeout(() => this.speak(item), 100);
+                        }
+                    },
+
+                    playCorrect: function () {
+                        // Ding-Dong sound
+                        const now = this.ctx.currentTime;
+                        this.playToneADSR(659.25, 0.1, 'sine', 0.3); // E5
+                        setTimeout(() => this.playToneADSR(830.61, 0.4, 'sine', 0.3), 100); // G#5
+                    },
+
+                    playWrong: function () {
+                        this.playToneADSR(150, 0.4, 'sawtooth', 0.2);
+                        this.speak("Oops!");
+                    },
+
+                    playCombo: function (numberObj, colorObj, animalObj) {
+                        // Determine singular or plural form
+                        const animalName = numberObj.value === 1 ? animalObj.name : animalObj.plural;
+                        const phrase = `${numberObj.name} ${colorObj.name} ${animalName}`;
+
+                        // Play a pleasant tone
+                        this.playToneADSR(392.00, 0.3, 'triangle', 0.2);
+
+                        // Speak the full phrase
+                        setTimeout(() => this.speak(phrase), 100);
+                    },
+
+                    playWin: function () {
+                        // Victory Fanfare!
+                        const notes = [523.25, 659.25, 783.99, 1046.50, 783.99, 1046.50]; // C E G C G C
+                        const times = [0, 150, 300, 450, 600, 800];
+                        const durations = [0.15, 0.15, 0.15, 0.15, 0.2, 0.6];
+
+                        notes.forEach((f, i) => {
+                            setTimeout(() => this.playToneADSR(f, durations[i], 'square', 0.2), times[i]);
+                        });
+                        setTimeout(() => this.speak("Amazing!"), 1000);
+                    }
+                };
+
+                const achievements = {
+                    totalStars: 0,
+                    combo: 0,
+                    bestCombo: 0,
+
+                    load: function () {
+                        const saved = localStorage.getItem('santaGameAchievements');
+                        if (saved) {
+                            const data = JSON.parse(saved);
+                            this.totalStars = data.totalStars || 0;
+                            this.bestCombo = data.bestCombo || 0;
+                        }
+                    },
+
+                    save: function () {
+                        localStorage.setItem('santaGameAchievements', JSON.stringify({
+                            totalStars: this.totalStars,
+                            bestCombo: this.bestCombo
+                        }));
+                    },
+
+                    addStar: function () {
+                        this.totalStars++;
+                        this.combo++;
+                        if (this.combo > this.bestCombo) {
+                            this.bestCombo = this.combo;
+                        }
+                        this.save();
+                        this.updateUI();
+                    },
+
+                    breakCombo: function () {
+                        this.combo = 0;
+                        this.updateUI();
+                    },
+
+                    updateUI: function () {
+                        const comboDisplay = document.getElementById('combo-display');
+                        if (this.combo >= 3) {
+                            comboDisplay.textContent = `🔥 Combo: ${this.combo}x`;
+                            comboDisplay.style.opacity = 1;
+                        } else {
+                            comboDisplay.style.opacity = 0;
+                        }
+                    }
+                };
+
+                const santaAnim = {
+                    init: function () {
+                        // PNG images don't have SVG eyes to animate
+                        // Character animation is handled by CSS (santa-breathe)
+                        console.log('Character animation initialized');
+                    },
+
+                    nod: function () {
+                        // Apply nod effect to the character image
+                        const characterImg = document.getElementById('character-img');
+                        if (characterImg) {
+                            characterImg.style.animation = 'none';
+                            setTimeout(() => {
+                                characterImg.style.animation = 'santa-breathe 3s ease-in-out infinite, nod 0.5s';
+                            }, 10);
+                            setTimeout(() => {
+                                characterImg.style.animation = 'santa-breathe 3s ease-in-out infinite';
+                            }, 600);
+                        }
+                    }
+                };
+
+                let state = {
+                    currentMode: 'color',
+                    score: 0,
+                    maxScore: 10,
+                    level: 1,
+                    sequence: [],
+                    playerInputIndex: 0,
+                    isInputLocked: false,
+                    isPlaying: false,
+                    // Combo mode specific
+                    comboSequence: [],  // [{number, color, animal}, ...]
+                    comboStep: 0,  // 0=number, 1=color, 2=animal
+                    currentComboSelection: {}  // Temporary storage for current combo being selected
+                };
+
+                const ui = {
+                    startOverlay: document.getElementById('start-overlay'),
+                    modeSelectOverlay: document.getElementById('mode-select-overlay'),
+                    levelUpOverlay: document.getElementById('level-up-overlay'),
+                    levelUpText: document.getElementById('level-up-text'),
+                    gameContainer: document.getElementById('game-container'),
+                    scoreboard: document.getElementById('scoreboard'),
+                    levelDisplay: document.getElementById('level-display'),
+                    statusText: document.getElementById('status-text'),
+                    comboDisplay: document.getElementById('combo-display'),
+                    modeIndicator: document.getElementById('mode-indicator'),
+                    bubble: document.getElementById('bubble'),
+                    bubbleContent: document.getElementById('bubble-content'),
+                    controlsView: document.getElementById('controls-view'),
+                    snowContainer: document.getElementById('snow-container')
+                };
+
+                let selectedCharacter = 'santa';
+                const bgmPlayer = document.getElementById('bgm-player');
                 const characterImg = document.getElementById('character-img');
-                if (characterImg) {
-                    characterImg.style.animation = 'none';
-                    setTimeout(() => {
-                        characterImg.style.animation = 'santa-breathe 3s ease-in-out infinite, nod 0.5s';
-                    }, 10);
-                    setTimeout(() => {
-                        characterImg.style.animation = 'santa-breathe 3s ease-in-out infinite';
-                    }, 600);
-                }
-            }
-        };
 
-        let state = {
-            currentMode: 'color',
-            score: 0,
-            maxScore: 10,
-            level: 1,
-            sequence: [],
-            playerInputIndex: 0,
-            isInputLocked: false,
-            isPlaying: false,
-            // Combo mode specific
-            comboSequence: [],  // [{number, color, animal}, ...]
-            comboStep: 0,  // 0=number, 1=color, 2=animal
-            currentComboSelection: {}  // Temporary storage for current combo being selected
-        };
+                function applyCharacterEffect(character) {
+                    const body = document.body;
+        body.classList.remove('santa-effect', 'snowman-effect', 'reindeer-effect'); // Clear previous effects
 
-        const ui = {
-            startOverlay: document.getElementById('start-overlay'),
-            modeSelectOverlay: document.getElementById('mode-select-overlay'),
-            levelUpOverlay: document.getElementById('level-up-overlay'),
-            levelUpText: document.getElementById('level-up-text'),
-            gameContainer: document.getElementById('game-container'),
-            scoreboard: document.getElementById('scoreboard'),
-            levelDisplay: document.getElementById('level-display'),
-            statusText: document.getElementById('status-text'),
-            comboDisplay: document.getElementById('combo-display'),
-            modeIndicator: document.getElementById('mode-indicator'),
-            bubble: document.getElementById('bubble'),
-            bubbleContent: document.getElementById('bubble-content'),
-            controlsView: document.getElementById('controls-view'),
-            snowContainer: document.getElementById('snow-container')
-        };
-
-        let selectedCharacter = 'santa';
-        const bgmPlayer = document.getElementById('bgm-player');
-        const characterImg = document.getElementById('character-img');
-
-        function applyCharacterEffect(character) {
-            const body = document.body;
-            body.classList.remove('santa-effect', 'snowman-effect', 'reindeer-effect'); // Clear previous effects
-
-            switch (character) {
-                case 'santa':
-                    body.classList.add('santa-effect');
-                    break;
-                case 'snowman':
-                    body.classList.add('snowman-effect');
-                    break;
-                case 'reindeer':
-                    body.classList.add('reindeer-effect');
-                    break;
-                default:
-                    break;
-            }
+        switch (character) {
+            case 'santa':
+                body.classList.add('santa-effect');
+                break;
+            case 'snowman':
+                body.classList.add('snowman-effect');
+                break;
+            case 'reindeer':
+                body.classList.add('reindeer-effect');
+                break;
+            default:
+                break;
+        }
         }
 
         function init() {
@@ -1577,37 +1660,48 @@
             setTimeout(startRound, 1000);
         }
 
-        function createControls(mode) {
+        function updateControls() { // Renamed from createControls, now takes no arguments
             ui.controlsView.innerHTML = '';
 
-            if (mode === 'combo') {
-                // Combo mode uses special grid layout
-                const grid = document.createElement('div');
+            // Ensure controls-grid exists for modes that use it, or create it if not
+            let grid = ui.controlsView.querySelector('.controls-grid');
+            if (!grid) {
+                grid = document.createElement('div');
                 grid.className = 'controls-grid';
                 ui.controlsView.appendChild(grid);
-                updateComboControls(0);  // Start with numbers
             } else {
-                // Other modes use original flex layout
-                const modeConfig = GAME_MODES[mode];
+                grid.className = 'controls-grid'; // Reset class for grid
+            }
+            grid.innerHTML = ''; // Clear grid content
 
-                modeConfig.items.forEach(item => {
+            // Reset water background for all modes initially
+            ui.controlsView.classList.remove('water-bg');
+
+            if (state.currentMode === 'combo') {
+                updateComboControls(state.comboStep);
+                return;
+            }
+
+            if (state.currentMode === 'fishing') {
+                ui.controlsView.classList.add('water-bg');
+                grid.className = 'controls-grid grid-6'; // Use grid-6 for fishing
+
+                const currentTarget = state.sequence[state.playerInputIndex];
+                const allItems = GAME_MODES.fishing.items;
+
+                // Filter out correct item to pick distractors
+                const distractors = allItems.filter(item => item.name !== currentTarget.name);
+                // Shuffle and pick 5 distractors
+                const selectedDistractors = distractors.sort(() => 0.5 - Math.random()).slice(0, 5);
+                // Combine and shuffle
+                const displayItems = [currentTarget, ...selectedDistractors].sort(() => 0.5 - Math.random());
+
+                displayItems.forEach(item => {
                     const btn = document.createElement('button');
-                    btn.className = 'control-btn';
-                    btn.setAttribute('data-item', item);
-
-                    const content = document.createElement('div');
-                    content.className = 'control-content';
-
-                    if (mode === 'color') {
-                        content.innerHTML = createChimneySVG(item);
-                    } else if (mode === 'shape') {
-                        content.innerHTML = createShapeSVG(item);
-                    } else if (mode === 'pitch') {
-                        content.innerHTML = createPitchSVG(item);
-                    }
-
-                    btn.appendChild(content);
-                    ui.controlsView.appendChild(btn);
+                    btn.className = 'control-btn fish-item'; // Add fish animation
+                    btn.setAttribute('data-item', item.name); // Add data-item for consistency
+                    btn.setAttribute('data-type', 'fishing'); // Add data-type for consistency
+                    btn.innerHTML = `<div class="control-content"><div style="font-size: 4rem;" class="animal-emoji">${item.emoji}</div></div>`;
 
                     const handler = (e) => {
                         e.preventDefault();
@@ -1884,6 +1978,7 @@
 
             function showNext() {
                 if (state.currentMode === 'combo') {
+                    // ... (combo logic)
                     if (i >= state.comboSequence.length) {
                         state.isInputLocked = false;
                         setStatus("Your Turn!");
@@ -1898,31 +1993,53 @@
                     audioSys.playCombo(combo.number, combo.color, combo.animal);
 
                     setTimeout(() => {
-                        ui.bubble.classList.remove('show');
                         i++;
-                        setTimeout(showNext, 1000);
-                    }, 1500);
-                } else {
-                    if (i >= state.sequence.length) {
-                        state.isInputLocked = false;
-                        setStatus("Your Turn!");
-                        toggleTurnSignal(true); // Green light on
-                        ui.bubble.classList.remove('show');
-                        return;
-                    }
-
-                    const item = state.sequence[i];
-                    showPrompt(item);
-                    highlightControl(item);
-                    audioSys.playItem(item);
-
-                    setTimeout(() => {
-                        ui.bubble.classList.remove('show');
-                        unhighlightControl(item);
-                        i++;
-                        setTimeout(showNext, 600);
-                    }, 800);
+                        showNext();
+                    }, 2500); // Slower for combo
+                    return;
                 }
+
+                if (i >= state.sequence.length) {
+                    state.isInputLocked = false;
+                    setStatus("Your Turn!");
+                    toggleTurnSignal(true); // Green light on
+                    ui.bubble.classList.remove('show');
+                    return;
+                }
+
+                const item = state.sequence[i];
+
+                // Show prompt based on mode
+                if (state.currentMode === 'fishing') {
+                    ui.bubbleContent.innerHTML = '<div style="font-size: 3rem;">👂</div>'; // Ear icon for listening
+                    ui.bubble.classList.add('show');
+                    audioSys.speak(item.name);
+                } else {
+                    // Color/Shape/Pitch logic
+                    let promptHTML = '';
+                    if (state.currentMode === 'color') {
+                        promptHTML = `<div class="prompt-content color-prompt" style="background-color: ${item.color};"></div>`;
+                    } else if (state.currentMode === 'shape') {
+                        promptHTML = `<div class="prompt-content">${createShapeSVG(item.name, item.color)}</div>`;
+                    } else if (state.currentMode === 'pitch') {
+                        promptHTML = `<div class="prompt-content">${createPitchSVG(item.name)}</div>`;
+                    }
+                    ui.bubbleContent.innerHTML = promptHTML;
+                    ui.bubble.classList.add('show');
+
+                    // Play sound
+                    if (state.currentMode === 'color' || state.currentMode === 'shape') {
+                        audioSys.speak(item.name);
+                    } else if (state.currentMode === 'pitch') {
+                        audioSys.playItem(item.name); // Play pitch tone
+                    }
+                }
+
+                setTimeout(() => {
+                    ui.bubble.classList.remove('show'); // Hide bubble after prompt
+                    i++;
+                    showNext();
+                }, 2000); // Standard delay
             }
 
             setTimeout(showNext, 1000);
