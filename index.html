@@ -1691,6 +1691,15 @@
                 ui.controlsView.classList.add('water-bg');
                 grid.className = 'controls-grid grid-6'; // Use grid-6 for fishing
 
+                // Add fishing rod visual
+                const rod = document.createElement('div');
+                rod.className = 'fishing-rod-container';
+                rod.innerHTML = `
+                    <div class="fishing-rod" style="position: absolute; top: -150px; right: 20px; font-size: 100px; transform: rotate(-15deg); z-index: 10;">🎣</div>
+                    <div class="bubbles" style="position: absolute; bottom: 0; width: 100%; height: 50px; pointer-events: none;"></div>
+                `;
+                ui.controlsView.appendChild(rod);
+
                 const currentTarget = state.sequence[state.playerInputIndex];
                 if (!currentTarget) {
                     console.error('No current target found!');
@@ -1740,11 +1749,14 @@
             modeConfig.items.forEach(itemName => {
                 const btn = document.createElement('button');
                 btn.className = 'control-btn';
+                btn.setAttribute('data-item', itemName); // Fix: Add data-item
+                btn.setAttribute('data-type', state.currentMode); // Fix: Add data-type
 
                 let content = '';
                 if (state.currentMode === 'color') {
                     const colorInfo = modeConfig.display[itemName];
-                    content = `<div style="width: 60px; height: 60px; border-radius: 50%; background-color: ${colorInfo.color}; box-shadow: 0 5px 15px rgba(0,0,0,0.2);"></div>`;
+                    // Increase size and use percentage for responsiveness
+                    content = `<div style="width: 80%; height: 80%; border-radius: 50%; background-color: ${colorInfo.color}; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 4px solid white;"></div>`;
                 } else if (state.currentMode === 'shape') {
                     const shapeInfo = modeConfig.display[itemName];
                     content = createShapeSVG(shapeInfo.shape);
