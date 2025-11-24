@@ -1846,17 +1846,41 @@
             if (musicMode === 0) {
                 // Jingle Bells
                 bgm.src = './外部資源/jingle-bells.mp3';
-                bgm.play();
-                btn.textContent = '🎵';
-                btn.classList.remove('off');
-                audioSys.speak("Jingle Bells");
+                bgm.volume = 0.3;
+                const playPromise = bgm.play();
+
+                if (playPromise !== undefined) {
+                    playPromise
+                        .then(() => {
+                            btn.textContent = '🎵';
+                            btn.classList.remove('off');
+                            audioSys.speak("Jingle Bells");
+                        })
+                        .catch(error => {
+                            console.log('⚠️ Play failed:', error);
+                            btn.textContent = '🔇';
+                            btn.classList.add('off');
+                        });
+                }
             } else if (musicMode === 1) {
                 // Silent Night
                 bgm.src = './外部資源/silent-night.mp3';
-                bgm.play();
-                btn.textContent = '🎶';
-                btn.classList.remove('off');
-                audioSys.speak("Silent Night");
+                bgm.volume = 0.3;
+                const playPromise = bgm.play();
+
+                if (playPromise !== undefined) {
+                    playPromise
+                        .then(() => {
+                            btn.textContent = '🎶';
+                            btn.classList.remove('off');
+                            audioSys.speak("Silent Night");
+                        })
+                        .catch(error => {
+                            console.log('⚠️ Play failed:', error);
+                            btn.textContent = '🔇';
+                            btn.classList.add('off');
+                        });
+                }
             } else {
                 // Off
                 bgm.pause();
@@ -1909,7 +1933,7 @@
             versionDisplay.style.color = 'rgba(255,255,255,0.5)';
             versionDisplay.style.fontSize = '12px';
             versionDisplay.style.zIndex = '9999';
-            versionDisplay.textContent = 'v52.0';
+            versionDisplay.textContent = 'v53.0 🎵';
             document.body.appendChild(versionDisplay);
 
             createSnow();
@@ -1960,50 +1984,68 @@
             state.currentMode = mode;
             state.isPlaying = true;
 
-            // Start real music
-            // Load music preference
-            const savedMode = localStorage.getItem('santaMusicMode');
-            if (savedMode !== null) {
-                musicMode = parseInt(savedMode);
+            // ✅ 修正：確保音頻系統初始化
+            audioSys.init();
+            santaAnim.init();
+
+            // ✅ 修正：先說話以解鎖音頻（手機需要）
+            audioSys.speak("Let's play!");
+
+            // ✅ 修正：延遲啟動音樂，確保音頻已解鎖
+            setTimeout(() => {
+                const savedMode = localStorage.getItem('santaMusicMode');
+                if (savedMode !== null) {
+                    musicMode = parseInt(savedMode);
+                }
+
                 if (musicMode === 0) {
                     bgmPlayer.src = './外部資源/jingle-bells.mp3';
                 } else if (musicMode === 1) {
                     bgmPlayer.src = './外部資源/silent-night.mp3';
                 }
-            }
 
-            if (musicMode < 2 && bgmPlayer) {
-                bgmPlayer.volume = 0.3;
-                bgmPlayer.play().catch(e => console.log('Audio play failed:', e));
+                if (musicMode < 2 && bgmPlayer) {
+                    bgmPlayer.volume = 0.3;
 
-                // Update button state
-                const btn = document.getElementById('music-control-btn');
-                if (btn) {
-                    if (musicMode === 0) btn.textContent = '🎵';
-                    else if (musicMode === 1) btn.textContent = '🎶';
-                    btn.classList.remove('off');
+                    // ✅ 手機需要：添加 play promise 處理
+                    const playPromise = bgmPlayer.play();
+
+                    if (playPromise !== undefined) {
+                        playPromise
+                            .then(() => {
+                                console.log('✅ Music started successfully');
+                                const btn = document.getElementById('music-control-btn');
+                                if (btn) {
+                                    if (musicMode === 0) btn.textContent = '🎵';
+                                    else if (musicMode === 1) btn.textContent = '🎶';
+                                    btn.classList.remove('off');
+                                }
+                            })
+                            .catch(error => {
+                                console.log('⚠️ Autoplay prevented:', error);
+                                // 音樂按鈕顯示為靜音，讓用戶手動啟動
+                                const btn = document.getElementById('music-control-btn');
+                                if (btn) {
+                                    btn.textContent = '🔇';
+                                    btn.classList.add('off');
+                                }
+                            });
+                    }
+                } else if (bgmPlayer) {
+                    bgmPlayer.pause();
+                    const btn = document.getElementById('music-control-btn');
+                    if (btn) {
+                        btn.textContent = '🔇';
+                        btn.classList.add('off');
+                    }
                 }
-            } else if (bgmPlayer) {
-                // Ensure it's off if mode is 2
-                bgmPlayer.pause();
-                const btn = document.getElementById('music-control-btn');
-                if (btn) {
-                    btn.textContent = '🔇';
-                    btn.classList.add('off');
-                }
-            }
-
-            audioSys.init();
-            santaAnim.init();
-            audioSys.speak("Let's play!");
+            }, 500); // 延遲 500ms 啟動音樂
 
             ui.modeSelectOverlay.style.display = 'none';
             ui.gameContainer.style.display = 'flex';
 
             const modeConfig = GAME_MODES[mode];
             ui.modeIndicator.textContent = `${modeConfig.icon} ${modeConfig.name}`;
-
-            // Note: Don't call updateControls() here, it will be called after playSequence
 
             state.score = 0;
             state.level = 1;
@@ -2397,9 +2439,19 @@
             state.comboStep = 0;
             state.currentComboSelection = {};
 
-            const sequenceLength = state.level + 1; // Level 1 = 2 items, Level 5 = 6 items
+            let sequenceLength;
 
             if (state.currentMode === 'combo') {
+                // ✅ Combo 模式特殊難度曲線（更溫和）
+                // Level 1 = 1 組, Level 2 = 1 組, Level 3 = 2 組, Level 4 = 2 組, Level 5 = 3 組
+                if (state.level === 1 || state.level === 2) {
+                    sequenceLength = 1;
+                } else if (state.level === 3 || state.level === 4) {
+                    sequenceLength = 2;
+                } else {
+                    sequenceLength = 3;
+                }
+
                 // Generate random combos
                 const comboConfig = GAME_MODES.combo;
                 for (let i = 0; i < sequenceLength; i++) {
@@ -2413,7 +2465,10 @@
                     });
                 }
             } else {
-                // Original mode logic
+                // ✅ 其他模式：原始難度曲線
+                // Level 1 = 2 items, Level 2 = 3 items, ..., Level 5 = 6 items
+                sequenceLength = state.level + 1;
+
                 const modeConfig = GAME_MODES[state.currentMode];
                 for (let i = 0; i < sequenceLength; i++) {
                     const randomItem = modeConfig.items[Math.floor(Math.random() * modeConfig.items.length)];
