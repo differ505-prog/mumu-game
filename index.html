@@ -426,18 +426,27 @@
         /* Controls View (Bottom 40%) - Glassmorphism */
         #controls-view {
             position: relative;
-            /* Fix for absolute positioning inside */
-            flex: 40;
-            display: flex;
+            flex: 0 0 40%;
+            /* ✅ 修正：強制佔據 40% 高度 */
+            display: flex !important;
+            /* ✅ 強制 flex */
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             border-top: 1px solid rgba(255, 255, 255, 0.2);
-            padding-top: 0;
-            align-items: flex-end;
-            justify-content: space-around;
-            padding-bottom: 0;
+            padding: 20px;
+            /* ✅ 改為固定 padding */
+            align-items: center;
+            /* ✅ 改為 center */
+            justify-content: center;
+            /* ✅ 改為 center */
             box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
+            min-height: 250px;
+            /* ✅ 新增：最小高度 */
+            max-height: 40vh;
+            /* ✅ 新增：最大高度 */
+            overflow: visible;
+            /* ✅ 防止被裁切 */
         }
 
         .control-btn {
@@ -451,12 +460,12 @@
             justify-content: center;
             align-items: center;
             background: transparent;
-            background: transparent;
             transition: transform 0.1s, filter 0.1s;
-            -webkit-tap-highlight-color: transparent;
             -webkit-tap-highlight-color: transparent;
             padding: 0;
             max-width: 30%;
+            min-height: 120px;
+            /* ✅ 確保按鈕有足夠高度 */
         }
 
         .control-btn:active {
@@ -831,11 +840,17 @@
 
         .controls-grid {
             display: grid !important;
-            gap: 10px;
+            gap: 15px;
+            /* ✅ 增加間距 */
             padding: 20px;
             width: 100%;
-            max-width: 800px;
+            max-width: 900px;
+            /* ✅ 增加最大寬度 */
             margin: 0 auto;
+            min-height: 180px;
+            /* ✅ 增加最小高度 */
+            grid-auto-rows: minmax(120px, auto);
+            /* ✅ 新增：確保每行至少 120px */
         }
 
         .controls-grid.grid-5 {
@@ -1197,6 +1212,30 @@
                 border-radius: 15px;
                 /* backdrop-filter: blur(5px); Removed to fix "weird box" look */
             }
+
+            @keyframes santa-breathe {
+
+                0%,
+                100% {
+                    transform: scale(1) translateY(0);
+                }
+
+                50% {
+                    transform: scale(1.02) translateY(-5px);
+                }
+            }
+
+            @keyframes nod {
+
+                0%,
+                100% {
+                    transform: rotateX(0deg);
+                }
+
+                50% {
+                    transform: rotateX(10deg);
+                }
+            }
     </style>
 </head>
 
@@ -1374,7 +1413,7 @@
         </div>
 
         <div id="controls-view">
-            <!-- Buttons will be dynamically created based on mode -->
+            <!-- 按鈕會由 JavaScript 動態生成 -->
         </div>
     </div>
 
@@ -1870,7 +1909,7 @@
             versionDisplay.style.color = 'rgba(255,255,255,0.5)';
             versionDisplay.style.fontSize = '12px';
             versionDisplay.style.zIndex = '9999';
-            versionDisplay.textContent = 'v51.0';
+            versionDisplay.textContent = 'v52.0';
             document.body.appendChild(versionDisplay);
 
             createSnow();
@@ -1974,13 +2013,21 @@
         }
 
         function updateControls() {
-            ui.controlsView.innerHTML = '';
-            ui.controlsView.classList.remove('water-bg');
+            console.log('🎮 updateControls 開始執行');
 
-            // Create grid
-            let grid = document.createElement('div');
-            grid.className = 'controls-grid';
-            ui.controlsView.appendChild(grid);
+            const controlsView = document.getElementById('controls-view');
+            if (!controlsView) {
+                console.error('❌ controls-view 不存在！');
+                return;
+            }
+
+            // 清空並設置樣式
+            controlsView.innerHTML = '';
+            controlsView.classList.remove('water-bg');
+            controlsView.style.display = 'flex';
+            controlsView.style.alignItems = 'center';
+            controlsView.style.justifyContent = 'center';
+            controlsView.style.minHeight = '250px';
 
             // Handle Combo Mode
             if (state.currentMode === 'combo') {
@@ -1991,18 +2038,21 @@
             // Handle Fishing Mode
             if (state.currentMode === 'fishing') {
                 ui.controlsView.classList.add('water-bg');
+
+                // Create grid for fishing
+                let grid = document.createElement('div');
                 grid.className = 'controls-grid grid-6';
+                ui.controlsView.appendChild(grid);
 
                 // Add fishing rod (Fixed position to ensure visibility)
-                // Remove existing rod if any (to prevent duplicates on redraw)
                 const existingRod = document.getElementById('fishing-rod-visual');
                 if (existingRod) existingRod.remove();
 
                 const rod = document.createElement('div');
                 rod.id = 'fishing-rod-visual';
                 rod.style.position = 'fixed';
-                rod.style.top = '100px'; // Adjusted to safer position
-                rod.style.right = '-10px'; // Reduced right offset
+                rod.style.top = '100px';
+                rod.style.right = '-10px';
                 rod.style.zIndex = '100';
                 rod.style.pointerEvents = 'none';
                 rod.style.transition = 'transform 0.3s';
@@ -2012,7 +2062,7 @@
                         <line id="fishing-line" x1="0" y1="0" x2="0" y2="0" stroke="white" stroke-width="2" style="opacity: 0;" />
                     </svg>
                 `;
-                document.body.appendChild(rod); // Append to body for fixed positioning
+                document.body.appendChild(rod);
 
                 const currentTarget = state.sequence[state.playerInputIndex];
                 if (!currentTarget) return;
@@ -2033,33 +2083,25 @@
 
                     const handler = async (e) => {
                         e.preventDefault();
-
-                        // Haptic feedback
                         if (navigator.vibrate) navigator.vibrate(10);
 
-                        // Fishing animation
                         const rodElem = document.querySelector('.rod-emoji');
                         const lineElem = document.getElementById('fishing-line');
                         const btnRect = btn.getBoundingClientRect();
                         const rodRect = rodElem.getBoundingClientRect();
 
-                        // Rod tip position (approximate based on emoji rotation)
                         const startX = rodRect.left + rodRect.width * 0.2;
                         const startY = rodRect.top + rodRect.height * 0.2;
                         const endX = btnRect.left + btnRect.width / 2;
                         const endY = btnRect.top + btnRect.height / 2;
 
-                        // 1. Cast rod
                         rodElem.style.transform = 'rotate(-60deg)';
-
-                        // 2. Show line
                         lineElem.setAttribute('x1', startX);
                         lineElem.setAttribute('y1', startY);
-                        lineElem.setAttribute('x2', startX); // Start from rod
+                        lineElem.setAttribute('x2', startX);
                         lineElem.setAttribute('y2', startY);
                         lineElem.style.opacity = '1';
 
-                        // Animate line to target
                         await new Promise(r => requestAnimationFrame(r));
                         lineElem.style.transition = 'all 0.3s ease-out';
                         lineElem.setAttribute('x2', endX);
@@ -2067,13 +2109,11 @@
 
                         await new Promise(r => setTimeout(r, 300));
 
-                        // 3. Catch effect
                         btn.style.transition = 'transform 0.2s';
                         btn.style.transform = 'translateY(-20px) scale(1.1)';
 
                         await new Promise(r => setTimeout(r, 200));
 
-                        // 4. Reset
                         lineElem.style.opacity = '0';
                         rodElem.style.transform = 'rotate(-45deg)';
                         btn.style.transform = '';
@@ -2088,51 +2128,36 @@
                 return;
             }
 
-            // Handle Color/Shape Modes
-            // Remove fishing rod if switching modes
-            const existingRod = document.getElementById('fishing-rod-visual');
-            if (existingRod) existingRod.remove();
+            // ✅✅✅ Color Mode - 硬編碼按鈕 ✅✅✅
+            if (state.currentMode === 'color') {
+                controlsView.innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 20px;">
+                        <button onclick="handleInput('red')" style="width: 100px; height: 100px; background: #c0392b; border-radius: 50%; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer; font-size: 2rem; color: rgba(255,255,255,0.4); transition: transform 0.1s;">●</button>
+                        <button onclick="handleInput('green')" style="width: 100px; height: 100px; background: #27ae60; border-radius: 50%; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer; font-size: 2rem; color: rgba(255,255,255,0.4); transition: transform 0.1s;">■</button>
+                        <button onclick="handleInput('blue')" style="width: 100px; height: 100px; background: #2980b9; border-radius: 50%; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer; font-size: 2rem; color: rgba(255,255,255,0.4); transition: transform 0.1s;">▲</button>
+                        <button onclick="handleInput('yellow')" style="width: 100px; height: 100px; background: #f1c40f; border-radius: 50%; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer; font-size: 2rem; color: rgba(255,255,255,0.4); transition: transform 0.1s;">★</button>
+                        <button onclick="handleInput('purple')" style="width: 100px; height: 100px; background: #8e44ad; border-radius: 50%; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer; font-size: 2rem; color: rgba(255,255,255,0.4); transition: transform 0.1s;">♦</button>
+                        <button onclick="handleInput('orange')" style="width: 100px; height: 100px; background: #e67e22; border-radius: 50%; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer; font-size: 2rem; color: rgba(255,255,255,0.4); transition: transform 0.1s;">◆</button>
+                    </div>
+                `;
+                console.log('✅ 顏色按鈕已創建');
+                return;
+            }
 
-            const modeConfig = GAME_MODES[state.currentMode];
-            if (!modeConfig || !modeConfig.items) return;
-
-            modeConfig.items.forEach(itemName => {
-                const btn = document.createElement('button');
-                btn.className = 'control-btn';
-                btn.setAttribute('data-item', itemName);
-                btn.setAttribute('data-type', state.currentMode);
-
-                let content = '';
-                if (state.currentMode === 'color') {
-                    const colorInfo = modeConfig.display[itemName];
-                    // Use fixed pixel size to ensure visibility
-                    content = `<div class="color-prompt" data-color="${itemName}" style="width: 100px; height: 100px; border-radius: 50%; background-color: ${colorInfo.color}; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 4px solid white;"></div>`;
-                    btn.setAttribute('aria-label', `${itemName} color button`);
-                } else if (state.currentMode === 'shape') {
-                    const shapeInfo = modeConfig.display[itemName];
-                    content = createShapeSVG(shapeInfo.shape);
-                }
-
-                btn.innerHTML = `<div class="control-content">${content}</div>`;
-
-                const handler = (e) => {
-                    e.preventDefault();
-                    if (navigator.vibrate) navigator.vibrate(10);
-
-                    // Visual feedback
-                    btn.style.transform = 'scale(0.95)';
-                    btn.style.filter = 'brightness(0.9)';
-                    setTimeout(() => {
-                        btn.style.transform = '';
-                        btn.style.filter = '';
-                    }, 100);
-
-                    handleInput(itemName);
-                };
-                btn.addEventListener('touchstart', handler);
-                btn.addEventListener('click', handler);
-                grid.appendChild(btn);
-            });
+            // ✅ Shape Mode - 硬編碼按鈕
+            if (state.currentMode === 'shape') {
+                controlsView.innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 20px;">
+                        <button onclick="handleInput('circle')" style="width: 100px; height: 100px; background: #e74c3c; border-radius: 50%; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer;"></button>
+                        <button onclick="handleInput('square')" style="width: 100px; height: 100px; background: #2ecc71; border-radius: 10px; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer;"></button>
+                        <div style="display: flex; align-items: center; justify-content: center;">
+                            <button onclick="handleInput('triangle')" style="width: 0; height: 0; border-left: 50px solid transparent; border-right: 50px solid transparent; border-bottom: 87px solid #3498db; cursor: pointer; background: transparent; border-top: none;"></button>
+                        </div>
+                    </div>
+                `;
+                console.log('✅ 形狀按鈕已創建');
+                return;
+            }
         }
 
 
