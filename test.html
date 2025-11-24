@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>測試按鈕顯示</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: sans-serif;
+        }
+
+        #controls-view {
+            border: 2px solid red;
+            padding: 20px;
+            background: lightgray;
+            min-height: 300px;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            border: 2px solid blue;
+            padding: 10px;
+        }
+
+        .control-btn {
+            border: 2px solid green;
+            padding: 20px;
+            background: white;
+            cursor: pointer;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fish-item {
+            animation: float 2s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>按鈕顯示測試</h1>
+    <p>紅框 = controls-view, 藍框 = controls-grid, 綠框 = 按鈕</p>
+
+    <button onclick="testColorMode()">測試 Color 模式</button>
+    <button onclick="testFishingMode()">測試 Fishing 模式</button>
+    <button onclick="console.log(document.getElementById('controls-view').innerHTML)">查看 HTML</button>
+
+    <div id="controls-view"></div>
+
+    <script>
+        const GAME_MODES = {
+            color: {
+                items: ['red', 'green', 'blue'],
+                display: {
+                    red: { color: '#c0392b' },
+                    green: { color: '#27ae60' },
+                    blue: { color: '#2980b9' }
+                }
+            },
+            fishing: {
+                items: [
+                    { name: 'cat', emoji: '🐱' },
+                    { name: 'dog', emoji: '🐶' },
+                    { name: 'fish', emoji: '🐟' },
+                    { name: 'bird', emoji: '🐦' },
+                    { name: 'pig', emoji: '🐷' },
+                    { name: 'cow', emoji: '🐮' }
+                ]
+            }
+        };
+
+        let state = {
+            currentMode: 'color',
+            sequence: ['red'],
+            playerInputIndex: 0
+        };
+
+        const ui = {
+            controlsView: document.getElementById('controls-view')
+        };
+
+        function testColorMode() {
+            state.currentMode = 'color';
+            state.sequence = ['red'];
+            updateControls();
+        }
+
+        function testFishingMode() {
+            state.currentMode = 'fishing';
+            state.sequence = [{ name: 'cat', emoji: '🐱' }];
+            updateControls();
+        }
+
+        function updateControls() {
+            console.log('updateControls called, mode:', state.currentMode);
+            ui.controlsView.innerHTML = '';
+
+            let grid = ui.controlsView.querySelector('.controls-grid');
+            if (!grid) {
+                grid = document.createElement('div');
+                grid.className = 'controls-grid';
+                ui.controlsView.appendChild(grid);
+            } else {
+                grid.className = 'controls-grid';
+            }
+            grid.innerHTML = '';
+
+            if (state.currentMode === 'fishing') {
+                console.log('Fishing mode selected');
+                grid.className = 'controls-grid grid-6';
+
+                const currentTarget = state.sequence[state.playerInputIndex];
+                console.log('Current target:', currentTarget);
+                const allItems = GAME_MODES.fishing.items;
+
+                const distractors = allItems.filter(item => item.name !== currentTarget.name);
+                const selectedDistractors = distractors.sort(() => 0.5 - Math.random()).slice(0, 5);
+                const displayItems = [currentTarget, ...selectedDistractors].sort(() => 0.5 - Math.random());
+
+                console.log('Display items:', displayItems);
+                displayItems.forEach(item => {
+                    const btn = document.createElement('button');
+                    btn.className = 'control-btn fish-item';
+                    btn.innerHTML = `<div>${item.emoji} ${item.name}</div>`;
+                    btn.onclick = () => alert('Clicked: ' + item.name);
+                    grid.appendChild(btn);
+                    console.log('Added button for:', item.name);
+                });
+                return;
+            }
+
+            // Color mode
+            console.log('Color mode selected');
+            const modeConfig = GAME_MODES[state.currentMode];
+            if (!modeConfig || !modeConfig.items) {
+                console.error('Invalid mode config');
+                return;
+            }
+
+            modeConfig.items.forEach(itemName => {
+                const btn = document.createElement('button');
+                btn.className = 'control-btn';
+
+                const colorInfo = modeConfig.display[itemName];
+                btn.innerHTML = `<div style="width: 60px; height: 60px; background: ${colorInfo.color};"></div>`;
+                btn.onclick = () => alert('Clicked: ' + itemName);
+                grid.appendChild(btn);
+                console.log('Added button for:', itemName);
+            });
+        }
+    </script>
+</body>
+
+</html>

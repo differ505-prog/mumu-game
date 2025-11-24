@@ -186,6 +186,43 @@
             /* Smaller for numbers */
             text-shadow: 0 3px 6px rgba(0, 0, 0, 0.5);
             color: white;
+            color: white;
+        }
+
+        #achievement-display {
+            position: absolute;
+            top: 100px;
+            left: 10px;
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+            transform: scale(0.8);
+            transform-origin: top left;
+        }
+
+        .medal-icon {
+            font-size: 2rem;
+            opacity: 0.3;
+            filter: grayscale(100%);
+            transition: all 0.3s;
+        }
+
+        .medal-icon.earned {
+            opacity: 1;
+            filter: grayscale(0%);
+            animation: medal-bounce 0.5s ease-out;
+        }
+
+        @keyframes medal-bounce {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.3) rotate(10deg);
+            }
         }
 
         #status-text {
@@ -257,6 +294,23 @@
         }
 
         /* ... keyframes ... */
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 rgba(241, 196, 15, 0);
+            }
+
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 30px rgba(241, 196, 15, 0.8);
+            }
+        }
+
+        #bubble.playing {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
 
         #bubble {
             position: absolute;
@@ -305,6 +359,68 @@
         .color-prompt {
             border-radius: 50%;
             box-shadow: inset 0 -5px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        /* Color Blindness Patterns */
+        .color-prompt[data-color="red"]::after {
+            content: '●';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .color-prompt[data-color="green"]::after {
+            content: '■';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .color-prompt[data-color="blue"]::after {
+            content: '▲';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .color-prompt[data-color="yellow"]::after {
+            content: '★';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .color-prompt[data-color="purple"]::after {
+            content: '♦';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .color-prompt[data-color="orange"]::after {
+            content: '◆';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.4);
         }
 
         /* Controls View (Bottom 40%) - Glassmorphism */
@@ -335,7 +451,9 @@
             justify-content: center;
             align-items: center;
             background: transparent;
-            transition: transform 0.1s;
+            background: transparent;
+            transition: transform 0.1s, filter 0.1s;
+            -webkit-tap-highlight-color: transparent;
             -webkit-tap-highlight-color: transparent;
             padding: 0;
             max-width: 30%;
@@ -966,6 +1084,66 @@
                 transform: scale(0.9);
             }
 
+            #slow-mode-btn {
+                position: absolute;
+                top: 15px;
+                left: 85px;
+                /* Next to replay button */
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                background: #3498db;
+                border: 3px solid #fff;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+                color: white;
+                font-size: 2rem;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+                z-index: 30;
+                transition: transform 0.2s, background 0.3s;
+            }
+
+            #slow-mode-btn.active {
+                background: #27ae60;
+                /* Green when active */
+                transform: scale(1.1);
+            }
+
+            #slow-mode-btn:active {
+                transform: scale(0.9);
+            }
+
+            #music-control-btn {
+                position: fixed;
+                bottom: 20px;
+                left: 20px;
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                background: rgba(52, 152, 219, 0.9);
+                border: 3px solid #fff;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+                color: white;
+                font-size: 2rem;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+                z-index: 30;
+                transition: transform 0.2s, background 0.3s;
+                backdrop-filter: blur(10px);
+            }
+
+            #music-control-btn:active {
+                transform: scale(0.9);
+            }
+
+            #music-control-btn.off {
+                background: rgba(149, 165, 166, 0.7);
+            }
+
             /* Turn Signal (Green Light) */
             #turn-signal {
                 position: absolute;
@@ -1151,10 +1329,12 @@
     </audio>
 
     <div id="game-container">
+        <button id="music-control-btn" onclick="cycleMusicMode()">🎵</button>
         <div id="tv-view">
             <div id="snow-container"></div>
 
             <button id="replay-btn" onclick="replaySequence()">🔊</button>
+            <button id="slow-mode-btn" onclick="toggleSlowMode()">🐢</button>
             <div id="turn-signal"></div>
 
             <div id="status-text" style="left: 80px;">Listen...</div> <!-- Shifted right -->
@@ -1175,6 +1355,12 @@
             <div id="scoreboard-container">
                 <div id="level-display">Level 1</div>
                 <div id="scoreboard">☆☆☆☆☆</div>
+            </div>
+            <div id="achievement-display">
+                <span class="medal-icon" data-medal="bronze">🥉</span>
+                <span class="medal-icon" data-medal="silver">🥈</span>
+                <span class="medal-icon" data-medal="gold">🥇</span>
+                <span class="medal-icon" data-medal="crown">👑</span>
             </div>
 
             <div id="santa-container">
@@ -1468,6 +1654,12 @@
             totalStars: 0,
             combo: 0,
             bestCombo: 0,
+            medals: {
+                bronze: false,
+                silver: false,
+                gold: false,
+                crown: false
+            },
 
             load: function () {
                 const saved = localStorage.getItem('santaGameAchievements');
@@ -1475,13 +1667,16 @@
                     const data = JSON.parse(saved);
                     this.totalStars = data.totalStars || 0;
                     this.bestCombo = data.bestCombo || 0;
+                    this.medals = data.medals || { bronze: false, silver: false, gold: false, crown: false };
                 }
+                this.updateMedals();
             },
 
             save: function () {
                 localStorage.setItem('santaGameAchievements', JSON.stringify({
                     totalStars: this.totalStars,
-                    bestCombo: this.bestCombo
+                    bestCombo: this.bestCombo,
+                    medals: this.medals
                 }));
             },
 
@@ -1491,8 +1686,40 @@
                 if (this.combo > this.bestCombo) {
                     this.bestCombo = this.combo;
                 }
+
+                // Check medals
+                if (this.combo >= 3 && !this.medals.bronze) {
+                    this.medals.bronze = true;
+                    this.awardMedal('bronze');
+                }
+                if (this.combo >= 5 && !this.medals.silver) {
+                    this.medals.silver = true;
+                    this.awardMedal('silver');
+                }
+                if (this.combo >= 8 && !this.medals.gold) {
+                    this.medals.gold = true;
+                    this.awardMedal('gold');
+                }
+
                 this.save();
                 this.updateUI();
+            },
+
+            awardMedal: function (type) {
+                const medal = document.querySelector(`[data-medal="${type}"]`);
+                if (medal) {
+                    medal.classList.add('earned');
+                    audioSys.speak(`${type} medal earned!`);
+                }
+            },
+
+            updateMedals: function () {
+                Object.keys(this.medals).forEach(type => {
+                    const medal = document.querySelector(`[data-medal="${type}"]`);
+                    if (medal && this.medals[type]) {
+                        medal.classList.add('earned');
+                    }
+                });
             },
 
             breakCombo: function () {
@@ -1536,12 +1763,13 @@
         let state = {
             currentMode: 'color',
             score: 0,
-            maxScore: 10,
+            maxScore: 8, // Reduced from 10
             level: 1,
             sequence: [],
             playerInputIndex: 0,
             isInputLocked: false,
             isPlaying: false,
+            slowMode: false, // Added slowMode
             // Combo mode specific
             comboSequence: [],  // [{number, color, animal}, ...]
             comboStep: 0,  // 0=number, 1=color, 2=animal
@@ -1568,6 +1796,51 @@
         let selectedCharacter = 'santa';
         const bgmPlayer = document.getElementById('bgm-player');
         const characterImg = document.getElementById('character-img');
+
+        let musicMode = 0; // 0: Jingle Bells, 1: Silent Night, 2: Off
+
+        function cycleMusicMode() {
+            musicMode = (musicMode + 1) % 3;
+            const btn = document.getElementById('music-control-btn');
+            const bgm = document.getElementById('bgm-player');
+
+            if (musicMode === 0) {
+                // Jingle Bells
+                bgm.src = './外部資源/jingle-bells.mp3';
+                bgm.play();
+                btn.textContent = '🎵';
+                btn.classList.remove('off');
+                audioSys.speak("Jingle Bells");
+            } else if (musicMode === 1) {
+                // Silent Night
+                bgm.src = './外部資源/silent-night.mp3';
+                bgm.play();
+                btn.textContent = '🎶';
+                btn.classList.remove('off');
+                audioSys.speak("Silent Night");
+            } else {
+                // Off
+                bgm.pause();
+                btn.textContent = '🔇';
+                btn.classList.add('off');
+            }
+
+            localStorage.setItem('santaMusicMode', musicMode);
+        }
+
+        function toggleSlowMode() {
+            state.slowMode = !state.slowMode;
+            const btn = document.getElementById('slow-mode-btn');
+            if (btn) {
+                if (state.slowMode) {
+                    btn.classList.add('active');
+                    audioSys.speak("Slow mode on");
+                } else {
+                    btn.classList.remove('active');
+                    audioSys.speak("Normal speed");
+                }
+            }
+        }
 
         function applyCharacterEffect(character) {
             const body = document.body;
@@ -1649,9 +1922,36 @@
             state.isPlaying = true;
 
             // Start real music
-            if (bgmPlayer) {
+            // Load music preference
+            const savedMode = localStorage.getItem('santaMusicMode');
+            if (savedMode !== null) {
+                musicMode = parseInt(savedMode);
+                if (musicMode === 0) {
+                    bgmPlayer.src = './外部資源/jingle-bells.mp3';
+                } else if (musicMode === 1) {
+                    bgmPlayer.src = './外部資源/silent-night.mp3';
+                }
+            }
+
+            if (musicMode < 2 && bgmPlayer) {
                 bgmPlayer.volume = 0.3;
                 bgmPlayer.play().catch(e => console.log('Audio play failed:', e));
+
+                // Update button state
+                const btn = document.getElementById('music-control-btn');
+                if (btn) {
+                    if (musicMode === 0) btn.textContent = '🎵';
+                    else if (musicMode === 1) btn.textContent = '🎶';
+                    btn.classList.remove('off');
+                }
+            } else if (bgmPlayer) {
+                // Ensure it's off if mode is 2
+                bgmPlayer.pause();
+                const btn = document.getElementById('music-control-btn');
+                if (btn) {
+                    btn.textContent = '🔇';
+                    btn.classList.add('off');
+                }
             }
 
             audioSys.init();
@@ -1701,8 +2001,8 @@
                 const rod = document.createElement('div');
                 rod.id = 'fishing-rod-visual';
                 rod.style.position = 'fixed';
-                rod.style.top = '150px'; // Lower it down
-                rod.style.right = '-40px';
+                rod.style.top = '100px'; // Adjusted to safer position
+                rod.style.right = '-10px'; // Reduced right offset
                 rod.style.zIndex = '100';
                 rod.style.pointerEvents = 'none';
                 rod.style.transition = 'transform 0.3s';
@@ -1733,6 +2033,9 @@
 
                     const handler = async (e) => {
                         e.preventDefault();
+
+                        // Haptic feedback
+                        if (navigator.vibrate) navigator.vibrate(10);
 
                         // Fishing animation
                         const rodElem = document.querySelector('.rod-emoji');
@@ -1803,7 +2106,8 @@
                 if (state.currentMode === 'color') {
                     const colorInfo = modeConfig.display[itemName];
                     // Use fixed pixel size to ensure visibility
-                    content = `<div style="width: 100px; height: 100px; border-radius: 50%; background-color: ${colorInfo.color}; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 4px solid white;"></div>`;
+                    content = `<div class="color-prompt" data-color="${itemName}" style="width: 100px; height: 100px; border-radius: 50%; background-color: ${colorInfo.color}; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 4px solid white;"></div>`;
+                    btn.setAttribute('aria-label', `${itemName} color button`);
                 } else if (state.currentMode === 'shape') {
                     const shapeInfo = modeConfig.display[itemName];
                     content = createShapeSVG(shapeInfo.shape);
@@ -1813,6 +2117,16 @@
 
                 const handler = (e) => {
                     e.preventDefault();
+                    if (navigator.vibrate) navigator.vibrate(10);
+
+                    // Visual feedback
+                    btn.style.transform = 'scale(0.95)';
+                    btn.style.filter = 'brightness(0.9)';
+                    setTimeout(() => {
+                        btn.style.transform = '';
+                        btn.style.filter = '';
+                    }, 100);
+
                     handleInput(itemName);
                 };
                 btn.addEventListener('touchstart', handler);
@@ -2058,7 +2372,7 @@
             state.comboStep = 0;
             state.currentComboSelection = {};
 
-            const sequenceLength = state.level;
+            const sequenceLength = state.level + 1; // Level 1 = 2 items, Level 5 = 6 items
 
             if (state.currentMode === 'combo') {
                 // Generate random combos
@@ -2118,7 +2432,8 @@
                     setTimeout(() => {
                         i++;
                         showNext();
-                    }, 2500); // Slower for combo
+                    }, state.slowMode ? 4000 : 2500); // Slower for combo
+                    return;
                     return;
                 }
 
@@ -2168,10 +2483,10 @@
                 }
 
                 setTimeout(() => {
-                    ui.bubble.classList.remove('show'); // Hide bubble after prompt
+                    ui.bubble.classList.remove('show', 'playing'); // Hide bubble after prompt
                     i++;
                     showNext();
-                }, 2000); // Standard delay
+                }, state.slowMode ? 3500 : 2000); // Standard delay
             }
 
             setTimeout(showNext, 1000);
@@ -2219,7 +2534,7 @@
                 ui.bubbleContent.innerHTML = `<div style="font-size: 3.5rem; color: ${display.color}">${display.note}</div>`;
             }
 
-            ui.bubble.classList.add('show');
+            ui.bubble.classList.add('show', 'playing');
         }
 
         function showComboPrompt(combo) {
@@ -2238,7 +2553,7 @@
                 </div>
             `;
             ui.bubbleContent.innerHTML = html;
-            ui.bubble.classList.add('show');
+            ui.bubble.classList.add('show', 'playing');
         }
 
         function highlightControl(item) {
@@ -2264,17 +2579,19 @@
             // Store selection based on step
             if (state.comboStep === 0) {
                 state.currentComboSelection.number = obj;
-                audioSys.speak(obj.value.toString()); // Speak number
+                audioSys.speak(obj.value.toString());
+                setTimeout(() => audioSys.speak("Good!"), 800); // Encouragement
                 state.comboStep = 1;
-                updateComboControls(1);  // Show colors
+                setTimeout(() => updateComboControls(1), 1000); // Delayed next step
             } else if (state.comboStep === 1) {
                 state.currentComboSelection.color = obj;
-                audioSys.speak(obj.name); // Speak color
+                audioSys.speak(obj.name);
+                setTimeout(() => audioSys.speak("Nice!"), 800); // Encouragement
                 state.comboStep = 2;
-                updateComboControls(2);  // Show animals
+                setTimeout(() => updateComboControls(2), 1000);
             } else if (state.comboStep === 2) {
                 state.currentComboSelection.animal = obj;
-                audioSys.speak(obj.name); // Speak animal
+                audioSys.speak(obj.name);
 
                 // Now validate the whole combo
                 const expectedCombo = state.comboSequence[state.playerInputIndex];
@@ -2284,22 +2601,21 @@
                     state.currentComboSelection.animal.name === expectedCombo.animal.name;
 
                 if (isCorrect) {
-                    // Play success sound
-                    audioSys.playCorrect();
-                    state.playerInputIndex++;
+                    setTimeout(() => audioSys.speak("Perfect!"), 800); // Encouragement
+                    setTimeout(() => {
+                        audioSys.playCorrect();
+                        state.playerInputIndex++;
 
-                    // Check if sequence complete
-                    if (state.playerInputIndex >= state.comboSequence.length) {
-                        handleRoundWin('combo');
-                    } else {
-                        // Reset for next combo
-                        state.comboStep = 0;
-                        state.currentComboSelection = {};
-                        updateComboControls(0);  // Back to numbers
-                        setStatus(`✅ Good! Next one...`);
-                    }
+                        if (state.playerInputIndex >= state.comboSequence.length) {
+                            handleRoundWin('combo');
+                        } else {
+                            state.comboStep = 0;
+                            state.currentComboSelection = {};
+                            updateComboControls(0);
+                            setStatus(`✅ Good! Next one...`);
+                        }
+                    }, 1200);
                 } else {
-                    // Wrong combo
                     handleComboWrong();
                 }
             }
@@ -2307,16 +2623,24 @@
 
         function handleComboWrong() {
             state.isInputLocked = true;
-            setStatus("❌ 再試試！ Try Again!");
-            audioSys.playWrong();
+            setStatus("❌ Try again! You can do it!");
+            audioSys.speak("Try again! You can do it!");
             achievements.breakCombo();
+
+            const characterImg = document.getElementById('character-img');
+            if (characterImg) {
+                characterImg.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    characterImg.style.animation = 'santa-breathe 3s ease-in-out infinite';
+                }, 500);
+            }
 
             setTimeout(() => {
                 state.playerInputIndex = 0;
                 state.comboStep = 0;
                 state.currentComboSelection = {};
                 playSequence();
-            }, 2000);
+            }, 1500); // Reduced from 2000
         }
 
         function handleInput(item) {
@@ -2415,6 +2739,13 @@
         function nextLevel() {
             hideLevelButtons();
 
+            // Check for Crown Medal (Level 5 complete)
+            if (state.level >= 5 && !achievements.medals.crown) {
+                achievements.medals.crown = true;
+                achievements.awardMedal('crown');
+                achievements.save();
+            }
+
             state.level++;
             if (state.level > 5) state.level = 1; // Loop back
 
@@ -2440,9 +2771,18 @@
 
         function handleWrong(item) {
             state.isInputLocked = true;
-            setStatus("❌ 再試試！ Try Again!");
-            audioSys.playWrong();
+            setStatus("❌ Try again! You can do it!"); // More encouraging
+            audioSys.speak("Try again! You can do it!");
             achievements.breakCombo();
+
+            // Character shake animation
+            const characterImg = document.getElementById('character-img');
+            if (characterImg) {
+                characterImg.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    characterImg.style.animation = 'santa-breathe 3s ease-in-out infinite';
+                }, 500);
+            }
 
             // Handle both string and object items
             const itemName = typeof item === 'object' ? item.name : item;
@@ -2455,7 +2795,7 @@
             setTimeout(() => {
                 state.playerInputIndex = 0;
                 playSequence();
-            }, 2000);
+            }, 1500); // Reduced from 2000
         }
 
         function handleLevelUp() {
