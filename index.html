@@ -1422,14 +1422,25 @@
             color: {
                 name: 'Colors',
                 icon: '🎨',
-                items: ['red', 'green', 'blue', 'yellow', 'purple', 'orange'],
+                // ✅ 擴充顏色題庫（可隨時添加新顏色）
+                items: [
+                    'red', 'green', 'blue', 'yellow', 'purple', 'orange',
+                    'pink', 'brown', 'black', 'white', 'gray', 'cyan'  // ✅ 新增顏色
+                ],
                 display: {
-                    red: { color: '#c0392b', emoji: '🎁' },
-                    green: { color: '#27ae60', emoji: '🎁' },
-                    blue: { color: '#2980b9', emoji: '🎁' },
-                    yellow: { color: '#f1c40f', emoji: '🎁' },
-                    purple: { color: '#8e44ad', emoji: '🎁' },
-                    orange: { color: '#e67e22', emoji: '🎁' }
+                    red: { color: '#c0392b', emoji: '🎁', symbol: '●' },
+                    green: { color: '#27ae60', emoji: '🎁', symbol: '■' },
+                    blue: { color: '#2980b9', emoji: '🎁', symbol: '▲' },
+                    yellow: { color: '#f1c40f', emoji: '🎁', symbol: '★' },
+                    purple: { color: '#8e44ad', emoji: '🎁', symbol: '♦' },
+                    orange: { color: '#e67e22', emoji: '🎁', symbol: '◆' },
+                    // ✅ 新增顏色資料
+                    pink: { color: '#e91e63', emoji: '🎁', symbol: '♥' },
+                    brown: { color: '#795548', emoji: '🎁', symbol: '◗' },
+                    black: { color: '#2c3e50', emoji: '🎁', symbol: '⬤' },
+                    white: { color: '#ecf0f1', emoji: '🎁', symbol: '○' },
+                    gray: { color: '#95a5a6', emoji: '🎁', symbol: '◐' },
+                    cyan: { color: '#1abc9c', emoji: '🎁', symbol: '◆' }
                 }
             },
             shape: {
@@ -1933,7 +1944,7 @@
             versionDisplay.style.color = 'rgba(255,255,255,0.5)';
             versionDisplay.style.fontSize = '12px';
             versionDisplay.style.zIndex = '9999';
-            versionDisplay.textContent = 'v53.0 🎵';
+            versionDisplay.textContent = 'v54.0 🎨';
             document.body.appendChild(versionDisplay);
 
             createSnow();
@@ -2170,30 +2181,64 @@
                 return;
             }
 
-            // ✅✅✅ Color Mode - 硬編碼按鈕 ✅✅✅
+            // ✅✅✅ Color Mode - 動態隨機生成（與 Fishing 相同邏輯）✅✅✅
             if (state.currentMode === 'color') {
-                controlsView.innerHTML = `
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 20px;">
-                        <button onclick="handleInput('red')" style="width: 100px; height: 100px; background: #c0392b; border-radius: 50%; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer; font-size: 2rem; color: rgba(255,255,255,0.4); transition: transform 0.1s;">●</button>
-                        <button onclick="handleInput('green')" style="width: 100px; height: 100px; background: #27ae60; border-radius: 50%; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer; font-size: 2rem; color: rgba(255,255,255,0.4); transition: transform 0.1s;">■</button>
-                        <button onclick="handleInput('blue')" style="width: 100px; height: 100px; background: #2980b9; border-radius: 50%; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer; font-size: 2rem; color: rgba(255,255,255,0.4); transition: transform 0.1s;">▲</button>
-                        <button onclick="handleInput('yellow')" style="width: 100px; height: 100px; background: #f1c40f; border-radius: 50%; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer; font-size: 2rem; color: rgba(255,255,255,0.4); transition: transform 0.1s;">★</button>
-                        <button onclick="handleInput('purple')" style="width: 100px; height: 100px; background: #8e44ad; border-radius: 50%; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer; font-size: 2rem; color: rgba(255,255,255,0.4); transition: transform 0.1s;">♦</button>
-                        <button onclick="handleInput('orange')" style="width: 100px; height: 100px; background: #e67e22; border-radius: 50%; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer; font-size: 2rem; color: rgba(255,255,255,0.4); transition: transform 0.1s;">◆</button>
-                    </div>
-                `;
-                console.log('✅ 顏色按鈕已創建');
+                const currentTarget = state.sequence[state.playerInputIndex];
+                if (!currentTarget) return;
+
+                const allColors = GAME_MODES.color.items;
+                const distractors = allColors.filter(c => c !== currentTarget);
+                const selectedDistractors = distractors.sort(() => 0.5 - Math.random()).slice(0, 5);
+                const displayColors = [currentTarget, ...selectedDistractors].sort(() => 0.5 - Math.random());
+
+                // Create grid container
+                const gridContainer = document.createElement('div');
+                gridContainer.style.cssText = 'display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 10px; max-width: 600px; margin: 0 auto;';
+
+                displayColors.forEach(colorName => {
+                    const colorInfo = GAME_MODES.color.display[colorName];
+                    const btn = document.createElement('button');
+                    btn.onclick = () => handleInput(colorName);
+                    btn.setAttribute('data-item', colorName);
+                    btn.style.cssText = `
+                        width: 90px; 
+                        height: 90px; 
+                        background: ${colorInfo.color}; 
+                        border-radius: 50%; 
+                        border: 4px solid white; 
+                        box-shadow: 0 5px 15px rgba(0,0,0,0.3); 
+                        cursor: pointer; 
+                        font-size: 2rem; 
+                        color: ${colorName === 'white' ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.4)'}; 
+                        transition: transform 0.1s;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    `;
+
+                    // Add symbol
+                    btn.textContent = colorInfo.symbol || '●';
+
+                    // Add hover effect
+                    btn.onmousedown = () => btn.style.transform = 'scale(0.9)';
+                    btn.onmouseup = () => btn.style.transform = 'scale(1)';
+
+                    gridContainer.appendChild(btn);
+                });
+
+                controlsView.appendChild(gridContainer);
+                console.log('✅ 顏色按鈕已創建 (隨找6選1):', displayColors);
                 return;
             }
 
-            // ✅ Shape Mode - 硬編碼按鈕
+            // ✅ Shape Mode - 硬編碼按鈕（形狀固定只有3個）
             if (state.currentMode === 'shape') {
                 controlsView.innerHTML = `
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 20px;">
-                        <button onclick="handleInput('circle')" style="width: 100px; height: 100px; background: #e74c3c; border-radius: 50%; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer;"></button>
-                        <button onclick="handleInput('square')" style="width: 100px; height: 100px; background: #2ecc71; border-radius: 10px; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer;"></button>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 10px; max-width: 600px; margin: 0 auto;">
+                        <button onclick="handleInput('circle')" style="width: 90px; height: 90px; background: #e74c3c; border-radius: 50%; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer;"></button>
+                        <button onclick="handleInput('square')" style="width: 90px; height: 90px; background: #2ecc71; border-radius: 10px; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer;"></button>
                         <div style="display: flex; align-items: center; justify-content: center;">
-                            <button onclick="handleInput('triangle')" style="width: 0; height: 0; border-left: 50px solid transparent; border-right: 50px solid transparent; border-bottom: 87px solid #3498db; cursor: pointer; background: transparent; border-top: none;"></button>
+                            <button onclick="handleInput('triangle')" style="width: 0; height: 0; border-left: 45px solid transparent; border-right: 45px solid transparent; border-bottom: 78px solid #3498db; cursor: pointer; background: transparent; border-top: none;"></button>
                         </div>
                     </div>
                 `;
