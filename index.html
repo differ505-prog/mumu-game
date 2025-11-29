@@ -2794,6 +2794,9 @@
 
                 if (state.playerInputIndex >= state.sequence.length) {
                     handleRoundWin(item);
+                } else {
+                    // ✅ Update controls for the next item in the sequence
+                    updateControls();
                 }
             } else {
                 handleWrong(item);
