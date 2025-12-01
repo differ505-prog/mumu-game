@@ -434,19 +434,19 @@
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             border-top: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 20px;
-            /* ✅ 改為固定 padding */
+            padding: 15px;
+            /* ✅ 減少 padding 避免溢出 */
             align-items: center;
             /* ✅ 改為 center */
             justify-content: center;
             /* ✅ 改為 center */
             box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
-            min-height: 250px;
-            /* ✅ 新增：最小高度 */
+            min-height: 200px;
+            /* ✅ 減少最小高度 */
             max-height: 40vh;
             /* ✅ 新增：最大高度 */
-            overflow: visible;
-            /* ✅ 防止被裁切 */
+            overflow: hidden;
+            /* ✅ 改為 hidden 防止溢出 */
         }
 
         .control-btn {
@@ -2116,13 +2116,26 @@
                 `;
                 document.body.appendChild(rod);
 
+                // ✅ 修正：使用最新的 playerInputIndex 來獲取當前目標
                 const currentTarget = state.sequence[state.playerInputIndex];
-                if (!currentTarget) return;
+                console.log('🎣 Fishing updateControls - playerInputIndex:', state.playerInputIndex);
+                console.log('🎣 Fishing updateControls - sequence length:', state.sequence.length);
+                console.log('🎣 Fishing updateControls - Current target:', currentTarget);
+
+                if (!currentTarget) {
+                    console.error('❌ No current target found!');
+                    return;
+                }
 
                 const allItems = GAME_MODES.fishing.items;
+                // ✅ 修正：確保過濾時使用正確的屬性比較
                 const distractors = allItems.filter(item => item.name !== currentTarget.name);
                 const selectedDistractors = distractors.sort(() => 0.5 - Math.random()).slice(0, 5);
                 const displayItems = [currentTarget, ...selectedDistractors].sort(() => 0.5 - Math.random());
+
+                console.log('🎣 Fishing updateControls - Current target name:', currentTarget.name);
+                console.log('🎣 Display items:', displayItems.map(i => i.name));
+                console.log('🎣 Correct answer included?', displayItems.some(i => i.name === currentTarget.name));
 
                 displayItems.forEach((item, index) => {
                     const btn = document.createElement('button');
@@ -2182,13 +2195,26 @@
 
             // ✅✅✅ Color Mode - 動態隨機生成（與 Fishing 相同邏輯）✅✅✅
             if (state.currentMode === 'color') {
+                // ✅ 修正：使用最新的 playerInputIndex 來獲取當前目標
                 const currentTarget = state.sequence[state.playerInputIndex];
-                if (!currentTarget) return;
+                console.log('🎨 Color updateControls - playerInputIndex:', state.playerInputIndex);
+                console.log('🎨 Color updateControls - sequence length:', state.sequence.length);
+                console.log('🎨 Color updateControls - Current target:', currentTarget);
+
+                if (!currentTarget) {
+                    console.error('❌ No current target found!');
+                    return;
+                }
 
                 const allColors = GAME_MODES.color.items;
+                // ✅ 修正：確保過濾時使用正確的屬性比較
                 const distractors = allColors.filter(c => c !== currentTarget);
                 const selectedDistractors = distractors.sort(() => 0.5 - Math.random()).slice(0, 5);
                 const displayColors = [currentTarget, ...selectedDistractors].sort(() => 0.5 - Math.random());
+
+                console.log('🎨 Color updateControls - Current target color:', currentTarget);
+                console.log('🎨 Display colors:', displayColors);
+                console.log('🎨 Correct answer included?', displayColors.includes(currentTarget));
 
                 // Create grid container
                 const gridContainer = document.createElement('div');
@@ -2508,6 +2534,16 @@
                         animal: randomAnimal
                     });
                 }
+            } else if (state.currentMode === 'fishing') {
+                // ✅ Fishing 模式特殊難度曲線（從 1 開始）
+                // Level 1 = 1 item, Level 2 = 2 items, Level 3 = 3 items, etc.
+                sequenceLength = state.level;
+
+                const modeConfig = GAME_MODES[state.currentMode];
+                for (let i = 0; i < sequenceLength; i++) {
+                    const randomItem = modeConfig.items[Math.floor(Math.random() * modeConfig.items.length)];
+                    state.sequence.push(randomItem);
+                }
             } else {
                 // ✅ 其他模式：原始難度曲線
                 // Level 1 = 2 items, Level 2 = 3 items, ..., Level 5 = 6 items
@@ -2578,7 +2614,6 @@
 
                 // Show prompt based on mode
                 if (state.currentMode === 'fishing') {
-                    console.log('Showing fishing prompt');
                     ui.bubbleContent.innerHTML = '<div style="font-size: 3rem;">👂</div>'; // Ear icon for listening
                     ui.bubble.classList.add('show');
                     audioSys.speak(item.name);
