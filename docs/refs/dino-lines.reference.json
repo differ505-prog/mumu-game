@@ -1,0 +1,338 @@
+{
+  "dino-triceratops": [
+    {
+      "zh-TW": "{name}說：我聽到你說話了，聽得很清楚喔！",
+      "en-US": "{name} says: I heard you loud and clear!"
+    },
+    {
+      "zh-TW": "{name}說：我的角可以幫你擋風雪，你慢慢聽。",
+      "en-US": "{name} says: My horns can block the snow. Take your time."
+    },
+    {
+      "zh-TW": "{name}說：別急，我們一起聽會更清楚。",
+      "en-US": "{name} says: No rush. We listen better together."
+    }
+  ],
+  "dino-trex": [
+    {
+      "zh-TW": "{name}說：一起來聽聽看！",
+      "en-US": "{name} says: Come listen with me!"
+    },
+    {
+      "zh-TW": "{name}說：別擔心，答錯也沒關係，我力氣大，心很軟。",
+      "en-US": "{name} says: Do not worry. I am big but my heart is soft."
+    },
+    {
+      "zh-TW": "{name}說：我再說一次，你慢慢聽。",
+      "en-US": "{name} says: I will say it once more. Listen slowly."
+    }
+  ],
+  "dino-brachiosaurus": [
+    {
+      "zh-TW": "{name}說：我脖子長，聽得比誰都遠！",
+      "en-US": "{name} says: My neck is long. I hear farther than anyone!"
+    },
+    {
+      "zh-TW": "{name}說：遠處有聲音，我幫你接回來。",
+      "en-US": "{name} says: There is a sound far away. I will bring it back."
+    },
+    {
+      "zh-TW": "{name}說：打拍子囉，一、二、三！",
+      "en-US": "{name} says: Clap along. One, two, three!"
+    }
+  ],
+  "dino-pteranodon": [
+    {
+      "zh-TW": "{name}說：我飛得高，聽得也遠。",
+      "en-US": "{name} says: I fly high, so I hear far."
+    },
+    {
+      "zh-TW": "{name}說：天空傳來一個聲音，我帶回來了！",
+      "en-US": "{name} says: A sound came from the sky. I brought it back!"
+    },
+    {
+      "zh-TW": "{name}說：看下面，答案在那裡。",
+      "en-US": "{name} says: Look down. The answer is there."
+    }
+  ],
+  "dino-stegosaurus": [
+    {
+      "zh-TW": "{name}說：我的骨板會跟著節奏震！",
+      "en-US": "{name} says: My plates shake with the beat!"
+    },
+    {
+      "zh-TW": "{name}說：噠、噠、噠，跟著我拍。",
+      "en-US": "{name} says: Ta, ta, ta. Clap with me."
+    },
+    {
+      "zh-TW": "{name}說：你拍得比我還準。",
+      "en-US": "{name} says: You keep the beat better than I do."
+    }
+  ],
+  "dino-velociraptor": [
+    {
+      "zh-TW": "{name}說：我跑最快，讓我先聽！",
+      "en-US": "{name} says: I am the fastest. Let me listen first!"
+    },
+    {
+      "zh-TW": "{name}說：好多聲音混在一起，我抓到對的那個了！",
+      "en-US": "{name} says: So many sounds mixed up. I caught the right one!"
+    },
+    {
+      "zh-TW": "{name}說：快快快，再來一題！",
+      "en-US": "{name} says: Zoom zoom, one more!"
+    }
+  ],
+  "dino-ankylosaurus": [
+    {
+      "zh-TW": "{name}說：我的尾巴敲起來像鼓！",
+      "en-US": "{name} says: My tail sounds like a drum!"
+    },
+    {
+      "zh-TW": "{name}說：重音在這裡——啪！",
+      "en-US": "{name} says: The strong beat is here. Bam!"
+    },
+    {
+      "zh-TW": "{name}說：我站穩了，你跟著節奏就好。",
+      "en-US": "{name} says: I am standing steady. Just follow the beat."
+    }
+  ],
+  "dino-parasaurolophus": [
+    {
+      "zh-TW": "{name}說：我的冠狀骨會發聲喔！",
+      "en-US": "{name} says: My crest can make sounds!"
+    },
+    {
+      "zh-TW": "{name}說：你說一次，我跟著說一次。",
+      "en-US": "{name} says: You say it, then I say it back."
+    },
+    {
+      "zh-TW": "{name}說：聽，我學得像不像？",
+      "en-US": "{name} says: Listen. Do I sound right?"
+    }
+  ],
+  "dino-allosaurus": [
+    {
+      "zh-TW": "{name}說：我最會模仿別人的叫聲！",
+      "en-US": "{name} says: I am the best at copying other roars!"
+    },
+    {
+      "zh-TW": "{name}說：欸？我剛才是不是排錯順序了？",
+      "en-US": "{name} says: Hmm? Did I get them out of order?"
+    },
+    {
+      "zh-TW": "{name}說：沒關係，我們再排一次。",
+      "en-US": "{name} says: No problem. Let us line them up again."
+    }
+  ],
+  "dino-carnotaurus": [
+    {
+      "zh-TW": "{name}說：我的角很特別，聽得出細細的差別。",
+      "en-US": "{name} says: My horns are special. I hear tiny differences."
+    },
+    {
+      "zh-TW": "{name}說：這兩個聲音，有一點點不一樣。",
+      "en-US": "{name} says: These two sounds are a little different."
+    },
+    {
+      "zh-TW": "{name}說：很小很小的地方，我也能聽見。",
+      "en-US": "{name} says: Even the tiniest bit, I hear it."
+    }
+  ],
+  "dino-iguanodon": [
+    {
+      "zh-TW": "{name}說：用我的拇指骨刺打拍子！",
+      "en-US": "{name} says: Clap with my thumb spike!"
+    },
+    {
+      "zh-TW": "{name}說：好節奏，繼續保持。",
+      "en-US": "{name} says: Nice rhythm. Keep it going."
+    },
+    {
+      "zh-TW": "{name}說：慢一點也沒關係，節奏可以很慢。",
+      "en-US": "{name} says: Slower is fine too. A beat can be slow."
+    }
+  ],
+  "dino-trachodon": [
+    {
+      "zh-TW": "{name}說：我的嘴巴扁扁的，最會哼長音。",
+      "en-US": "{name} says: My mouth is flat. I hum the longest notes."
+    },
+    {
+      "zh-TW": "{name}說：聽——唔————",
+      "en-US": "{name} says: Listen. Mmmmmm."
+    },
+    {
+      "zh-TW": "{name}說：把聲音拉長一點试试看。",
+      "en-US": "{name} says: Try stretching the sound a little."
+    }
+  ],
+  "dino-tyrannosaurus": [
+    {
+      "zh-TW": "{name}說：別怕，我不會吃人。",
+      "en-US": "{name} says: Do not be afraid. I do not eat people."
+    },
+    {
+      "zh-TW": "{name}說：我站在這裡，你說，我聽。",
+      "en-US": "{name} says: I am right here. You talk, I listen."
+    },
+    {
+      "zh-TW": "{name}說：最大的恐龍，也怕聽錯題目。",
+      "en-US": "{name} says: Even the biggest dinosaur worries about missing a question."
+    }
+  ],
+  "dino-diplodocus": [
+    {
+      "zh-TW": "{name}說：我的尾巴超長，能記很長的順序。",
+      "en-US": "{name} says: My tail is so long. I remember long sequences."
+    },
+    {
+      "zh-TW": "{name}說：一、二、三、四、五……還記得嗎？",
+      "en-US": "{name} says: One, two, three, four, five. Still remember?"
+    },
+    {
+      "zh-TW": "{name}說：慢慢來，尾巴有的是耐心。",
+      "en-US": "{name} says: Take your time. My tail has plenty of patience."
+    }
+  ],
+  "dino-compysognathus": [
+    {
+      "zh-TW": "{name}說：我最小，但聲音最尖！",
+      "en-US": "{name} says: I am the smallest, but my voice is the sharpest!"
+    },
+    {
+      "zh-TW": "{name}說：噠！有沒有聽到？",
+      "en-US": "{name} says: Tada! Did you hear that?"
+    },
+    {
+      "zh-TW": "{name}說：小聲音也很重要喔。",
+      "en-US": "{name} says: Small sounds matter too."
+    }
+  ],
+  "dino-dilophosaurus": [
+    {
+      "zh-TW": "{name}說：我的兩片冠狀骨會張開，像在唱歌。",
+      "en-US": "{name} says: My two crests open wide, like singing."
+    },
+    {
+      "zh-TW": "{name}說：聽——啊～",
+      "en-US": "{name} says: Listen. Aaaah."
+    },
+    {
+      "zh-TW": "{name}說：你也來張開嘴巴唱一句。",
+      "en-US": "{name} says: Open your mouth and sing one with me."
+    }
+  ],
+  "dino-tyrannosaurus-scout": [
+    {
+      "zh-TW": "{name}說：這條路我走過，跟我來。",
+      "en-US": "{name} says: I know this path. Follow me."
+    },
+    {
+      "zh-TW": "{name}說：這裡亂亂的，答案藏在裡面。",
+      "en-US": "{name} says: It is noisy here. The answer hides inside."
+    },
+    {
+      "zh-TW": "{name}說：我當斥候，專找藏在雜音裡的那個。",
+      "en-US": "{name} says: I am the scout. I find the one hidden in the noise."
+    }
+  ],
+  "dino-spinosaurus": [
+    {
+      "zh-TW": "{name}說：我背上的帆船能收水面上的聲音。",
+      "en-US": "{name} says: My sail catches the sounds on water."
+    },
+    {
+      "zh-TW": "{name}說：安靜，有水聲。",
+      "en-US": "{name} says: Shhh. There is water."
+    },
+    {
+      "zh-TW": "{name}說：水面也會告訴我們答案。",
+      "en-US": "{name} says: The water tells us answers too."
+    }
+  ],
+  "dino-maiasaura": [
+    {
+      "zh-TW": "{name}說：第一次聽都會怕，這很正常。",
+      "en-US": "{name} says: Everyone is scared the first time. That is normal."
+    },
+    {
+      "zh-TW": "{name}說：我以前也是從很簡單的題目開始的。",
+      "en-US": "{name} says: I started with very easy questions too."
+    },
+    {
+      "zh-TW": "{name}說：慢慢來，我陪你。",
+      "en-US": "{name} says: Take your time. I am right here."
+    }
+  ],
+  "dino-oviraptor": [
+    {
+      "zh-TW": "{name}說：我叫偷蛋龍，但其實很會照顧蛋。",
+      "en-US": "{name} says: My name means egg thief, but I am good at caring for eggs."
+    },
+    {
+      "zh-TW": "{name}說：來，聽聽看，輕輕的。",
+      "en-US": "{name} says: Come. Listen. Gently."
+    },
+    {
+      "zh-TW": "{name}說：我會幫你把聲音小心捧回來。",
+      "en-US": "{name} says: I will carry the sound back carefully."
+    }
+  ],
+  "dino-eoraptor": [
+    {
+      "zh-TW": "{name}說：我是最古老的恐龍，故事從我開始。",
+      "en-US": "{name} says: I am the oldest dinosaur. The story starts with me."
+    },
+    {
+      "zh-TW": "{name}說：一開始，什麼都還沒有的時候……",
+      "en-US": "{name} says: At the beginning, when there was nothing yet..."
+    },
+    {
+      "zh-TW": "{name}說：然後，就有了第一個聲音。",
+      "en-US": "{name} says: And then, there was the very first sound."
+    }
+  ],
+  "dino-ceratosaurus": [
+    {
+      "zh-TW": "{name}說：我鼻上的角像指南針。",
+      "en-US": "{name} says: The horn on my nose is like a compass."
+    },
+    {
+      "zh-TW": "{name}說：往左一點，再一點……就是這裡。",
+      "en-US": "{name} says: A bit to the left, a little more. Right here."
+    },
+    {
+      "zh-TW": "{name}說：方向對了，聲音就聽得見了。",
+      "en-US": "{name} says: When the direction is right, the sound comes clear."
+    }
+  ],
+  "dino-giganotosaurus": [
+    {
+      "zh-TW": "{name}說：我的聲音很大，但你不用怕。",
+      "en-US": "{name} says: My voice is loud, but you need not be afraid."
+    },
+    {
+      "zh-TW": "{name}說：我會等你答完，慢慢說。",
+      "en-US": "{name} says: I will wait for your answer. Take your time."
+    },
+    {
+      "zh-TW": "{name}說：聲音再大，也要聽得清楚才算數。",
+      "en-US": "{name} says: A voice can be loud, but it still has to be clear."
+    }
+  ],
+  "dino-mosasaurus": [
+    {
+      "zh-TW": "{name}說：我住在深海，聲音傳得比誰都遠。",
+      "en-US": "{name} says: I live in the deep sea. My sound travels farther than any."
+    },
+    {
+      "zh-TW": "{name}說：水面下的歌，你聽見了嗎？",
+      "en-US": "{name} says: The song under the water, did you hear it?"
+    },
+    {
+      "zh-TW": "{name}說：從最深的海傳來，也是最清楚的。",
+      "en-US": "{name} says: From the deepest sea comes the clearest sound."
+    }
+  ]
+}

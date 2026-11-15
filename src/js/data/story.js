@@ -52,6 +52,9 @@ export function pickLine(bundle, locale, ctx, seed = 0) {
 
 /**
  * 依語系取恐龍台詞。
+ *
+ * 規範：dinoLines 的值可能是單一字串或字串陣列；
+ * 陣列時依序輪替，讓同一隻恐龍的不同句子都被聽到。
  * @param {any} bundle
  * @param {string} locale
  * @param {string} dinoId
@@ -60,8 +63,22 @@ export function pickLine(bundle, locale, ctx, seed = 0) {
 export function dinoLine(bundle, locale, dinoId) {
     const entry = bundle?.narrative?.dinoLines?.[dinoId];
     if (!entry) return "";
+
+    if (Array.isArray(entry)) {
+        const pool = entry
+            .map((/** @type {any} */ line) => line?.[locale] || line?.["zh-TW"])
+            .filter(Boolean);
+        if (!pool.length) return "";
+        const index = dinoLineCursor.get(dinoId) ?? 0;
+        dinoLineCursor.set(dinoId, index + 1);
+        return pool[index % pool.length];
+    }
+
     return entry[locale] || entry["zh-TW"] || "";
 }
+
+/** 每隻恐龍的台詞輪替游標。 @type {Map<string, number>} */
+const dinoLineCursor = new Map();
 
 /**
  * 取分齡提示句。
