@@ -28,7 +28,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 function walk(dir, exts) {
     /** @type {string[]} */
     const out = [];
-    /** @type {string[]} */
+    /** @type {import("node:fs").Dirent[]} */
     let entries = [];
     try {
         entries = readdirSync(dir, { withFileTypes: true });
