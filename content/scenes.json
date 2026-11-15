@@ -1,0 +1,77 @@
+{
+  "christmas": {
+    "id": "christmas",
+    "title": { "zh-TW": "北極的聖誕", "en-US": "Arctic Christmas" },
+    "music": { "scene": "christmas", "gainDb": -15, "tempo": 62 },
+    "ambience": { "kind": "wind", "gainDb": -24 },
+    "palette": {
+      "sky": "#16294f",
+      "glow": "#f1c40f",
+      "fog": "#cfe4f2",
+      "ridge": "#203a43",
+      "midground": "#16294f",
+      "foreground": "#0a1a3c"
+    },
+    "weather": "snow"
+  },
+  "valley": {
+    "id": "valley",
+    "title": { "zh-TW": "恐龍谷", "en-US": "Dinosaur Valley" },
+    "music": { "scene": "valley", "gainDb": -15, "tempo": 96 },
+    "ambience": { "kind": "none", "gainDb": -26 },
+    "palette": {
+      "sky": "#1d3b2a",
+      "glow": "#f7d774",
+      "fog": "#a9c6d8",
+      "ridge": "#2f5d3a",
+      "midground": "#3d7a4a",
+      "foreground": "#1a3324"
+    },
+    "weather": "none"
+  },
+  "forest": {
+    "id": "forest",
+    "title": { "zh-TW": "語言之森", "en-US": "Forest of Voices" },
+    "music": { "scene": "forest", "gainDb": -16, "tempo": 84 },
+    "ambience": { "kind": "forest", "gainDb": -25 },
+    "palette": {
+      "sky": "#123a3d",
+      "glow": "#9ad8a0",
+      "fog": "#8fbfa8",
+      "ridge": "#1b5148",
+      "midground": "#256b54",
+      "foreground": "#0d2b2c"
+    },
+    "weather": "mist"
+  },
+  "ice-age": {
+    "id": "ice-age",
+    "title": { "zh-TW": "冰原與深海", "en-US": "Ice and Deep Sea" },
+    "music": { "scene": "ice-age", "gainDb": -17, "tempo": 58 },
+    "ambience": { "kind": "wind", "gainDb": -26 },
+    "palette": {
+      "sky": "#1b2f52",
+      "glow": "#bfe4ff",
+      "fog": "#dcecf7",
+      "ridge": "#33547d",
+      "midground": "#4a7ba8",
+      "foreground": "#101f3a"
+    },
+    "weather": "snow"
+  },
+  "north": {
+    "id": "north",
+    "title": { "zh-TW": "北方之夜", "en-US": "Northern Night" },
+    "music": { "scene": "north", "gainDb": -17, "tempo": 52 },
+    "ambience": { "kind": "wind", "gainDb": -25 },
+    "palette": {
+      "sky": "#2a2050",
+      "glow": "#e8d9ff",
+      "fog": "#b9a9d6",
+      "ridge": "#3d2f6b",
+      "midground": "#4a3a80",
+      "foreground": "#180f33"
+    },
+    "weather": "aurora"
+  }
+}
