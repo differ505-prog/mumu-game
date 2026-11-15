@@ -36,7 +36,7 @@ import { track, trackShare } from "./core/telemetry.js";
 import { referralCode, consumeReferral } from "./core/referral.js";
 import { createMasteryEntry, updateMastery } from "./core/mastery.js";
 import { buildScene, setParallax } from "./ui/parallax.js";
-import { setMusicMap } from "./audio/music.js";
+import { setMusicMap, playMusic, stopMusic, playSceneMusic, stopSceneMusic, hasSceneMusic } from "./audio/music.js";
 
 /** @type {any} */
 let bundle = null;
@@ -141,6 +141,22 @@ async function loadChildVoice() {
     }
 }
 
+/** 目前場景（用於音樂與視覺切換）。 @type {string} */
+let currentSceneId = "";
+
+/**
+ * 套用場景音樂。
+ *
+ * 規範：背景音必須自動播放並隨場景切換；不得硬編碼音檔路徑。
+ * @param {string} scene
+ */
+function applySceneAudio(scene) {
+    if (!scene || scene === currentSceneId) return;
+    currentSceneId = scene;
+    // 場景鍵由 playMusic 轉譯到程序化軌道
+    playMusic(scene);
+}
+
 /**
  * 兒童化玩法名稱。
  *
@@ -194,6 +210,7 @@ function showStart() {
  */
 async function startGame() {
     ensureAudio(locale);
+    applySceneAudio("christmas");
     $("start-overlay").classList.add("hidden");
 
     const letter = bundle.narrative.letters.prologue?.[locale] || "";
@@ -309,6 +326,7 @@ function startLevel(levelId) {
 
     $("game-container").classList.remove("hidden");
     $("mode-indicator").textContent = childVerbLabel(level.verb, locale);
+    applySceneAudio(level.scene);
     setState({ level: levelId, chapter: level.chapter, verb: level.verb });
 
     hud.update({
@@ -651,14 +669,16 @@ function wire() {
 
     const musicBtn = $("music-control-btn");
     musicBtn?.addEventListener("click", () => {
-        const bgm = /** @type {HTMLAudioElement} */ ($("bgm-player"));
-        if (!bgm) return;
-        if (bgm.paused) {
-            bgm.src = "./assets/audio/外部資源__jingle-bells.m4a";
-            bgm.volume = 0.25;
-            bgm.play().catch(() => { });
+        const scene = currentSceneId || "daily";
+        const playing = hasSceneMusic(scene);
+        if (playing && !musicBtn.getAttribute("aria-pressed")) {
+            // 目前未在播放 → 播放當前場景主題曲
+            playSceneMusic(scene);
+            musicBtn.setAttribute("aria-pressed", "true");
         } else {
-            bgm.pause();
+            stopSceneMusic(600);
+            stopMusic(600);
+            musicBtn.setAttribute("aria-pressed", "false");
         }
     });
 

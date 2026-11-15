@@ -1,45 +1,51 @@
 {
+  "_comment": "音樂定義 — 場景主題曲改為程序化生成（src/js/audio/scene-music.js）。scene 欄位指向 SCENE_MUSIC 的鍵；file 保留為載入失敗時的退路。",
   "music": {
     "daily": {
       "id": "daily",
+      "scene": "daily",
       "file": "./assets/audio/外部資源__jingle-bells.m4a",
       "loopStart": 0,
       "loopEnd": 30,
       "durationSec": 30,
-      "gainDb": -14,
+      "gainDb": -16,
       "theme": "christmas"
     },
     "celebrate": {
       "id": "celebrate",
+      "scene": "celebrate",
       "file": "./assets/audio/外部資源__jingle-bells.m4a",
       "loopStart": 0,
       "loopEnd": 12,
       "durationSec": 12,
-      "gainDb": -12,
+      "gainDb": -14,
       "theme": "celebrate"
     },
     "night": {
       "id": "night",
+      "scene": "night",
       "file": "./assets/audio/外部資源__silent-night.m4a",
       "loopStart": 0,
       "loopEnd": 45,
       "durationSec": 45,
-      "gainDb": -16,
+      "gainDb": -18,
       "theme": "north"
     }
   },
   "chapters": {
     "christmas": {
       "id": "chapter.theme.christmas",
+      "scene": "christmas",
       "file": "./assets/audio/外部資源__jingle-bells.m4a",
       "loopStart": 0,
       "loopEnd": 30,
       "durationSec": 30,
-      "gainDb": -14,
+      "gainDb": -16,
       "theme": "christmas"
     },
     "valley": {
       "id": "chapter.theme.valley",
+      "scene": "valley",
       "file": "./assets/audio/外部資源__jingle-bells.m4a",
       "loopStart": 0,
       "loopEnd": 30,
@@ -49,29 +55,32 @@
     },
     "forest": {
       "id": "chapter.theme.forest",
-      "file": "./assets/audio/外部資源__silent-night.m4a",
-      "loopStart": 0,
-      "loopEnd": 45,
-      "durationSec": 45,
-      "gainDb": -16,
-      "theme": "forest"
-    },
-    "ice-age": {
-      "id": "chapter.theme.ice-age",
-      "file": "./assets/audio/外部資源__silent-night.m4a",
-      "loopStart": 0,
-      "loopEnd": 45,
-      "durationSec": 45,
-      "gainDb": -16,
-      "theme": "ice-age"
-    },
-    "north": {
-      "id": "chapter.theme.north",
+      "scene": "forest",
       "file": "./assets/audio/外部資源__silent-night.m4a",
       "loopStart": 0,
       "loopEnd": 45,
       "durationSec": 45,
       "gainDb": -17,
+      "theme": "forest"
+    },
+    "ice-age": {
+      "id": "chapter.theme.ice-age",
+      "scene": "ice-age",
+      "file": "./assets/audio/外部資源__silent-night.m4a",
+      "loopStart": 0,
+      "loopEnd": 45,
+      "durationSec": 45,
+      "gainDb": -18,
+      "theme": "ice-age"
+    },
+    "north": {
+      "id": "chapter.theme.north",
+      "scene": "north",
+      "file": "./assets/audio/外部資源__silent-night.m4a",
+      "loopStart": 0,
+      "loopEnd": 45,
+      "durationSec": 45,
+      "gainDb": -18,
       "theme": "north"
     }
   },
