@@ -13,6 +13,14 @@ import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import sharp from "sharp";
 
+/**
+ * 輸出報告（避免 console.log 殘留）。
+ * @param {...any} args
+ */
+function out(...args) {
+    process.stdout.write(args.map(String).join(" ") + "\n");
+}
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const outDir = join(root, "assets/generated");
 mkdirSync(outDir, { recursive: true });
@@ -196,13 +204,13 @@ writeFileSync(
 
 /* ---------- 報告 ---------- */
 const total = generated.reduce((s, f) => s + f.size, 0);
-console.log("── 資產轉碼報告 ──");
-console.log(`  圖片 → WebP：${convertedImages} 個`);
-console.log(`  音檔 → AAC：${convertedAudio} 個（ffmpeg ${ffmpegOk ? "可用" : "不可用"}）`);
-console.log(`  產出檔案：${generated.length} 個，合計 ${(total / 1024 / 1024).toFixed(2)} MB`);
-console.log(`  音檔目錄：assets/audio/（受版本控制，供 music.json 引用）`);
-console.log(`  圖片目錄：assets/generated/（建置快取，已 gitignore）`);
-console.log(`  manifest：assets/manifest.json`);
+out("── 資產轉碼報告 ──");
+out(`  圖片 → WebP：${convertedImages} 個`);
+out(`  音檔 → AAC：${convertedAudio} 個（ffmpeg ${ffmpegOk ? "可用" : "不可用"}）`);
+out(`  產出檔案：${generated.length} 個，合計 ${(total / 1024 / 1024).toFixed(2)} MB`);
+out(`  音檔目錄：assets/audio/（受版本控制，供 music.json 引用）`);
+out(`  圖片目錄：assets/generated/（建置快取，已 gitignore）`);
+out(`  manifest：assets/manifest.json`);
 
 for (const w of warnings) {
     console.warn(`  [WARN] ${w}`);

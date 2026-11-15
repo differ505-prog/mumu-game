@@ -16,6 +16,14 @@ import { readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
+/**
+ * 輸出報告（避免 console.log 殘留）。
+ * @param {...any} args
+ */
+function out(...args) {
+    process.stdout.write(args.map(String).join(" ") + "\n");
+}
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const problems = [];
 
@@ -236,4 +244,4 @@ if (problems.length) {
     process.exit(1);
 }
 
-console.log("[PASS] 內容驗證通過：levels 40／chapters 6／characters 7+24／items 9 軸／narrative 對稱");
+out("[PASS] 內容驗證通過：levels 40／chapters 6／characters 7+24／items 9 軸／narrative 對稱");

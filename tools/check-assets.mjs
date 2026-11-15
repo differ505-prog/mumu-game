@@ -14,6 +14,14 @@ import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join, relative } from "node:path";
 
+/**
+ * 輸出報告（避免 console.log 殘留）。
+ * @param {...any} args
+ */
+function out(...args) {
+    process.stdout.write(args.map(String).join(" ") + "\n");
+}
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const problems = [];
 const warnings = [];
@@ -169,11 +177,11 @@ const srcSize = dirSize(join(root, "src"));
 const offlineSize = assetsSize + contentSize + srcSize;
 
 const MB = 1024 * 1024;
-console.log("── 資產體積報告 ──");
-console.log(`  assets/      ${(assetsSize / MB).toFixed(2)} MB`);
-console.log(`  content/     ${(contentSize / MB).toFixed(2)} MB`);
-console.log(`  src/         ${(srcSize / MB).toFixed(2)} MB`);
-console.log(`  離線資產合計 ${(offlineSize / MB).toFixed(2)} MB（目標 < 6 MB）`);
+out("── 資產體積報告 ──");
+out(`  assets/      ${(assetsSize / MB).toFixed(2)} MB`);
+out(`  content/     ${(contentSize / MB).toFixed(2)} MB`);
+out(`  src/         ${(srcSize / MB).toFixed(2)} MB`);
+out(`  離線資產合計 ${(offlineSize / MB).toFixed(2)} MB（目標 < 6 MB）`);
 
 if (offlineSize > 6 * MB) {
     problems.push(`離線資產 ${(offlineSize / MB).toFixed(2)} MB 超過 6 MB 上限`);
@@ -189,4 +197,4 @@ if (problems.length) {
     process.exit(1);
 }
 
-console.log("[PASS] 資產驗證通過：PNG alpha／icon 尺寸／24 隻恐龍 4 幀／emoji = 0／引用完整");
+out("[PASS] 資產驗證通過：PNG alpha／icon 尺寸／24 隻恐龍 4 幀／emoji = 0／引用完整");

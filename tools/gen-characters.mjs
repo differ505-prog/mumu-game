@@ -13,6 +13,14 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { readFileSync } from "node:fs";
 
+/**
+ * 輸出報告（避免 console.log 殘留）。
+ * @param {...any} args
+ */
+function out(...args) {
+    process.stdout.write(args.map(String).join(" ") + "\n");
+}
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const outDir = join(root, "assets/characters");
 mkdirSync(outDir, { recursive: true });
@@ -271,4 +279,4 @@ for (const c of characters.playable) {
 writeFileSync(join(outDir, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n");
 
 const total = manifest.length * 5 + festive.length;
-console.log(`[OK] 產生 ${manifest.length} 隻恐龍（含 4 幀步行）＋ ${festive.length} 隻節慶角色，共 ${total} 個 SVG`);
+out(`[OK] 產生 ${manifest.length} 隻恐龍（含 4 幀步行）＋ ${festive.length} 隻節慶角色，共 ${total} 個 SVG`);

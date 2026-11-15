@@ -2,7 +2,7 @@
    Accessibility — 無障礙樣式
    ============================================================ */
 
-/* 螢幕閱讀器專用 */
+/* ---------- 螢幕閱讀器專用 ---------- */
 .sr-only {
     position: absolute;
     width: 1px;
@@ -15,53 +15,131 @@
     border: 0;
 }
 
-/* 焦點可視 */
+/* ---------- 焦點可視 ---------- */
 :focus-visible {
-    outline: 3px solid var(--focus-ring);
-    outline-offset: 2px;
+    outline: 3px solid var(--accent-warm);
+    outline-offset: 3px;
     border-radius: var(--r-sm);
 }
 
-/* 高對比偏好 */
-@media (prefers-contrast: more) {
+/* 滑桿與 checkbox 也給予明確焦點 */
+input[type="range"]:focus-visible,
+input[type="checkbox"]:focus-visible {
+    outline: 3px solid var(--accent-warm);
+    outline-offset: 2px;
+}
 
+/* ---------- 減少動畫 ---------- */
+[data-reduced-motion="on"] *,
+[data-reduced-motion="on"] *::before,
+[data-reduced-motion="on"] *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+}
+
+.reduced-motion *,
+.reduced-motion *::before,
+.reduced-motion *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 1ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 1ms !important;
+    }
+}
+
+/* ---------- 高對比 ---------- */
+@media (prefers-contrast: more) {
     :root {
-        --border-soft: rgba(247, 251, 255, .55);
-        --text-muted: var(--text-secondary);
+        --text-secondary: #f0f6ff;
+        --text-muted: #d8e4f5;
+        --border-soft: rgba(255, 255, 255, .55);
+        --border-strong: rgba(255, 255, 255, .85);
     }
 
     .control-btn,
-    .option-btn,
-    .mode-option {
-        border-width: 2px;
+    .mode-option,
+    .level-btn {
+        border-width: 3px;
     }
 }
 
-/* 色覺友善：顏色題加入符號冗餘編碼 */
-[data-colorblind="on"] .control-btn__label::before {
-    content: "◆ ";
-    color: var(--accent-warm);
+/* ---------- 色覺輔助：形狀與符號冗餘編碼 ---------- */
+/* 以形狀（非符號）表達對／錯，避免依賴字形 */
+[data-colorblind="on"] .control-btn--correct::after {
+    content: "";
+    display: inline-block;
+    width: 0.7em;
+    height: 0.7em;
+    margin-left: var(--s-2);
+    border: 3px solid currentColor;
+    border-radius: 50%;
+    vertical-align: middle;
 }
 
-[data-colorblind="on"] .dex-card__shape {
-    filter: contrast(1.4);
+[data-colorblind="on"] .control-btn--wrong::after {
+    content: "";
+    display: inline-block;
+    width: 0.7em;
+    height: 0.7em;
+    margin-left: var(--s-2);
+    background: currentColor;
+    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+    vertical-align: middle;
 }
 
-/* 觸覺開關（由 a11y.js 設定） */
-[data-haptics="off"] .tool-btn {
-    opacity: .6;
+[data-colorblind="on"] .control-btn--correct {
+    border-style: double;
+    border-width: 4px;
 }
 
-/* 列印：僅輸出信件 */
+[data-colorblind="on"] .control-btn--wrong {
+    border-style: dashed;
+    border-width: 3px;
+}
+
+/* 色彩題改以形狀差異標示（不單靠顏色） */
+[data-colorblind="on"] .option-color__swatch {
+    outline: 2px dashed currentColor;
+    outline-offset: 2px;
+}
+
+[data-colorblind="on"] .levelmap__star.is-on {
+    filter: drop-shadow(0 0 3px var(--accent-warm));
+}
+
+/* ---------- 觸覺開關 ---------- */
+[data-haptics="off"] .haptic-target {
+    --haptics-enabled: 0;
+}
+
+/* ---------- 列印樣式：僅輸出信件 ---------- */
 @media print {
-
-    body>* {
+    body > *:not(#print-letter) {
         display: none !important;
     }
 
-    .story-letter,
-    .story-letter * {
+    #print-letter {
         display: block !important;
+        position: static;
         color: #000;
+        background: #fff;
+        padding: 2rem;
+        font-size: 12pt;
+        line-height: 1.7;
+    }
+
+    #print-letter .letter__signature {
+        margin-top: 2rem;
+        font-style: italic;
     }
 }

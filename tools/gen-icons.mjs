@@ -11,6 +11,14 @@ import { writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+/**
+ * 輸出報告（避免 console.log 殘留）。
+ * @param {...any} args
+ */
+function out(...args) {
+    process.stdout.write(args.map(String).join(" ") + "\n");
+}
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const outDir = join(root, "assets/icons");
 mkdirSync(outDir, { recursive: true });
@@ -106,4 +114,4 @@ for (const spec of icons) {
 const manifest = icons.map((i) => ({ id: i.id, group: i.group, file: `${i.id}.svg` }));
 writeFileSync(join(outDir, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n");
 
-console.log(`[OK] 產生 ${icons.length} 個 SVG icon`);
+out(`[OK] 產生 ${icons.length} 個 SVG icon`);

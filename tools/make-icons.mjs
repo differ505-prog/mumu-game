@@ -10,6 +10,14 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 
+/**
+ * 輸出報告（避免 console.log 殘留）。
+ * @param {...any} args
+ */
+function out(...args) {
+    process.stdout.write(args.map(String).join(" ") + "\n");
+}
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const source = join(root, "assets/icons/app-icon.svg");
 
@@ -35,7 +43,7 @@ for (const t of targets) {
     if (!meta.hasAlpha) {
         throw new Error(`${t.file} 缺少 alpha 通道`);
     }
-    console.log(`[OK] ${t.file}：${meta.width}×${meta.height}，${meta.channels} 通道，${(buf.length / 1024).toFixed(1)}KB`);
+    out(`[OK] ${t.file}：${meta.width}×${meta.height}，${meta.channels} 通道，${(buf.length / 1024).toFixed(1)}KB`);
 }
 
-console.log("[OK] App icon 產生完成");
+out("[OK] App icon 產生完成");

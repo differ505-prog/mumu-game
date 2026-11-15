@@ -508,7 +508,7 @@ function wire() {
         const bgm = /** @type {HTMLAudioElement} */ ($("bgm-player"));
         if (!bgm) return;
         if (bgm.paused) {
-            bgm.src = "./外部資源/jingle-bells.mp3";
+            bgm.src = "./assets/audio/外部資源__jingle-bells.m4a";
             bgm.volume = 0.25;
             bgm.play().catch(() => { });
         } else {
