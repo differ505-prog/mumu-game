@@ -19,7 +19,7 @@
 
 import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { dirname, join, relative } from "node:path";
+import { dirname, join } from "node:path";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -364,8 +364,7 @@ function walk(dir, prefix) {
 /**
  * 解鎖條件 type 對應的技能軸名稱。
  * @param {string} type
- */
-function axisForType(type) {
+ */function axisForType(type) {
     const map = {
         "minimal-pair": "minimalPairCorrect",
         sequence: "sequenceCorrect",

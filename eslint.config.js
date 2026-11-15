@@ -2,7 +2,7 @@ import js from "@eslint/js";
 import globals from "globals";
 
 export default [
-  { ignores: ["node_modules/**", "dist/**", "外部資源/**", "assets/generated/**"] },
+  { ignores: ["node_modules/**", "dist/**", "外部資源/**", "assets/generated/**", "docs/refs/**"] },
   js.configs.recommended,
   {
     files: ["src/**/*.js", "tools/**/*.mjs"],

@@ -12,7 +12,7 @@
  */
 
 import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -270,24 +270,243 @@ function checkVisualSceneDiff() {
 }
 
 /* ------------------------------------------------------------------ *
- * 工具
+ * 兒童語言層
  * ------------------------------------------------------------------ */
 
 /**
- * 遞迴走訪目錄。
- * @param {string} dir
- * @param {string} prefix
- * @returns {string[]}
+ * 孩子層禁用術語（18 個）。
+ * 家長層（parent-report / assessment）不在此限。
  */
-function walk(dir, prefix) {
-    const res = [];
-    for (const entry of readdirSync(dir)) {
-        const full = join(dir, entry);
-        if (statSync(full).isDirectory()) res.push(...walk(full, join(prefix, entry)));
-        else res.push(join(prefix, entry));
-    }
-    return res;
+const CHILD_BANNED = [
+    "最小對辨識", "語音覺辨", "序列回憶", "干擾抑制", "音高模仿", "節奏模仿",
+    "圖像推理", "空間記憶", "記憶配對", "正確率", "掌握度", "成效",
+    "前測", "後測", "百分點", "技能軸", "認知", "認知動詞"
+];
+
+/**
+ * 孩子可見的檔案。
+ */
+const CHILD_VISIBLE_FILES = [
+    "src/js/core/dex.js",
+    "src/js/ui/dex.js",
+    "src/js/ui/share-card.js",
+    "src/js/ui/hud.js",
+    "src/js/main.js"
+];
+
+/**
+ * 移除 JS 註解（行註解與區塊註解），只留下字串字面值可比對。
+ * @param {string} src
+ */
+function stripComments(src) {
+    return src
+        .replace(/\/\*[\s\S]*?\*\//g, " ")
+        .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
 }
+
+/**
+ * 取出程式碼中的字串字面值。
+ * @param {string} src
+ */
+function extractStringLiterals(src) {
+    const out = [];
+    const re = /"((?:[^"\\\n]|\\.)*)"|'((?:[^'\\\n]|\\.)*)'|`((?:[^`\\]|\\.)*)`/g;
+    let m;
+    while ((m = re.exec(src))) {
+        out.push(m[1] ?? m[2] ?? m[3] ?? "");
+    }
+    return out;
+}
+
+/**
+ * 1. 孩子可見檔案的字面值不得含禁用術語。
+ */
+function checkChildNoJargon() {
+    const hits = [];
+    for (const rel of CHILD_VISIBLE_FILES) {
+        const src = readSrc(rel);
+        if (!src) continue;
+        for (const lit of extractStringLiterals(stripComments(src))) {
+            for (const bad of CHILD_BANNED) {
+                if (lit.includes(bad)) hits.push(`${rel}: 「${lit.trim()}」含「${bad}」`);
+            }
+        }
+    }
+    if (hits.length) {
+        return { ok: false, msg: `${hits.length} 處禁用術語：${hits.slice(0, 5).join("；")}` };
+    }
+    return { ok: true, msg: `${CHILD_VISIBLE_FILES.length} 個孩子可見檔案字面值無禁用術語` };
+}
+
+/**
+ * 2. 孩子路徑不得出現評量構件（雷達圖、多軸圖、達成率指標）。
+ */
+function checkChildNoEvalWidget() {
+    const problems = [];
+
+    // 分享卡：孩子版不得產出雷達圖（多軸繪製）
+    const share = readSrc("src/js/ui/share-card.js");
+    if (share) {
+        const cleaned = stripComments(share);
+        // 找出 view === "child" 的分支
+        const idx = cleaned.search(/view\s*===\s*["']child["']/);
+        if (idx >= 0) {
+            const branch = cleaned.slice(idx, idx + 900);
+            if (/drawLearningCard|radar|Radar|AXES/.test(branch)) {
+                problems.push("分享卡孩子版仍產出雷達圖／多軸圖");
+            }
+        }
+        // 孩子版分享文字不得含雷達圖相關文案
+        for (const lit of extractStringLiterals(cleaned)) {
+            if (/雷達|radar|Radar/.test(lit)) problems.push(`分享卡含雷達圖文案：「${lit.trim()}」`);
+        }
+    }
+
+    // 圖鑑介面不得顯示達成率／正確率指標
+    const dexUi = readSrc("src/js/ui/dex.js");
+    if (dexUi) {
+        for (const lit of extractStringLiterals(stripComments(dexUi))) {
+            if (/正確率|達成率|掌握度/.test(lit)) {
+                problems.push(`圖鑑介面含評量指標：「${lit.trim()}」`);
+            }
+        }
+    }
+
+    // HUD 不得顯示統計指標
+    const hud = readSrc("src/js/ui/hud.js");
+    if (hud) {
+        for (const lit of extractStringLiterals(stripComments(hud))) {
+            if (/正確率|本週分鐘|連續天數|掌握度/.test(lit)) {
+                problems.push(`HUD 含評量指標：「${lit.trim()}」`);
+            }
+        }
+    }
+
+    if (problems.length) {
+        return { ok: false, msg: `${problems.length} 處評量構件：${problems.slice(0, 5).join("；")}` };
+    }
+    return { ok: true, msg: "孩子路徑無雷達圖／多軸圖／達成率指標" };
+}
+
+/**
+ * 3. 兒童文案資料檔必須齊備。
+ */
+function checkChildVoiceComplete() {
+    const v = readJson("content/child-voice.json");
+    if (!v) return { ok: false, msg: "content/child-voice.json 不存在" };
+
+    const verbs = ["sequence", "minimal-pair", "rhythm", "interference", "pitch", "puzzle", "memory"];
+    const missing = [];
+    for (const k of verbs) {
+        const e = v.verbChildLabel?.[k];
+        if (!e) missing.push(`verbChildLabel.${k}`);
+        else if (!e["zh-TW"] || !e["en-US"]) missing.push(`verbChildLabel.${k} 雙語不全`);
+    }
+    for (const k of ["minimal-pair", "stars", "chapter"]) {
+        if (!v.unlockChild?.[k]) missing.push(`unlockChild.${k}`);
+    }
+    if (missing.length) {
+        return { ok: false, msg: `缺漏：${missing.slice(0, 6).join(", ")}` };
+    }
+    return { ok: true, msg: "7 種玩法兒童名與解鎖模板齊備" };
+}
+
+/**
+ * 4. 7 種玩法的兒童名必須互不相同（中文）。
+ */
+function checkChildPositiveCheck() {
+    const v = readJson("content/child-voice.json");
+    if (!v) return { ok: false, msg: "content/child-voice.json 不存在" };
+
+    const names = Object.values(v.verbChildLabel || {}).map((e) => e["zh-TW"]).filter(Boolean);
+    const uniq = new Set(names);
+    if (uniq.size !== names.length) {
+        return { ok: false, msg: `玩法兒童名有重複（${names.length} 個中僅 ${uniq.size} 個相異）` };
+    }
+    return { ok: true, msg: `${names.length} 個玩法兒童名互不相同` };
+}
+
+/**
+ * 5. 分享卡必須引用兒童文案。
+ */
+function checkChildShareUsesVoice() {
+    const share = readSrc("src/js/ui/share-card.js");
+    if (!share) return { ok: false, msg: "無法讀取 share-card.js" };
+    if (!/shareChildTitle|verbChildLabel|shareChildBody/.test(share)) {
+        return { ok: false, msg: "分享卡未引用兒童文案（shareChildTitle / verbChildLabel / shareChildBody）" };
+    }
+    return { ok: true, msg: "分享卡已引用兒童文案" };
+}
+
+/**
+ * 6. 反向檢查：家長端術語必須仍在（確認沒被誤改）。
+ */
+function checkParentViewUntouched() {
+    const parent = readSrc("src/js/ui/parent-report.js");
+    const assess = readSrc("src/js/ui/assessment-ui.js");
+
+    const parentOk = parent && /掌握度|Skill Mastery/.test(parent);
+    const assessOk = assess && /成效|Assessment|前後測/.test(assess);
+
+    if (!parentOk) {
+        return { ok: false, msg: "家長端被誤改：parent-report.js 已無「掌握度／Skill Mastery」" };
+    }
+    if (!assessOk) {
+        return { ok: false, msg: "家長端被誤改：assessment-ui.js 已無「成效／Assessment／前後測」" };
+    }
+    return { ok: true, msg: "家長端術語完整保留" };
+}
+
+/**
+ * 7. HUD 關卡顯示不得硬編碼 Level 模板。
+ */
+function checkChildHudLevel() {
+    const hud = readSrc("src/js/ui/hud.js");
+    if (!hud) return { ok: false, msg: "無法讀取 hud.js" };
+    if (/Level\s*\$\{/.test(stripComments(hud))) {
+        return { ok: false, msg: "HUD 仍硬編碼 `Level ${…}` 字面值" };
+    }
+    return { ok: true, msg: "HUD 未硬編碼 Level 模板" };
+}
+
+/**
+ * 8. 資訊分層：家長端只能由家長閘門觸發，孩子流程不會自動開啟。
+ */
+function checkChildSingleLayer() {
+    const main = readSrc("src/js/main.js");
+    const index = readSrc("index.html");
+    if (!main || !index) return { ok: false, msg: "無法讀取 main.js 或 index.html" };
+
+    if (!index.includes("parent-report-root") || !index.includes("assessment-root")) {
+        return { ok: false, msg: "index.html 缺少家長端容器" };
+    }
+
+    const cleaned = stripComments(main);
+    // 找出所有開啟家長報告的呼叫點，確認每個都在 requireParentalGate 之後
+    const openCalls = cleaned.match(/showParentReport\(|showAssessment\(|renderParentReport\(/g) || [];
+    if (!openCalls.length) {
+        return { ok: true, msg: "孩子流程未自動開啟家長報告" };
+    }
+
+    // 每個開啟點前 600 字元內必須有家長閘門
+    const bad = [];
+    const re = /showParentReport\(|showAssessment\(|renderParentReport\(/g;
+    let m;
+    while ((m = re.exec(cleaned))) {
+        const before = cleaned.slice(Math.max(0, m.index - 600), m.index);
+        if (!/requireParentalGate|parental/i.test(before)) {
+            bad.push(cleaned.slice(Math.max(0, m.index - 80), m.index + 40).replace(/\s+/g, " "));
+        }
+    }
+    if (bad.length) {
+        return { ok: false, msg: `${bad.length} 處家長端開啟未經家長閘門` };
+    }
+    return { ok: true, msg: "家長端只能由家長閘門觸發" };
+}
+
+/* ------------------------------------------------------------------ *
+ * 工具
+ * ------------------------------------------------------------------ */
 
 /* ------------------------------------------------------------------ *
  * 執行
@@ -304,7 +523,15 @@ const CHECKS = [
     { id: "story-lines-count", phase: "story", fn: checkStoryLinesCount },
     { id: "visual-body-types", phase: "visual", fn: checkVisualBodyTypes },
     { id: "visual-parallax", phase: "visual", fn: checkVisualParallax },
-    { id: "visual-scene-diff", phase: "visual", fn: checkVisualSceneDiff }
+    { id: "visual-scene-diff", phase: "visual", fn: checkVisualSceneDiff },
+    { id: "child-no-jargon", phase: "child", fn: checkChildNoJargon },
+    { id: "child-no-eval-widget", phase: "child", fn: checkChildNoEvalWidget },
+    { id: "child-voice-complete", phase: "child", fn: checkChildVoiceComplete },
+    { id: "child-positive-check", phase: "child", fn: checkChildPositiveCheck },
+    { id: "child-share-uses-voice", phase: "child", fn: checkChildShareUsesVoice },
+    { id: "child-hud-level", phase: "child", fn: checkChildHudLevel },
+    { id: "child-single-layer", phase: "child", fn: checkChildSingleLayer },
+    { id: "parent-view-untouched", phase: "child", fn: checkParentViewUntouched }
 ];
 
 const args = process.argv.slice(2);
