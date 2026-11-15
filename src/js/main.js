@@ -21,6 +21,23 @@ import { burst, startAmbientSnow } from "./ui/particles.js";
 import { animate } from "./ui/motion.js";
 import { APP } from "./core/config.js";
 import { VERBS, verbLabel } from "./core/verbs.js";
+import { renderLevelMap } from "./ui/levelmap.js";
+import { renderDex } from "./ui/dex.js";
+import { renderParentReport } from "./ui/parent-report.js";
+import { createAudioSettings } from "./ui/settings-audio.js";
+import { createPreferencesPanel, applyPreferences, announce } from "./ui/a11y.js";
+import { showStoryScene, showLetter as showStoryLetter } from "./ui/story.js";
+import { createTutorial } from "./ui/tutorial.js";
+import { showPaywall } from "./ui/paywall.js";
+import { buildShareCard, shareToLine } from "./ui/share-card.js";
+import { loadProgress, saveProgress, recordLevelResult, unlockDex, updateStreak, todayString } from "./core/progress.js";
+import { recordLearningSample, checkDexUnlock } from "./core/dex.js";
+import { track, trackShare } from "./core/telemetry.js";
+import { referralCode, consumeReferral, storeReferral } from "./core/referral.js";
+import { getEntitlement, setEntitlement } from "./core/entitlements.js";
+import { createMasteryEntry, updateMastery, axisMastery } from "./core/mastery.js";
+import { buildScene, setParallax } from "./ui/parallax.js";
+import { setMusicMap, playMusic, musicForTheme } from "./audio/music.js";
 
 /** @type {any} */
 let bundle = null;
@@ -34,6 +51,12 @@ let session = null;
 let selectedCharacter = "santa";
 /** @type {number} */
 let currentLevelId = 1;
+/** @type {any} */
+let progress = null;
+/** @type {any} */
+let audioSettings = null;
+/** @type {any} */
+let preferencesPanel = null;
 
 /* ---------- DOM 快捷存取 ---------- */
 const $ = (/** @type {string} */ id) => document.getElementById(id);
@@ -50,15 +73,48 @@ async function boot() {
         return;
     }
 
+    // 進度與推薦碼
+    progress = loadProgress();
+    if (!progress.referralCode) {
+        progress.referralCode = referralCode();
+        saveProgress(progress);
+    }
+    const ref = new URLSearchParams(location.search).get("ref");
+    if (ref) {
+        const consumed = consumeReferral(ref);
+        if (consumed) track("share_install", { referralCode: consumed });
+    }
+
     hud = createHud($("hud"));
     hud.update({ chapter: 1, chapterTitle: chapterTitle(bundle, locale, 1) });
 
     await loadTimeline();
     await loadSfx();
+    await loadMusic();
+
+    // 場景與偏好
+    buildScene($("scene"));
+    applyPreferences(document.body);
+    audioSettings = createAudioSettings($("audio-settings-root"));
+    preferencesPanel = createPreferencesPanel($("parent-report-root"), locale);
+
     wire();
     startAmbientSnow($("snow-container"));
 
+    track("session_start", { chapter: 1, sessionMs: 0 });
     showStart();
+}
+
+/**
+ * 載入音樂定義。
+ */
+async function loadMusic() {
+    try {
+        const res = await fetch("./content/music.json", { cache: "no-cache" });
+        if (res.ok) setMusicMap(await res.json());
+    } catch (err) {
+        console.error("[main] 音樂定義載入失敗", err);
+    }
 }
 
 /**
@@ -104,7 +160,7 @@ function showStart() {
 }
 
 /**
- * 開始遊戲：解鎖音訊 → 序章信 → 角色選擇。
+ * 開始遊戲：解鎖音訊 → 序章信 → 角色選擇 → 首次教學。
  */
 async function startGame() {
     ensureAudio(locale);
@@ -116,7 +172,46 @@ async function startGame() {
     renderCharacter($("santa-container"), char, "idle");
 
     showLetter(letter);
-    setTimeout(() => showCharacterSelect(), 2600);
+
+    // 首次啟動才跑教學；之後可從設定重播
+    const firstRun = !localStorage.getItem("mumu.tutorial.done");
+    if (firstRun) {
+        setTimeout(() => runTutorial(), 2600);
+    } else {
+        setTimeout(() => showCharacterSelect(), 2600);
+    }
+}
+
+/**
+ * 執行教學流程，完成後進入角色選擇。
+ */
+function runTutorial() {
+    const root = $("tutorial-root") || $("levelmap-root");
+    const tutorial = createTutorial(root, bundle, locale);
+
+    const finish = () => {
+        localStorage.setItem("mumu.tutorial.done", "1");
+        if (root.id === "tutorial-root") {
+            root.classList.add("hidden");
+            showCharacterSelect();
+        } else {
+            showCharacterSelect();
+        }
+    };
+
+    tutorial.skip(finish);
+    // 每一步完成後自動前進
+    const originalNext = tutorial.next;
+    tutorial.next = (/** @type {(done:boolean)=>void} */ onDone) => {
+        originalNext(() => {
+            if (tutorial.isFinished) {
+                finish();
+            } else {
+                originalNext(() => { });
+            }
+            onDone?.(tutorial.isFinished);
+        });
+    };
 }
 
 /**
@@ -164,35 +259,11 @@ function showCharacterSelect() {
  */
 function showLevelMap() {
     const overlay = $("levelmap-root");
-    const levels = bundle.levels || [];
 
-    overlay.innerHTML = `
-        <h1>${locale === "en-US" ? "Choose a Level" : "選擇關卡"}</h1>
-        <div class="dex-grid">
-            ${levels.map((/** @type {any} */ l) => `
-                <button class="mode-option" data-level="${l.id}" type="button">
-                    <div class="mode-title">${l.id}. ${l.name[locale] || l.name["zh-TW"]}</div>
-                    <div class="mode-desc">${VERBS[l.verb] ? verbLabel(l.verb, locale) : l.verb}</div>
-                    <div class="mode-desc">${l.objective[locale] || l.objective["zh-TW"]}</div>
-                </button>
-            `).join("")}
-        </div>
-        <button class="level-btn level-btn--secondary" id="levelmap-close" type="button">
-            ${locale === "en-US" ? "Back" : "返回"}
-        </button>
-    `;
-
-    overlay.querySelectorAll("[data-level]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-            const id = Number(/** @type {HTMLElement} */ (btn).dataset.level);
-            overlay.classList.add("hidden");
-            startLevel(id);
-        });
-    });
-
-    $("levelmap-close")?.addEventListener("click", () => {
+    const map = renderLevelMap(overlay, bundle, progress, locale);
+    map.onSelect((levelId) => {
         overlay.classList.add("hidden");
-        showCharacterSelect();
+        startLevel(levelId);
     });
 
     overlay.classList.remove("hidden");
@@ -286,6 +357,51 @@ function onLevelFinish(r) {
         };
     }
     container.classList.remove("hidden");
+
+    // 進度、掌握度與圖鑑解鎖
+    recordLevelResult(progress, currentLevelId, stars);
+    updateStreak(progress, todayString());
+    progress.totalSessionMs = (progress.totalSessionMs || 0) + (r.durationMs || 0);
+
+    // 掌握度模型：以實際作答更新
+    const samples = r.samples || [];
+    for (const sample of samples) {
+        const axis = sample.axis || "minimalPairCorrect";
+        const entry = progress.mastery[axis] || createMasteryEntry(axis);
+        updateMastery(entry, {
+            correct: Boolean(sample.correct),
+            ms: sample.ms || 0,
+            hinted: Boolean(sample.hinted)
+        });
+        progress.mastery[axis] = entry;
+        recordLearningSample(progress, {
+            verb: sample.verb || "minimal-pair",
+            correct: Boolean(sample.correct),
+            locale
+        });
+    }
+
+    // 檢查是否有新恐龍解鎖
+    for (const dino of bundle.dex || []) {
+        if (!checkDexUnlock(bundle, progress, dino.id)) continue;
+        if (unlockDex(progress, dino.id)) {
+            track("dex_unlock", { dinoId: dino.id, chapter: level.chapter });
+            hud.toast(
+                locale === "en-US" ? `New dinosaur: ${dino.name?.[locale] || dino.id}` : `新夥伴解鎖：${dino.name?.["zh-TW"] || dino.id}`,
+                "good"
+            );
+            playTimeline("dex:unlock", runTimelineStep);
+        }
+    }
+
+    saveProgress(progress);
+    track("level_complete", {
+        levelId: currentLevelId,
+        chapter: level.chapter,
+        correct: r.correct,
+        hintsUsed: r.hintsUsed || 0,
+        sessionMs: r.durationMs || 0
+    });
 
     console.warn("[main] 關卡完成", currentLevelId, stars, level.id);
 }
@@ -519,6 +635,75 @@ function wire() {
     // 視線追隨
     document.addEventListener("pointermove", (e) => {
         lookAt($("santa-container"), e.clientX, e.clientY);
+    });
+
+    // 視差場景
+    document.addEventListener("pointermove", (e) => {
+        const offset = (e.clientX / Math.max(1, window.innerWidth) - 0.5) * 40;
+        setParallax($("scene"), offset);
+    });
+
+    // 圖鑑 / 家長報告 / 付費牆 事件（由關卡地圖與 HUD 觸發）
+    document.addEventListener("dex:request", () => {
+        const root = $("dex-root");
+        renderDex(root, bundle, progress, locale);
+        root.classList.remove("hidden");
+        track("level_map_view", { chapter: 0 });
+    });
+
+    document.addEventListener("parent:request", () => {
+        const root = $("parent-report-root");
+        renderParentReport(root, progress, bundle, locale);
+        root.classList.remove("hidden");
+        track("parent_report_view", {});
+    });
+
+    document.addEventListener("paywall:request", (/** @type {CustomEvent} */ e) => {
+        const feature = e.detail?.feature || "chapter4";
+        showPaywall($("share-root"), {
+            id: feature,
+            title: locale === "en-US" ? "Unlock the full journey" : "解鎖完整旅程",
+            body: locale === "en-US"
+                ? "Chapters 4 and 5, the dinosaur valley theme pack, the full parent report and cross-device sync."
+                : "第 4–5 章、恐龍谷主題包、家長報告完整版與跨裝置同步。",
+            cta: locale === "en-US" ? "Subscribe annually" : "訂閱年方案",
+            price: "NT$790 / 年",
+            features: []
+        });
+    });
+
+    // 分享成果卡
+    document.addEventListener("share:request", (/** @type {CustomEvent} */ e) => {
+        const kind = e.detail?.kind || "learning";
+        const card = buildShareCard(bundle, progress, kind, {
+            referralCode: progress.referralCode,
+            dinoId: e.detail?.dinoId
+        });
+        const share = shareToLine(card.dataUrl, card.text, { code: progress.referralCode });
+
+        const root = $("share-root");
+        root.innerHTML = `
+            <div class="share-panel">
+                <h2>${locale === "en-US" ? "Share the achievement" : "分享這份成果"}</h2>
+                <img class="share-panel__card" src="${card.dataUrl}" alt="" />
+                <p class="share-panel__text">${card.text}</p>
+                <a class="level-btn" id="share-line" href="${share.lineUrl}" target="_blank" rel="noopener">
+                    ${locale === "en-US" ? "Share on LINE" : "分享到 LINE"}
+                </a>
+                <button class="level-btn level-btn--secondary" id="share-close" type="button">
+                    ${locale === "en-US" ? "Close" : "關閉"}
+                </button>
+            </div>
+        `;
+        root.classList.remove("hidden");
+        trackShare("share_click", {
+            cardKind: kind,
+            channel: "line",
+            referralCode: progress.referralCode
+        });
+        root.querySelector("#share-close")?.addEventListener("click", () => {
+            root.classList.add("hidden");
+        });
     });
 
     // 視窗改變時切換橫向提示

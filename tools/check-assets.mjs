@@ -119,7 +119,9 @@ if (!existsSync(charManifestPath)) {
 }
 
 /* --- 4. Emoji 殘留掃描 --- */
-const EMOJI = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{1F000}-\u{1F0FF}]/u;
+/* 分成兩個 regex：主體範圍與變體選擇符，避免 no-misleading-character-class 誤判 */
+const EMOJI = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{1F000}-\u{1F0FF}]/u;
+const VARIATION_SELECTOR = /\uFE0F/u;
 const codeFiles = [
     ...walk(join(root, "src"), [".js", ".css"]),
     ...walk(join(root, "tools"), [".mjs"])
@@ -128,7 +130,7 @@ for (const file of codeFiles) {
     const content = readFileSync(file, "utf8");
     const lines = content.split("\n");
     for (let i = 0; i < lines.length; i++) {
-        if (EMOJI.test(lines[i])) {
+        if (EMOJI.test(lines[i]) || VARIATION_SELECTOR.test(lines[i])) {
             problems.push(`${relative(root, file)}:${i + 1} 殘留 emoji 圖示`);
         }
     }
@@ -138,7 +140,7 @@ for (const file of codeFiles) {
     const html = readFileSync(join(root, "index.html"), "utf8");
     const lines = html.split("\n");
     for (let i = 0; i < lines.length; i++) {
-        if (EMOJI.test(lines[i])) {
+        if (EMOJI.test(lines[i]) || VARIATION_SELECTOR.test(lines[i])) {
             problems.push(`index.html:${i + 1} 殘留 emoji 圖示`);
         }
     }

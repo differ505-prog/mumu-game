@@ -192,11 +192,11 @@ function drawLearningCard(ctx, bundle, progress, referral) {
  * @param {CanvasRenderingContext2D} ctx
  * @param {any} bundle
  * @param {any} progress
- * @param {string} referral
+ * @param {string} _referral
  * @param {any} payload
  * @returns {string}
  */
-function drawDexCard(ctx, bundle, progress, referral, payload) {
+function drawDexCard(ctx, bundle, progress, _referral, payload) {
     const dinoId = payload.dinoId || (progress.unlockedDex || [])[0] || "";
     const entry = bundle?.dex?.find((/** @type {any} */ d) => d.id === dinoId);
     const name = entry?.name?.["zh-TW"] || entry?.name?.["en-US"] || dinoId;
@@ -236,11 +236,11 @@ function drawDexCard(ctx, bundle, progress, referral, payload) {
  * @param {CanvasRenderingContext2D} ctx
  * @param {any} bundle
  * @param {any} progress
- * @param {string} referral
+ * @param {string} _referral
  * @param {any} payload
  * @returns {string}
  */
-function drawPuzzleCard(ctx, bundle, progress, referral, payload) {
+function drawPuzzleCard(ctx, bundle, progress, _referral, payload) {
     ctx.fillStyle = "#f7fbff";
     ctx.font = "700 58px system-ui, sans-serif";
     ctx.textAlign = "center";

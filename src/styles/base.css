@@ -213,16 +213,6 @@ body {
     pointer-events: none;
 }
 
-#combo-display {
-    position: absolute;
-    top: calc(var(--s-4) + var(--fs-2xl) + var(--s-2));
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 3;
-    font-size: var(--fs-md);
-    color: var(--accent-warm);
-    pointer-events: none;
-}
 
 #combo-step-indicator {
     position: absolute;
