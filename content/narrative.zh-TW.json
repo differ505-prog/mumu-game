@@ -1,0 +1,221 @@
+{
+  "locale": "zh-TW",
+  "contexts": {
+    "invite": [
+      "今天想先探索哪一個山谷？",
+      "要一起去找恐龍嗎？",
+      "我們來聽聽看，牠在說什麼。",
+      "准备好幫聖誕老人了嗎？",
+      "這一次要挑戰哪一種玩法呢？",
+      "要不要來比比看誰的耳朵比較靈？",
+      "跟我走，我帶你去恐龍谷。",
+      "那邊好像有聲音，你要不要聽聽看？",
+      "今天的任務來了，我們開始吧。",
+      "這隻恐龍等你好久囉。",
+      "來看看這次的題目是什麼。",
+      "我會一直陪著你。",
+      "深呼吸，我們慢慢來。",
+      "你的耳朵今天特別靈。",
+      "看看這關會出現什麼新玩法。"
+    ],
+    "encourage": [
+      "你辦到了！",
+      "真棒，再試一次看看",
+      "答對了，你真厲害",
+      "就是這樣！",
+      "很好，繼續保持",
+      "你聽得很仔細",
+      "對了，就是這個",
+      "真聰明啊",
+      "你學會了耶",
+      "沒錯，你做到了",
+      "保持這個節奏",
+      "嗯，很棒",
+      "你越來越進步了",
+      "聽得真準",
+      "就是這個聲音"
+    ],
+    "hint": [
+      "再聽一次，我們一起來",
+      "看，這個就是正確的",
+      "先聽前面那一個",
+      "這個聲音比較短喔",
+      "注意最後那個音",
+      "它一共有三個音",
+      "再慢一點聽",
+      "前面兩個一樣",
+      "這個有一點不一樣",
+      "我先示範一次給你看",
+      "聽到最後一個再回答",
+      "跟著我的節奏",
+      "看看有沒有更接近的",
+      "最後那個音最輕",
+      "你只要注意中間就好"
+    ],
+    "celebrate": [
+      "你完成今天的任務了！",
+      "這隻恐龍已經加入你的圖鑑",
+      "太厲害了，繼續加油",
+      "你解鎖了新關卡",
+      "這是我見過最棒的一次",
+      "圖鑑又更完整了",
+      "你值得一枚星星",
+      "再挑戰下一關吧",
+      "完成的感覺很好吧",
+      "我們成功了",
+      "你比上次更進步",
+      "這就是努力的力量",
+      "來看看你解鎖了什麼",
+      "新的朋友加入了",
+      "今天就到此為止吧"
+    ],
+    "comfort": [
+      "沒關係，我們再試一次",
+      "慢慢來，你學會了",
+      "沒錯過，我們再聽一次",
+      "第一次都這樣，沒問題",
+      "休息一下再繼續",
+      "我在這裡陪你",
+      "換個方式看看",
+      "答案就在裡面",
+      "再聽一次你會發現",
+      "你剛才差一點就對了",
+      "不要急，我們慢慢做",
+      "這次換我提示你",
+      "錯誤是學習的一部分",
+      "我從來不會嫌你",
+      "你試試看，我陪你"
+    ]
+  },
+  "letters": {
+    "prologue": "親愛的孩子：今年聖誕夜，我需要你的幫忙。恐龍谷的星星走失了，牠們聽得見聲音，可是沒有人聽得見牠們。願意幫我嗎？—— 聖誕老人",
+    "perChapter": {
+      "0": "第一章：恐龍谷",
+      "1": "第二章：恐龍的語言",
+      "2": "第三章：深海與天空",
+      "3": "第四章：冰河紀的聖誕",
+      "4": "第五章：北方的一夜",
+      "5": "尾聲：北方的一夜"
+    },
+    "epilogue": "你做到了！這封信可以列印給你，貼在你的聖誕樹上。謝謝你，親愛的孩子。 —— 聖誕老人"
+  },
+  "dinoLines": {
+    "dino-triceratops": {
+      "zh-TW": "{name}說：我聽到你說話了！",
+      "en-US": "{name} says: I heard you!"
+    },
+    "dino-trex": {
+      "zh-TW": "{name}說：一起來聽聽看。",
+      "en-US": "{name} says: Let's listen together."
+    },
+    "dino-brachiosaurus": {
+      "zh-TW": "{name}說：我用角把雪推開了！",
+      "en-US": "{name} says: I pushed the snow away!"
+    },
+    "dino-pteranodon": {
+      "zh-TW": "{name}說：你的聲音變得更清楚了。",
+      "en-US": "{name} says: Your voice is clearer now."
+    },
+    "dino-stegosaurus": {
+      "zh-TW": "{name}說：這次的聲音有點不一樣喔。",
+      "en-US": "{name} says: This sound is a little different."
+    },
+    "dino-velociraptor": {
+      "zh-TW": "{name}說：我找到星星了！",
+      "en-US": "{name} says: I found the stars!"
+    },
+    "dino-ankylosaurus": {
+      "zh-TW": "{name}說：我們再玩一次好不好。",
+      "en-US": "{name} says: Shall we play once more?"
+    },
+    "dino-parasaurolophus": {
+      "zh-TW": "{name}說：你的耳朵好厲害。",
+      "en-US": "{name} says: Your ears are amazing."
+    },
+    "dino-allosaurus": {
+      "zh-TW": "{name}說：我聽到你說話了！",
+      "en-US": "{name} says: I heard you!"
+    },
+    "dino-carnotaurus": {
+      "zh-TW": "{name}說：一起來聽聽看。",
+      "en-US": "{name} says: Let's listen together."
+    },
+    "dino-iguanodon": {
+      "zh-TW": "{name}說：我用角把雪推開了！",
+      "en-US": "{name} says: I pushed the snow away!"
+    },
+    "dino-trachodon": {
+      "zh-TW": "{name}說：你的聲音變得更清楚了。",
+      "en-US": "{name} says: Your voice is clearer now."
+    },
+    "dino-tyrannosaurus": {
+      "zh-TW": "{name}說：這次的聲音有點不一樣喔。",
+      "en-US": "{name} says: This sound is a little different."
+    },
+    "dino-diplodocus": {
+      "zh-TW": "{name}說：我找到星星了！",
+      "en-US": "{name} says: I found the stars!"
+    },
+    "dino-compysognathus": {
+      "zh-TW": "{name}說：我們再玩一次好不好。",
+      "en-US": "{name} says: Shall we play once more?"
+    },
+    "dino-dilophosaurus": {
+      "zh-TW": "{name}說：你的耳朵好厲害。",
+      "en-US": "{name} says: Your ears are amazing."
+    },
+    "dino-tyrannosaurus-scout": {
+      "zh-TW": "{name}說：我聽到你說話了！",
+      "en-US": "{name} says: I heard you!"
+    },
+    "dino-spinosaurus": {
+      "zh-TW": "{name}說：一起來聽聽看。",
+      "en-US": "{name} says: Let's listen together."
+    },
+    "dino-maiasaura": {
+      "zh-TW": "{name}說：我用角把雪推開了！",
+      "en-US": "{name} says: I pushed the snow away!"
+    },
+    "dino-oviraptor": {
+      "zh-TW": "{name}說：你的聲音變得更清楚了。",
+      "en-US": "{name} says: Your voice is clearer now."
+    },
+    "dino-eoraptor": {
+      "zh-TW": "{name}說：這次的聲音有點不一樣喔。",
+      "en-US": "{name} says: This sound is a little different."
+    },
+    "dino-ceratosaurus": {
+      "zh-TW": "{name}說：我找到星星了！",
+      "en-US": "{name} says: I found the stars!"
+    },
+    "dino-giganotosaurus": {
+      "zh-TW": "{name}說：我們再玩一次好不好。",
+      "en-US": "{name} says: Shall we play once more?"
+    },
+    "dino-mosasaurus": {
+      "zh-TW": "{name}說：你的耳朵好厲害。",
+      "en-US": "{name} says: Your ears are amazing."
+    }
+  },
+  "ageVariants": {
+    "young": [
+      "找紅色。",
+      "聽這兩個。",
+      "哪一個？",
+      "再聽一次。",
+      "對了！"
+    ],
+    "older": [
+      "幫三角龍找回三顆紅色的星星，它們藏在雪地裡。",
+      "聽清楚前後兩個音有什麼不同，然後告訴我它們是不是一樣。",
+      "用你的耳朵找出藏在干擾聲裡的那個聲音。",
+      "把恐龍的腳跡記起來，等一下我要問你哪一格走過。",
+      "照著節拍把這八拍拍完，不要搶拍也不要慢拍。"
+    ]
+  },
+  "dexPraise": [
+    "你認識了 {name}！",
+    "{name} 加入你的圖鑑了！",
+    "又認識一位新朋友：{name}！"
+  ]
+}

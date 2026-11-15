@@ -1,0 +1,221 @@
+{
+  "locale": "en-US",
+  "contexts": {
+    "invite": [
+      "Which valley shall we visit today?",
+      "Shall we go find the dinosaurs?",
+      "Let's listen to what they say.",
+      "Ready to help Santa?",
+      "Which challenge will you pick today?",
+      "Let's see whose ears are sharper.",
+      "Follow me, I'll show you the valley.",
+      "I hear something over there.",
+      "Today's task is ready. Let's begin.",
+      "This dinosaur has been waiting for you.",
+      "Let's see what this level brings.",
+      "I'll stay right here with you.",
+      "Take a slow breath, we go slowly.",
+      "Your ears are especially sharp today.",
+      "Let's see the new way to play."
+    ],
+    "encourage": [
+      "You did it!",
+      "Well done, let's try another",
+      "That's right, you're doing great",
+      "Exactly like that!",
+      "Very good, keep it up",
+      "You listened so carefully",
+      "Yes, that's the one",
+      "So clever!",
+      "You've learned it",
+      "Yes, you got it",
+      "Keep that rhythm",
+      "Very good indeed",
+      "You're improving fast",
+      "You heard it perfectly",
+      "That's the exact sound"
+    ],
+    "hint": [
+      "Let's listen again together",
+      "Look, this is the right one",
+      "Listen to the first one first",
+      "This sound is shorter",
+      "Focus on the last sound",
+      "It has three sounds in total",
+      "Listen a bit more slowly",
+      "The first two are the same",
+      "This one is a little different",
+      "Let me show you once",
+      "Answer after the last sound",
+      "Follow my rhythm",
+      "Look for a closer one",
+      "The last sound is the lightest",
+      "Just focus on the middle one"
+    ],
+    "celebrate": [
+      "You finished today's task!",
+      "This dinosaur joined your dex",
+      "Amazing, keep going",
+      "You unlocked a new level",
+      "That's the best I've ever seen",
+      "The dex is more complete now",
+      "You deserve a star",
+      "Let's try the next one",
+      "That feels good, doesn't it",
+      "We did it!",
+      "You're better than last time",
+      "This is what effort looks like",
+      "Let's see what you unlocked",
+      "A new friend joined",
+      "That's enough for today"
+    ],
+    "comfort": [
+      "It's okay, let's try again",
+      "Take your time, you can do it",
+      "No harm, let's listen once more",
+      "Everyone does this at first",
+      "Take a break and continue",
+      "I'm right here with you",
+      "Let's try another way",
+      "The answer is in there",
+      "Listen again and you'll notice",
+      "You were nearly there",
+      "No rush, we go slowly",
+      "This time I'll hint you",
+      "Mistakes are part of learning",
+      "I never mind at all",
+      "Go on, I'm with you"
+    ]
+  },
+  "letters": {
+    "prologue": "Dear helper: This Christmas night I need your help. The stars of Dinosaur Valley have gone missing. They can hear sounds, but no one can hear them. Will you help me? — Santa",
+    "perChapter": {
+      "0": "Chapter 1: Dinosaur Valley",
+      "1": "Chapter 2: The Language of Dinosaurs",
+      "2": "Chapter 3: Deep Sea and Open Sky",
+      "3": "Chapter 4: A Christmas in the Ice Age",
+      "4": "Chapter 5: One Night in the North",
+      "5": "Epilogue: One Night in the North"
+    },
+    "epilogue": "You did it! This letter can be printed for you and hung on your Christmas tree. Thank you, dear helper. — Santa"
+  },
+  "dinoLines": {
+    "dino-triceratops": {
+      "zh-TW": "{name}說：我聽到你說話了！",
+      "en-US": "{name} says: I heard you!"
+    },
+    "dino-trex": {
+      "zh-TW": "{name}說：一起來聽聽看。",
+      "en-US": "{name} says: Let's listen together."
+    },
+    "dino-brachiosaurus": {
+      "zh-TW": "{name}說：我用角把雪推開了！",
+      "en-US": "{name} says: I pushed the snow away!"
+    },
+    "dino-pteranodon": {
+      "zh-TW": "{name}說：你的聲音變得更清楚了。",
+      "en-US": "{name} says: Your voice is clearer now."
+    },
+    "dino-stegosaurus": {
+      "zh-TW": "{name}說：這次的聲音有點不一樣喔。",
+      "en-US": "{name} says: This sound is a little different."
+    },
+    "dino-velociraptor": {
+      "zh-TW": "{name}說：我找到星星了！",
+      "en-US": "{name} says: I found the stars!"
+    },
+    "dino-ankylosaurus": {
+      "zh-TW": "{name}說：我們再玩一次好不好。",
+      "en-US": "{name} says: Shall we play once more?"
+    },
+    "dino-parasaurolophus": {
+      "zh-TW": "{name}說：你的耳朵好厲害。",
+      "en-US": "{name} says: Your ears are amazing."
+    },
+    "dino-allosaurus": {
+      "zh-TW": "{name}說：我聽到你說話了！",
+      "en-US": "{name} says: I heard you!"
+    },
+    "dino-carnotaurus": {
+      "zh-TW": "{name}說：一起來聽聽看。",
+      "en-US": "{name} says: Let's listen together."
+    },
+    "dino-iguanodon": {
+      "zh-TW": "{name}說：我用角把雪推開了！",
+      "en-US": "{name} says: I pushed the snow away!"
+    },
+    "dino-trachodon": {
+      "zh-TW": "{name}說：你的聲音變得更清楚了。",
+      "en-US": "{name} says: Your voice is clearer now."
+    },
+    "dino-tyrannosaurus": {
+      "zh-TW": "{name}說：這次的聲音有點不一樣喔。",
+      "en-US": "{name} says: This sound is a little different."
+    },
+    "dino-diplodocus": {
+      "zh-TW": "{name}說：我找到星星了！",
+      "en-US": "{name} says: I found the stars!"
+    },
+    "dino-compysognathus": {
+      "zh-TW": "{name}說：我們再玩一次好不好。",
+      "en-US": "{name} says: Shall we play once more?"
+    },
+    "dino-dilophosaurus": {
+      "zh-TW": "{name}說：你的耳朵好厲害。",
+      "en-US": "{name} says: Your ears are amazing."
+    },
+    "dino-tyrannosaurus-scout": {
+      "zh-TW": "{name}說：我聽到你說話了！",
+      "en-US": "{name} says: I heard you!"
+    },
+    "dino-spinosaurus": {
+      "zh-TW": "{name}說：一起來聽聽看。",
+      "en-US": "{name} says: Let's listen together."
+    },
+    "dino-maiasaura": {
+      "zh-TW": "{name}說：我用角把雪推開了！",
+      "en-US": "{name} says: I pushed the snow away!"
+    },
+    "dino-oviraptor": {
+      "zh-TW": "{name}說：你的聲音變得更清楚了。",
+      "en-US": "{name} says: Your voice is clearer now."
+    },
+    "dino-eoraptor": {
+      "zh-TW": "{name}說：這次的聲音有點不一樣喔。",
+      "en-US": "{name} says: This sound is a little different."
+    },
+    "dino-ceratosaurus": {
+      "zh-TW": "{name}說：我找到星星了！",
+      "en-US": "{name} says: I found the stars!"
+    },
+    "dino-giganotosaurus": {
+      "zh-TW": "{name}說：我們再玩一次好不好。",
+      "en-US": "{name} says: Shall we play once more?"
+    },
+    "dino-mosasaurus": {
+      "zh-TW": "{name}說：你的耳朵好厲害。",
+      "en-US": "{name} says: Your ears are amazing."
+    }
+  },
+  "ageVariants": {
+    "young": [
+      "Find red.",
+      "Listen to these two.",
+      "Which one?",
+      "Listen again.",
+      "That's it!"
+    ],
+    "older": [
+      "Help Triceratops find three red stars hidden in the snow.",
+      "Listen carefully to how the first and last sounds differ, then tell me if they are the same.",
+      "Use your ears to find the sound hidden inside the noise.",
+      "Remember where the footprints are; I will ask you later.",
+      "Keep these eight beats going, not early and not late."
+    ]
+  },
+  "dexPraise": [
+    "You met {name}!",
+    "{name} joined your dex!",
+    "A new friend: {name}!"
+  ]
+}
