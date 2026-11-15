@@ -20,7 +20,7 @@ import { haptic } from "./ui/haptics.js";
 import { burst, startAmbientSnow } from "./ui/particles.js";
 import { animate } from "./ui/motion.js";
 import { APP } from "./core/config.js";
-import { verbLabel } from "./core/verbs.js";
+import { verbLabel, verbById } from "./core/verbs.js";
 import { renderLevelMap } from "./ui/levelmap.js";
 import { renderDex } from "./ui/dex.js";
 import { renderParentReport } from "./ui/parent-report.js";
@@ -30,7 +30,8 @@ import { createTutorial } from "./ui/tutorial.js";
 import { showPaywall } from "./ui/paywall.js";
 import { buildShareCard, shareToLine } from "./ui/share-card.js";
 import { loadProgress, saveProgress, recordLevelResult, unlockDex, updateStreak, todayString } from "./core/progress.js";
-import { recordLearningSample, checkDexUnlock, setChildVoice } from "./core/dex.js";
+import { recordLearningSample, checkDexUnlock, setChildVoice, childVoice } from "./core/dex.js";
+import { requireParentalGate } from "./core/parental-gate.js";
 import { track, trackShare } from "./core/telemetry.js";
 import { referralCode, consumeReferral } from "./core/referral.js";
 import { createMasteryEntry, updateMastery } from "./core/mastery.js";
@@ -138,6 +139,24 @@ async function loadChildVoice() {
     } catch (err) {
         console.warn("[main] 兒童文案載入失敗", err);
     }
+}
+
+/**
+ * 兒童化玩法名稱。
+ *
+ * 優先使用 content/child-voice.json 的 verbChildLabel（動作或角色名）；
+ * 載入失敗時回退到 core/verbs.js 的既有標籤。
+ * @param {string} verb
+ * @param {string} locale
+ * @returns {string}
+ */
+function childVerbLabel(verb, locale) {
+    const voice = childVoice() || {};
+    const key = locale === "en-US" ? "en-US" : "zh-TW";
+    const named = voice.verbChildLabel?.[verb]?.[key];
+    if (named) return named;
+    const id = verbById(verb);
+    return id ? verbLabel(id, locale) : verb;
 }
 
 /**
@@ -289,7 +308,7 @@ function startLevel(levelId) {
     const level = getLevel(bundle, levelId);
 
     $("game-container").classList.remove("hidden");
-    $("mode-indicator").textContent = verbLabel(level.verb, locale);
+    $("mode-indicator").textContent = childVerbLabel(level.verb, locale);
     setState({ level: levelId, chapter: level.chapter, verb: level.verb });
 
     hud.update({
@@ -626,8 +645,8 @@ function wire() {
         session?.setPace(state.slowMode ? 3500 : 2000);
         slowBtn.textContent = state.slowMode ? "◑" : "◔";
         hud?.toast(state.slowMode
-            ? (locale === "en-US" ? "Slow mode on" : "慢速模式開啟")
-            : (locale === "en-US" ? "Slow mode off" : "慢速模式關閉"));
+            ? (locale === "en-US" ? "Let's go slow" : "我們慢慢來")
+            : (locale === "en-US" ? "Let's go fast!" : "快一點出發！"));
     });
 
     const musicBtn = $("music-control-btn");
@@ -662,7 +681,14 @@ function wire() {
         track("level_map_view", { chapter: 0 });
     });
 
-    document.addEventListener("parent:request", () => {
+    document.addEventListener("parent:request", async () => {
+        // 家長端必須通過家長閘門（算術題或長按 3 秒），避免幼兒誤入評量介面
+        const gateRoot = $("parent-report-root");
+        const passed = await requireParentalGate(gateRoot, {
+            reason: locale === "en-US" ? "Parent verification" : "請家長先驗證"
+        });
+        if (!passed) return;
+
         const root = $("parent-report-root");
         renderParentReport(root, progress, bundle, locale);
         root.classList.remove("hidden");

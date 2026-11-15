@@ -1,6 +1,11 @@
 /**
  * 單一 HUD 狀態列 — 取代舊有分散在四個角落的計分元件。
+ *
+ * 規範：關卡與分數標籤使用兒童語言（見 content/child-voice.json），
+ * 不得出現「Level」等硬編碼英文字面值或任何評量指標。
  */
+
+import { childVoice } from "../core/dex.js";
 
 /**
  * 建立 HUD。
@@ -13,6 +18,16 @@ export function createHud(root) {
     const medalsEl = root.querySelector(".hud__medals");
     const toastLayer = document.getElementById("toast-layer");
 
+    /**
+     * 依語系取得文案。
+     * @param {string} key
+     */
+    const t = (key) => {
+        const voice = childVoice() || {};
+        const loc = (localStorage.getItem("mumu.locale") || "zh-TW") === "en-US" ? "en-US" : "zh-TW";
+        return voice[key]?.[loc] || "";
+    };
+
     return {
         /**
          * 更新狀態。
@@ -23,12 +38,24 @@ export function createHud(root) {
                 chapterEl.textContent = s.chapterTitle || (s.chapter != null ? `第 ${s.chapter} 章` : "");
             }
             if (levelEl) {
-                levelEl.textContent = s.level != null ? `Level ${s.level}` : "";
+                if (s.level == null) {
+                    levelEl.textContent = "";
+                } else {
+                    const tmpl = t("hudLevelLabel");
+                    levelEl.textContent = tmpl
+                        ? tmpl.replace("{n}", String(s.level))
+                        : String(s.level);
+                }
             }
             if (scoreEl) {
-                scoreEl.textContent = s.score != null && s.maxScore != null
-                    ? `${s.score} / ${s.maxScore}`
-                    : "";
+                if (s.score == null || s.maxScore == null) {
+                    scoreEl.textContent = "";
+                } else {
+                    const label = t("childScoreLabel");
+                    scoreEl.textContent = label
+                        ? `${label} ${s.score} / ${s.maxScore}`
+                        : `${s.score} / ${s.maxScore}`;
+                }
             }
             if (medalsEl) {
                 const medals = s.medals || [];
