@@ -1,0 +1,76 @@
+{
+  "chapters": [
+    {
+      "chapter": 0,
+      "title": { "zh-TW": "序章：北極的星星", "en-US": "Prologue: The North Star" },
+      "mood": "wonder",
+      "scene": "christmas",
+      "verbs": ["sequence"],
+      "unlockDex": [0, 1, 2, 3],
+      "letter": {
+        "zh-TW": "親愛的孩子：今年聖誕夜，我需要你的幫忙。恐龍谷的星星走失了，牠們聽得見聲音，可是沒有人聽得見牠們。願意幫我嗎？",
+        "en-US": "Dear helper: This Christmas night I need your help. The stars of Dinosaur Valley have gone missing. They can hear sounds, but no one can hear them. Will you help me?"
+      }
+    },
+    {
+      "chapter": 1,
+      "title": { "zh-TW": "第一章：恐龍谷", "en-US": "Chapter 1: Dinosaur Valley" },
+      "mood": "play",
+      "scene": "valley",
+      "verbs": ["minimal-pair"],
+      "unlockDex": [4, 5, 6, 7, 8, 9, 10, 11],
+      "letter": {
+        "zh-TW": "你走進了恐龍谷。三角龍用牠的角推開雪堆，抬頭看你：「你聽得見我嗎？」從今天起，牠們要用聲音說話，而你要學會分辨一樣與不一樣。",
+        "en-US": "You entered Dinosaur Valley. Triceratops pushed the snow aside with its horns and looked up: 'Can you hear me?' From today, they will speak in sounds, and you will learn to tell same from different."
+      }
+    },
+    {
+      "chapter": 2,
+      "title": { "zh-TW": "第二章：恐龍的語言", "en-US": "Chapter 2: The Language of Dinosaurs" },
+      "mood": "brave",
+      "scene": "forest",
+      "verbs": ["minimal-pair", "rhythm"],
+      "unlockDex": [12, 13, 14, 15, 16, 17, 18, 19],
+      "letter": {
+        "zh-TW": "森林深處有兩座谷：一座說華語，一座說英語。你聽得懂兩種語言的最小對，也學會了恐龍的節拍。腕龍把節拍傳給你，牠說你的節奏比昨天穩了。",
+        "en-US": "Two valleys lie deep in the forest: one speaks Chinese, one speaks English. You now hear minimal pairs in both, and you have learned the dinosaurs' rhythm. Brachiosaurus passes the beat to you, saying your rhythm is steadier than yesterday."
+      }
+    },
+    {
+      "chapter": 3,
+      "title": { "zh-TW": "第三章：深海與天空", "en-US": "Chapter 3: Deep Sea and Open Sky" },
+      "mood": "kind",
+      "scene": "ice-age",
+      "verbs": ["rhythm", "interference"],
+      "unlockDex": [20, 21, 22, 23, 24, 25, 26, 27],
+      "letter": {
+        "zh-TW": "翼龍從天空帶回線索，滄龍在深海低聲呼喚。冰河紀的風聲到處都是，真正的聲音卻藏在裡面。迅猛龍跑得最快，牠說迷宮擋不住你。",
+        "en-US": "Pteranodon brings clues from the sky, Mosasaurus calls from the deep sea. Ice-age wind is everywhere, and the true voice hides inside it. Velociraptor runs fastest, saying the maze cannot stop you."
+      }
+    },
+    {
+      "chapter": 4,
+      "title": { "zh-TW": "第四章：冰河紀的聖誕", "en-US": "Chapter 4: A Christmas in the Ice Age" },
+      "mood": "home",
+      "scene": "ice-age",
+      "verbs": ["puzzle", "memory"],
+      "unlockDex": [28, 29, 30, 31, 32, 33, 34, 35],
+      "letter": {
+        "zh-TW": "冰河吞沒了恐龍谷。你要拼出恐龍的樣子讓牠破殼，也要記住雪地上留下的每一個腳跡。禮物不能送給看不見的人——除非有人記得。",
+        "en-US": "The ice swallowed Dinosaur Valley. You must assemble the dinosaurs so they can hatch, and remember every footprint left in the snow. A gift cannot reach someone unseen — unless someone remembers."
+      }
+    },
+    {
+      "chapter": 5,
+      "title": { "zh-TW": "第五章：北方的一夜", "en-US": "Chapter 5: One Night in the North" },
+      "mood": "together",
+      "scene": "north",
+      "verbs": ["memory", "interference", "puzzle"],
+      "unlockDex": [36, 37, 38, 39, 40, 41, 42, 43],
+      "letter": {
+        "zh-TW": "北方的一夜，星星回來了。恐龍群圍著爐火，你把牠們的聲音一個一個排好，牠們終於都聽懂了彼此。你幫我送出的禮物，比我準備的還多。",
+        "en-US": "On the northern night, the stars returned. The dinosaurs gathered around the fire, and you put their sounds in order, so they finally understood one another. The gifts you sent me outnumber the ones I had prepared."
+      }
+    }
+  ]
+}
