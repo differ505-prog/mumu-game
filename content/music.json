@@ -1,0 +1,89 @@
+{
+  "music": {
+    "daily": {
+      "id": "daily",
+      "file": "./外部資源/jingle-bells.mp3",
+      "loopStart": 0,
+      "loopEnd": 30,
+      "durationSec": 30,
+      "gainDb": -14,
+      "theme": "christmas"
+    },
+    "celebrate": {
+      "id": "celebrate",
+      "file": "./外部資源/jingle-bells.mp3",
+      "loopStart": 0,
+      "loopEnd": 12,
+      "durationSec": 12,
+      "gainDb": -12,
+      "theme": "celebrate"
+    },
+    "night": {
+      "id": "night",
+      "file": "./外部資源/silent-night.mp3",
+      "loopStart": 0,
+      "loopEnd": 45,
+      "durationSec": 45,
+      "gainDb": -16,
+      "theme": "north"
+    }
+  },
+  "chapters": {
+    "christmas": {
+      "id": "chapter.theme.christmas",
+      "file": "./外部資源/jingle-bells.mp3",
+      "loopStart": 0,
+      "loopEnd": 30,
+      "durationSec": 30,
+      "gainDb": -14,
+      "theme": "christmas"
+    },
+    "valley": {
+      "id": "chapter.theme.valley",
+      "file": "./外部資源/jingle-bells.mp3",
+      "loopStart": 0,
+      "loopEnd": 30,
+      "durationSec": 30,
+      "gainDb": -15,
+      "theme": "valley"
+    },
+    "forest": {
+      "id": "chapter.theme.forest",
+      "file": "./外部資源/silent-night.mp3",
+      "loopStart": 0,
+      "loopEnd": 45,
+      "durationSec": 45,
+      "gainDb": -16,
+      "theme": "forest"
+    },
+    "ice-age": {
+      "id": "chapter.theme.ice-age",
+      "file": "./外部資源/silent-night.mp3",
+      "loopStart": 0,
+      "loopEnd": 45,
+      "durationSec": 45,
+      "gainDb": -16,
+      "theme": "ice-age"
+    },
+    "north": {
+      "id": "chapter.theme.north",
+      "file": "./外部資源/silent-night.mp3",
+      "loopStart": 0,
+      "loopEnd": 45,
+      "durationSec": 45,
+      "gainDb": -17,
+      "theme": "north"
+    }
+  },
+  "ambience": {
+    "snow": {
+      "id": "ambience.snow",
+      "file": "./外部資源/silent-night.mp3",
+      "loopStart": 0,
+      "loopEnd": 45,
+      "durationSec": 45,
+      "gainDb": -26,
+      "theme": "snow"
+    }
+  }
+}
