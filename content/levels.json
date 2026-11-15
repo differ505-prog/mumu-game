@@ -1,0 +1,1122 @@
+[
+  {
+    "id": 1,
+    "chapter": 0,
+    "verb": "sequence",
+    "axis": "sequence",
+    "name": {
+      "zh-TW": "聽一聽",
+      "en-US": "聽一聽"
+    },
+    "difficulty": 1,
+    "theme": "christmas",
+    "scene": "christmas",
+    "objective": {
+      "zh-TW": "幫聖誕老人找回走失的星星",
+      "en-US": "Help Santa find the lost stars"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 3,
+      "options": 2,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 2,
+    "chapter": 0,
+    "verb": "sequence",
+    "axis": "sequence",
+    "name": {
+      "zh-TW": "跟著我做",
+      "en-US": "跟著我做"
+    },
+    "difficulty": 1,
+    "theme": "christmas",
+    "scene": "christmas",
+    "objective": {
+      "zh-TW": "幫聖誕老人找回走失的星星",
+      "en-US": "Help Santa find the lost stars"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 3,
+      "options": 2,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 3,
+    "chapter": 0,
+    "verb": "sequence",
+    "axis": "sequence",
+    "name": {
+      "zh-TW": "記住順序",
+      "en-US": "記住順序"
+    },
+    "difficulty": 1,
+    "theme": "christmas",
+    "scene": "christmas",
+    "objective": {
+      "zh-TW": "幫聖誕老人找回走失的星星",
+      "en-US": "Help Santa find the lost stars"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 3,
+      "options": 2,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 4,
+    "chapter": 0,
+    "verb": "sequence",
+    "axis": "sequence",
+    "name": {
+      "zh-TW": "再試一次",
+      "en-US": "再試一次"
+    },
+    "difficulty": 1,
+    "theme": "christmas",
+    "scene": "christmas",
+    "objective": {
+      "zh-TW": "幫聖誕老人找回走失的星星",
+      "en-US": "Help Santa find the lost stars"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 3,
+      "options": 2,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 5,
+    "chapter": 1,
+    "verb": "minimal-pair",
+    "axis": "minimal-pair",
+    "name": {
+      "zh-TW": "一樣還是不一樣",
+      "en-US": "一樣還是不一樣"
+    },
+    "difficulty": 2,
+    "theme": "valley",
+    "scene": "valley",
+    "objective": {
+      "zh-TW": "幫三角龍分辨一樣與不一樣的聲音",
+      "en-US": "Help Triceratops tell same from different"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 4,
+      "options": 3,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 6,
+    "chapter": 1,
+    "verb": "minimal-pair",
+    "axis": "minimal-pair",
+    "name": {
+      "zh-TW": "第一次的耳朵",
+      "en-US": "第一次的耳朵"
+    },
+    "difficulty": 2,
+    "theme": "valley",
+    "scene": "valley",
+    "objective": {
+      "zh-TW": "幫三角龍分辨一樣與不一樣的聲音",
+      "en-US": "Help Triceratops tell same from different"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 4,
+      "options": 3,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 7,
+    "chapter": 1,
+    "verb": "minimal-pair",
+    "axis": "minimal-pair",
+    "name": {
+      "zh-TW": "找出不同",
+      "en-US": "找出不同"
+    },
+    "difficulty": 2,
+    "theme": "valley",
+    "scene": "valley",
+    "objective": {
+      "zh-TW": "幫三角龍分辨一樣與不一樣的聲音",
+      "en-US": "Help Triceratops tell same from different"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 4,
+      "options": 3,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 8,
+    "chapter": 1,
+    "verb": "minimal-pair",
+    "axis": "minimal-pair",
+    "name": {
+      "zh-TW": "雙聲考驗",
+      "en-US": "雙聲考驗"
+    },
+    "difficulty": 2,
+    "theme": "valley",
+    "scene": "valley",
+    "objective": {
+      "zh-TW": "幫三角龍分辨一樣與不一樣的聲音",
+      "en-US": "Help Triceratops tell same from different"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 4,
+      "options": 3,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 9,
+    "chapter": 1,
+    "verb": "minimal-pair",
+    "axis": "minimal-pair",
+    "name": {
+      "zh-TW": "三隻耳朵",
+      "en-US": "三隻耳朵"
+    },
+    "difficulty": 2,
+    "theme": "valley",
+    "scene": "valley",
+    "objective": {
+      "zh-TW": "幫三角龍分辨一樣與不一樣的聲音",
+      "en-US": "Help Triceratops tell same from different"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 4,
+      "options": 3,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 10,
+    "chapter": 1,
+    "verb": "minimal-pair",
+    "axis": "minimal-pair",
+    "name": {
+      "zh-TW": "小聲一點",
+      "en-US": "小聲一點"
+    },
+    "difficulty": 2,
+    "theme": "valley",
+    "scene": "valley",
+    "objective": {
+      "zh-TW": "幫三角龍分辨一樣與不一樣的聲音",
+      "en-US": "Help Triceratops tell same from different"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 4,
+      "options": 3,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 11,
+    "chapter": 1,
+    "verb": "minimal-pair",
+    "axis": "minimal-pair",
+    "name": {
+      "zh-TW": "認真聽",
+      "en-US": "認真聽"
+    },
+    "difficulty": 2,
+    "theme": "valley",
+    "scene": "valley",
+    "objective": {
+      "zh-TW": "幫三角龍分辨一樣與不一樣的聲音",
+      "en-US": "Help Triceratops tell same from different"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 4,
+      "options": 3,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 12,
+    "chapter": 1,
+    "verb": "minimal-pair",
+    "axis": "minimal-pair",
+    "name": {
+      "zh-TW": "耳朵挑戰",
+      "en-US": "耳朵挑戰"
+    },
+    "difficulty": 2,
+    "theme": "valley",
+    "scene": "valley",
+    "objective": {
+      "zh-TW": "幫三角龍分辨一樣與不一樣的聲音",
+      "en-US": "Help Triceratops tell same from different"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 4,
+      "options": 3,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 13,
+    "chapter": 2,
+    "verb": "minimal-pair",
+    "axis": "minimal-pair",
+    "name": {
+      "zh-TW": "英語的兩兄弟",
+      "en-US": "英語的兩兄弟"
+    },
+    "difficulty": 3,
+    "theme": "forest",
+    "scene": "forest",
+    "objective": {
+      "zh-TW": "跟著恐龍的節拍一起打拍子",
+      "en-US": "Keep the beat with the dinosaurs"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 5,
+      "options": 3,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 14,
+    "chapter": 2,
+    "verb": "minimal-pair",
+    "axis": "minimal-pair",
+    "name": {
+      "zh-TW": "跨海的最小對",
+      "en-US": "跨海的最小對"
+    },
+    "difficulty": 3,
+    "theme": "forest",
+    "scene": "forest",
+    "objective": {
+      "zh-TW": "跟著恐龍的節拍一起打拍子",
+      "en-US": "Keep the beat with the dinosaurs"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 5,
+      "options": 3,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 15,
+    "chapter": 2,
+    "verb": "minimal-pair",
+    "axis": "minimal-pair",
+    "name": {
+      "zh-TW": "節拍起點",
+      "en-US": "節拍起點"
+    },
+    "difficulty": 3,
+    "theme": "forest",
+    "scene": "forest",
+    "objective": {
+      "zh-TW": "跟著恐龍的節拍一起打拍子",
+      "en-US": "Keep the beat with the dinosaurs"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 5,
+      "options": 3,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 16,
+    "chapter": 2,
+    "verb": "minimal-pair",
+    "axis": "minimal-pair",
+    "name": {
+      "zh-TW": "重音在哪裡",
+      "en-US": "重音在哪裡"
+    },
+    "difficulty": 3,
+    "theme": "forest",
+    "scene": "forest",
+    "objective": {
+      "zh-TW": "跟著恐龍的節拍一起打拍子",
+      "en-US": "Keep the beat with the dinosaurs"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 5,
+      "options": 3,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 17,
+    "chapter": 2,
+    "verb": "rhythm",
+    "axis": "rhythm",
+    "name": {
+      "zh-TW": "四拍搖擺",
+      "en-US": "四拍搖擺"
+    },
+    "difficulty": 3,
+    "theme": "forest",
+    "scene": "forest",
+    "objective": {
+      "zh-TW": "跟著恐龍的節拍一起打拍子",
+      "en-US": "Keep the beat with the dinosaurs"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 5,
+      "options": 3,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 18,
+    "chapter": 2,
+    "verb": "rhythm",
+    "axis": "rhythm",
+    "name": {
+      "zh-TW": "六拍搖擺",
+      "en-US": "六拍搖擺"
+    },
+    "difficulty": 3,
+    "theme": "forest",
+    "scene": "forest",
+    "objective": {
+      "zh-TW": "跟著恐龍的節拍一起打拍子",
+      "en-US": "Keep the beat with the dinosaurs"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 5,
+      "options": 3,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 19,
+    "chapter": 2,
+    "verb": "rhythm",
+    "axis": "rhythm",
+    "name": {
+      "zh-TW": "八拍搖擺",
+      "en-US": "八拍搖擺"
+    },
+    "difficulty": 3,
+    "theme": "forest",
+    "scene": "forest",
+    "objective": {
+      "zh-TW": "跟著恐龍的節拍一起打拍子",
+      "en-US": "Keep the beat with the dinosaurs"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 5,
+      "options": 3,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 20,
+    "chapter": 2,
+    "verb": "rhythm",
+    "axis": "rhythm",
+    "name": {
+      "zh-TW": "節奏挑戰",
+      "en-US": "節奏挑戰"
+    },
+    "difficulty": 3,
+    "theme": "forest",
+    "scene": "forest",
+    "objective": {
+      "zh-TW": "跟著恐龍的節拍一起打拍子",
+      "en-US": "Keep the beat with the dinosaurs"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 5,
+      "options": 3,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 21,
+    "chapter": 3,
+    "verb": "rhythm",
+    "axis": "rhythm",
+    "name": {
+      "zh-TW": "迷宮入口",
+      "en-US": "迷宮入口"
+    },
+    "difficulty": 4,
+    "theme": "ice-age",
+    "scene": "ice-age",
+    "objective": {
+      "zh-TW": "在迷宮的干擾聲裡找到正確的聲音",
+      "en-US": "Find the right sound inside the maze"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 6,
+      "options": 4,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 22,
+    "chapter": 3,
+    "verb": "rhythm",
+    "axis": "rhythm",
+    "name": {
+      "zh-TW": "干擾來了",
+      "en-US": "干擾來了"
+    },
+    "difficulty": 4,
+    "theme": "ice-age",
+    "scene": "ice-age",
+    "objective": {
+      "zh-TW": "在迷宮的干擾聲裡找到正確的聲音",
+      "en-US": "Find the right sound inside the maze"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 6,
+      "options": 4,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 23,
+    "chapter": 3,
+    "verb": "rhythm",
+    "axis": "rhythm",
+    "name": {
+      "zh-TW": "更靠近的聲音",
+      "en-US": "更靠近的聲音"
+    },
+    "difficulty": 4,
+    "theme": "ice-age",
+    "scene": "ice-age",
+    "objective": {
+      "zh-TW": "在迷宮的干擾聲裡找到正確的聲音",
+      "en-US": "Find the right sound inside the maze"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 6,
+      "options": 4,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 24,
+    "chapter": 3,
+    "verb": "rhythm",
+    "axis": "rhythm",
+    "name": {
+      "zh-TW": "迷宮核心",
+      "en-US": "迷宮核心"
+    },
+    "difficulty": 4,
+    "theme": "ice-age",
+    "scene": "ice-age",
+    "objective": {
+      "zh-TW": "在迷宮的干擾聲裡找到正確的聲音",
+      "en-US": "Find the right sound inside the maze"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 6,
+      "options": 4,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 25,
+    "chapter": 3,
+    "verb": "interference",
+    "axis": "interference",
+    "name": {
+      "zh-TW": "更深處",
+      "en-US": "更深處"
+    },
+    "difficulty": 4,
+    "theme": "ice-age",
+    "scene": "ice-age",
+    "objective": {
+      "zh-TW": "在迷宮的干擾聲裡找到正確的聲音",
+      "en-US": "Find the right sound inside the maze"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 6,
+      "options": 4,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 26,
+    "chapter": 3,
+    "verb": "interference",
+    "axis": "interference",
+    "name": {
+      "zh-TW": "回聲疊疊",
+      "en-US": "回聲疊疊"
+    },
+    "difficulty": 4,
+    "theme": "ice-age",
+    "scene": "ice-age",
+    "objective": {
+      "zh-TW": "在迷宮的干擾聲裡找到正確的聲音",
+      "en-US": "Find the right sound inside the maze"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 6,
+      "options": 4,
+      "interference": 1
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 27,
+    "chapter": 3,
+    "verb": "interference",
+    "axis": "interference",
+    "name": {
+      "zh-TW": "只差一點",
+      "en-US": "只差一點"
+    },
+    "difficulty": 4,
+    "theme": "ice-age",
+    "scene": "ice-age",
+    "objective": {
+      "zh-TW": "在迷宮的干擾聲裡找到正確的聲音",
+      "en-US": "Find the right sound inside the maze"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 6,
+      "options": 4,
+      "interference": 2
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 28,
+    "chapter": 3,
+    "verb": "interference",
+    "axis": "interference",
+    "name": {
+      "zh-TW": "迷宮守護者",
+      "en-US": "迷宮守護者"
+    },
+    "difficulty": 4,
+    "theme": "ice-age",
+    "scene": "ice-age",
+    "objective": {
+      "zh-TW": "在迷宮的干擾聲裡找到正確的聲音",
+      "en-US": "Find the right sound inside the maze"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 6,
+      "options": 4,
+      "interference": 3
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 29,
+    "chapter": 4,
+    "verb": "puzzle",
+    "axis": "puzzle",
+    "name": {
+      "zh-TW": "第一片羽毛",
+      "en-US": "第一片羽毛"
+    },
+    "difficulty": 4,
+    "theme": "ice-age",
+    "scene": "ice-age",
+    "objective": {
+      "zh-TW": "拼出恐龍圖並讓牠破殼",
+      "en-US": "Assemble the dinosaur picture and hatch it"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 6,
+      "options": 4,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 30,
+    "chapter": 4,
+    "verb": "puzzle",
+    "axis": "puzzle",
+    "name": {
+      "zh-TW": "拼圖拼圖",
+      "en-US": "拼圖拼圖"
+    },
+    "difficulty": 4,
+    "theme": "ice-age",
+    "scene": "ice-age",
+    "objective": {
+      "zh-TW": "拼出恐龍圖並讓牠破殼",
+      "en-US": "Assemble the dinosaur picture and hatch it"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 6,
+      "options": 4,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 31,
+    "chapter": 4,
+    "verb": "puzzle",
+    "axis": "puzzle",
+    "name": {
+      "zh-TW": "差兩片了",
+      "en-US": "差兩片了"
+    },
+    "difficulty": 4,
+    "theme": "ice-age",
+    "scene": "ice-age",
+    "objective": {
+      "zh-TW": "拼出恐龍圖並讓牠破殼",
+      "en-US": "Assemble the dinosaur picture and hatch it"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 6,
+      "options": 4,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 32,
+    "chapter": 4,
+    "verb": "puzzle",
+    "axis": "puzzle",
+    "name": {
+      "zh-TW": "最後一片",
+      "en-US": "最後一片"
+    },
+    "difficulty": 4,
+    "theme": "ice-age",
+    "scene": "ice-age",
+    "objective": {
+      "zh-TW": "拼出恐龍圖並讓牠破殼",
+      "en-US": "Assemble the dinosaur picture and hatch it"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 6,
+      "options": 4,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 33,
+    "chapter": 4,
+    "verb": "memory",
+    "axis": "memory",
+    "name": {
+      "zh-TW": "腳跡石林",
+      "en-US": "腳跡石林"
+    },
+    "difficulty": 4,
+    "theme": "ice-age",
+    "scene": "ice-age",
+    "objective": {
+      "zh-TW": "拼出恐龍圖並讓牠破殼",
+      "en-US": "Assemble the dinosaur picture and hatch it"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 6,
+      "options": 4,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 34,
+    "chapter": 4,
+    "verb": "memory",
+    "axis": "memory",
+    "name": {
+      "zh-TW": "翻翻看",
+      "en-US": "翻翻看"
+    },
+    "difficulty": 4,
+    "theme": "ice-age",
+    "scene": "ice-age",
+    "objective": {
+      "zh-TW": "拼出恐龍圖並讓牠破殼",
+      "en-US": "Assemble the dinosaur picture and hatch it"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 6,
+      "options": 4,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 35,
+    "chapter": 4,
+    "verb": "memory",
+    "axis": "memory",
+    "name": {
+      "zh-TW": "記憶的邊界",
+      "en-US": "記憶的邊界"
+    },
+    "difficulty": 4,
+    "theme": "ice-age",
+    "scene": "ice-age",
+    "objective": {
+      "zh-TW": "拼出恐龍圖並讓牠破殼",
+      "en-US": "Assemble the dinosaur picture and hatch it"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 6,
+      "options": 4,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 36,
+    "chapter": 4,
+    "verb": "memory",
+    "axis": "memory",
+    "name": {
+      "zh-TW": "圖鑑守護者",
+      "en-US": "圖鑑守護者"
+    },
+    "difficulty": 4,
+    "theme": "ice-age",
+    "scene": "ice-age",
+    "objective": {
+      "zh-TW": "拼出恐龍圖並讓牠破殼",
+      "en-US": "Assemble the dinosaur picture and hatch it"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 6,
+      "options": 4,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 37,
+    "chapter": 5,
+    "verb": "memory",
+    "axis": "memory",
+    "name": {
+      "zh-TW": "北方的一夜",
+      "en-US": "北方的一夜"
+    },
+    "difficulty": 5,
+    "theme": "north",
+    "scene": "north",
+    "objective": {
+      "zh-TW": "記住每隻恐龍留下的腳跡",
+      "en-US": "Remember every dinosaur footprint"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 7,
+      "options": 4,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 38,
+    "chapter": 5,
+    "verb": "memory",
+    "axis": "memory",
+    "name": {
+      "zh-TW": "聖誕的迴響",
+      "en-US": "聖誕的迴響"
+    },
+    "difficulty": 5,
+    "theme": "north",
+    "scene": "north",
+    "objective": {
+      "zh-TW": "記住每隻恐龍留下的腳跡",
+      "en-US": "Remember every dinosaur footprint"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 7,
+      "options": 4,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 39,
+    "chapter": 5,
+    "verb": "interference",
+    "axis": "interference",
+    "name": {
+      "zh-TW": "最後的考驗",
+      "en-US": "最後的考驗"
+    },
+    "difficulty": 5,
+    "theme": "north",
+    "scene": "north",
+    "objective": {
+      "zh-TW": "記住每隻恐龍留下的腳跡",
+      "en-US": "Remember every dinosaur footprint"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 7,
+      "options": 4,
+      "interference": 2
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  },
+  {
+    "id": 40,
+    "chapter": 5,
+    "verb": "puzzle",
+    "axis": "puzzle",
+    "name": {
+      "zh-TW": "你做到了",
+      "en-US": "你做到了"
+    },
+    "difficulty": 5,
+    "theme": "north",
+    "scene": "north",
+    "objective": {
+      "zh-TW": "記住每隻恐龍留下的腳跡",
+      "en-US": "Remember every dinosaur footprint"
+    },
+    "spec": {
+      "rounds": 3,
+      "sequenceLength": 7,
+      "options": 4,
+      "interference": 0
+    },
+    "stars": {
+      "1": "完成關卡",
+      "2": "正確率 ≥ 70%",
+      "3": "無提示且正確率 ≥ 90%"
+    }
+  }
+]
