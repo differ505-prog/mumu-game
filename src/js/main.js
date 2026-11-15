@@ -35,7 +35,7 @@ import { requireParentalGate } from "./core/parental-gate.js";
 import { track, trackShare } from "./core/telemetry.js";
 import { referralCode, consumeReferral } from "./core/referral.js";
 import { createMasteryEntry, updateMastery } from "./core/mastery.js";
-import { buildScene, setParallax } from "./ui/parallax.js";
+import { buildScene, setParallax, applyTheme, setScenePalettes } from "./ui/parallax.js";
 import { setMusicMap, playMusic, stopMusic, playSceneMusic, stopSceneMusic, hasSceneMusic } from "./audio/music.js";
 
 /** @type {any} */
@@ -91,6 +91,7 @@ async function boot() {
     await loadSfx();
     await loadMusic();
     await loadChildVoice();
+    await loadScenes();
 
     // 場景與偏好
     buildScene($("scene"));
@@ -158,6 +159,16 @@ function applySceneAudio(scene) {
 }
 
 /**
+ * 套用場景視覺（色票）。
+ * @param {string} scene
+ */
+function applySceneVisual(scene) {
+    if (!scene) return;
+    applyTheme($("scene"), scene);
+    setParallax($("scene"), 0);
+}
+
+/**
  * 兒童化玩法名稱。
  *
  * 優先使用 content/child-voice.json 的 verbChildLabel（動作或角色名）；
@@ -173,6 +184,18 @@ function childVerbLabel(verb, locale) {
     if (named) return named;
     const id = verbById(verb);
     return id ? verbLabel(id, locale) : verb;
+}
+
+/**
+ * 載入場景設定（色票）。
+ */
+async function loadScenes() {
+    try {
+        const res = await fetch("./content/scenes.json", { cache: "no-cache" });
+        if (res.ok) setScenePalettes(await res.json());
+    } catch (err) {
+        console.warn("[main] 場景設定載入失敗", err);
+    }
 }
 
 /**
@@ -211,6 +234,7 @@ function showStart() {
 async function startGame() {
     ensureAudio(locale);
     applySceneAudio("christmas");
+    applySceneVisual("christmas");
     $("start-overlay").classList.add("hidden");
 
     const letter = bundle.narrative.letters.prologue?.[locale] || "";
@@ -327,6 +351,7 @@ function startLevel(levelId) {
     $("game-container").classList.remove("hidden");
     $("mode-indicator").textContent = childVerbLabel(level.verb, locale);
     applySceneAudio(level.scene);
+    applySceneVisual(level.scene);
     setState({ level: levelId, chapter: level.chapter, verb: level.verb });
 
     hud.update({

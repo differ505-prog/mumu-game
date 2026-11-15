@@ -43,6 +43,7 @@ export function buildScene(sceneRoot) {
         const el = document.createElement("div");
         el.className = "scene__layer";
         el.dataset.layer = layer;
+        el.dataset.depth = String(DEPTH[layer]);
         el.style.setProperty("--depth", String(DEPTH[layer]));
         sceneRoot.appendChild(el);
     }
@@ -51,17 +52,44 @@ export function buildScene(sceneRoot) {
 }
 
 /**
- * 套用章節主題。
+ * 場景色票（可由 content/scenes.json 注入）。
+ * @type {any}
+ */
+let scenePalettes = {};
+
+/**
+ * 注入場景色票資料。
+ * @param {any} data
+ */
+export function setScenePalettes(data) {
+    scenePalettes = data || {};
+}
+
+/**
+ * 取得場景色票。
+ * @param {string} scene
+ */
+function paletteFor(scene) {
+    return scenePalettes?.[scene]?.palette || THEMES[scene] || THEMES.christmas;
+}
+
+/**
+ * 套用章節主題（場景色票）。
+ *
+ * 規範：所有色值來自 content/scenes.json 的 palette，不得硬編碼。
  * @param {HTMLElement} sceneRoot
  * @param {string} theme
  */
 export function applyTheme(sceneRoot, theme) {
     if (!sceneRoot) return;
-    const t = THEMES[theme] || THEMES.christmas;
+    const p = paletteFor(theme);
     sceneRoot.dataset.theme = theme;
-    sceneRoot.style.setProperty("--scene-sky", t.sky);
-    sceneRoot.style.setProperty("--scene-glow", t.glow);
-    sceneRoot.style.setProperty("--scene-fog", t.fog);
+    sceneRoot.style.setProperty("--scene-sky", p.sky);
+    sceneRoot.style.setProperty("--scene-glow", p.glow);
+    sceneRoot.style.setProperty("--scene-fog", p.fog);
+    sceneRoot.style.setProperty("--scene-ridge", p.ridge || p.sky);
+    sceneRoot.style.setProperty("--scene-midground", p.midground || p.sky);
+    sceneRoot.style.setProperty("--scene-foreground", p.foreground || p.sky);
 }
 
 /**
@@ -72,7 +100,7 @@ export function applyTheme(sceneRoot, theme) {
 export function setParallax(sceneRoot, px) {
     if (!sceneRoot) return;
     Array.from(sceneRoot.querySelectorAll(".scene__layer")).forEach((/** @type {HTMLElement} */ layer) => {
-        const depth = Number(layer.dataset.depth || 0);
+        const depth = Number(layer.dataset.depth ?? layer.style.getPropertyValue("--depth") ?? 0);
         layer.style.transform = `translate3d(0, ${(px * depth).toFixed(2)}px, 0)`;
     });
 }

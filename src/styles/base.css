@@ -99,11 +99,69 @@ body {
 }
 
 .scene__layer[data-layer="sky"] {
-    background: radial-gradient(ellipse at 50% 110%, var(--c-night-700) 0%, var(--c-night-900) 60%);
+    background:
+        radial-gradient(ellipse at 50% 110%, var(--scene-glow, var(--c-night-700)) 0%, transparent 55%),
+        radial-gradient(ellipse at 50% 115%, var(--c-night-700) 0%, var(--c-night-900) 62%);
+}
+
+/* 遠山稜線 — 剪影 + clip-path 稜線形狀 */
+.scene__layer[data-layer="ridge"] {
+    z-index: calc(var(--z-scene) + 1);
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--scene-ridge, #203a43) 88%, transparent) 0%,
+        var(--scene-ridge, #203a43) 45%,
+        color-mix(in srgb, var(--scene-ridge, #203a43) 72%, var(--scene-fog, #cfe4f2)) 100%
+    );
+    clip-path: polygon(
+        0% 68%, 8% 58%, 16% 63%, 25% 48%, 34% 56%, 43% 44%,
+        52% 52%, 61% 40%, 70% 50%, 79% 46%, 88% 56%, 96% 50%, 100% 55%,
+        100% 100%, 0% 100%
+    );
+    opacity: 0.92;
+}
+
+/* 中景 — 斑點紋理 + 漸層 */
+.scene__layer[data-layer="midground"] {
+    z-index: calc(var(--z-scene) + 2);
+    background:
+        radial-gradient(circle at 12% 78%, color-mix(in srgb, var(--scene-fog, #cfe4f2) 26%, transparent) 0 2.2%, transparent 2.6%),
+        radial-gradient(circle at 28% 84%, color-mix(in srgb, var(--scene-fog, #cfe4f2) 20%, transparent) 0 1.8%, transparent 2.2%),
+        radial-gradient(circle at 46% 80%, color-mix(in srgb, var(--scene-fog, #cfe4f2) 24%, transparent) 0 2.4%, transparent 2.8%),
+        radial-gradient(circle at 64% 86%, color-mix(in srgb, var(--scene-fog, #cfe4f2) 18%, transparent) 0 1.6%, transparent 2%),
+        radial-gradient(circle at 82% 78%, color-mix(in srgb, var(--scene-fog, #cfe4f2) 22%, transparent) 0 2%, transparent 2.4%),
+        linear-gradient(
+            180deg,
+            transparent 52%,
+            color-mix(in srgb, var(--scene-midground, #16294f) 82%, transparent) 74%,
+            var(--scene-midground, #16294f) 100%
+        );
+}
+
+/* 近景 — 最深，壓住畫面底部 */
+.scene__layer[data-layer="foreground"] {
+    z-index: calc(var(--z-scene) + 3);
+    background:
+        radial-gradient(ellipse 42% 60% at 18% 104%, var(--scene-foreground, #0a1a3c) 0 70%, transparent 72%),
+        radial-gradient(ellipse 50% 66% at 52% 106%, var(--scene-foreground, #0a1a3c) 0 70%, transparent 72%),
+        radial-gradient(ellipse 44% 58% at 86% 104%, var(--scene-foreground, #0a1a3c) 0 70%, transparent 72%),
+        linear-gradient(
+            180deg,
+            transparent 76%,
+            color-mix(in srgb, var(--scene-foreground, #0a1a3c) 88%, transparent) 88%,
+            var(--scene-foreground, #0a1a3c) 100%
+        );
 }
 
 .scene__layer[data-layer="character"] {
     z-index: var(--z-character);
+}
+
+/* 尊重減少動態偏好：層面仍可見，只是不做位移 */
+@media (prefers-reduced-motion: reduce) {
+    .scene__layer {
+        transform: none !important;
+    }
 }
 
 #game-container {
