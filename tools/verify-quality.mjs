@@ -11,7 +11,7 @@
  *   只有把兩個檔案放在一起比對才會發現錯誤。
  */
 
-import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
+import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
