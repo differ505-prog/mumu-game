@@ -1,0 +1,103 @@
+/* ============================================================
+   Design Tokens — 單一事實來源
+   所有樣式與 JS 一律引用本檔變數，禁止裸寫數值。
+   ============================================================ */
+
+:root {
+    /* ---------- 色彩：primitive ---------- */
+    --c-night-900: #0a1a3c;
+    --c-night-700: #16294f;
+    --c-night-500: #203a43;
+    --c-snow-100: #f7fbff;
+    --c-snow-300: #cfe4f2;
+    --c-cloud-400: #a9c6d8;
+    --c-red-500: #c0392b;
+    --c-red-400: #e74c3c;
+    --c-green-500: #27ae60;
+    --c-blue-500: #2980b9;
+    --c-gold-400: #f1c40f;
+    --c-amber-500: #f39c12;
+    --c-violet-500: #8e44ad;
+    --c-orange-500: #e67e22;
+
+    /* 恐龍主題色 */
+    --c-dino-green: #4a9d5f;
+    --c-dino-teal: #2f8f8a;
+    --c-dino-amber: #d98b28;
+    --c-dino-slate: #5a6b7a;
+
+    /* ---------- 色彩：semantic ---------- */
+    --bg-scene: var(--c-night-900);
+    --bg-panel: var(--c-night-700);
+    --bg-elevated: #1d3358;
+    --text-primary: var(--c-snow-100);
+    --text-secondary: var(--c-snow-300);
+    --text-muted: var(--c-cloud-400);
+    --accent-warm: var(--c-gold-400);
+    --accent-cool: var(--c-blue-500);
+    --border-soft: rgba(207, 228, 242, .22);
+    --focus-ring: var(--c-gold-400);
+
+    /* ---------- 圓角 ---------- */
+    --r-sm: 8px;
+    --r-md: 12px;
+    --r-lg: 20px;
+    --r-full: 999px;
+
+    /* ---------- 間距（4 基準） ---------- */
+    --s-1: 4px;
+    --s-2: 8px;
+    --s-3: 12px;
+    --s-4: 16px;
+    --s-5: 20px;
+    --s-6: 24px;
+    --s-8: 32px;
+    --s-10: 40px;
+
+    /* ---------- 字級 ---------- */
+    --fs-xs: 12px;
+    --fs-sm: 14px;
+    --fs-md: 16px;
+    --fs-lg: 20px;
+    --fs-xl: 26px;
+    --fs-2xl: 32px;
+
+    /* ---------- 觸控 ---------- */
+    --touch-min: 64px;
+    --touch-gap: 8px;
+
+    /* ---------- 材質 ---------- */
+    --mat-border-light: inset 0 1px 0 rgba(255, 255, 255, .18);
+    --mat-shadow-1: 0 6px 18px rgba(0, 0, 0, .28);
+    --mat-shadow-2: 0 12px 32px rgba(0, 0, 0, .36);
+
+    /* ---------- Motion tokens：8 級時長 ---------- */
+    --t-instant: 80ms;
+    --t-micro: 120ms;
+    --t-base: 200ms;
+    --t-enter: 300ms;
+    --t-settle: 450ms;
+    --t-hold: 800ms;
+    --t-scene: 1200ms;
+    --t-epic: 2000ms;
+
+    /* ---------- Motion tokens：6 級曲線 ---------- */
+    --e-linear: linear;
+    --e-standard: cubic-bezier(.2, 0, 0, 1);
+    --e-emphasized: cubic-bezier(.2, 0, 0, 1);
+    --e-decelerate: cubic-bezier(0, 0, 0, 1);
+    --e-accelerate: cubic-bezier(.3, 0, 1, 1);
+    --e-spring: cubic-bezier(.34, 1.56, .64, 1);
+    --e-overshoot: cubic-bezier(.2, 0, .2, 1.2);
+
+    /* ---------- 層級 ---------- */
+    --z-scene: 0;
+    --z-character: 2;
+    --z-hud: 10;
+    --z-overlay: 40;
+    --z-toast: 60;
+
+    /* ---------- 版面 ---------- */
+    --tv-ratio: 70;
+    --font-ui: "Fredoka One", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, -apple-system, sans-serif;
+}
