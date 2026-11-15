@@ -1,0 +1,92 @@
+{
+  "version": 1,
+  "paramNaming": {
+    "verb": "玩法 id（sequence／minimal-pair／rhythm／interference／puzzle／memory）",
+    "axis": "技能軸 id（minimalPairCorrect／sequenceCorrect／rhythmCorrect／interferenceCorrect／pitchCorrect／puzzleCorrect／memoryCorrect）",
+    "levelId": "關卡 id（1–40）",
+    "chapter": "章節編號（0–5）",
+    "correct": "該回合是否答對（0／1）",
+    "hintsUsed": "本回合使用的提示次數",
+    "reactionMs": "反應時間（毫秒）",
+    "sessionMs": "本次 session 長度（毫秒）",
+    "cardKind": "分享卡類型（learning／dex／puzzle）",
+    "channel": "分享通道（line／copy／system）"
+  },
+  "events": {
+    "session_start": {
+      "name": "session_start",
+      "params": ["chapter", "sessionMs"],
+      "trigger": "App 啟動且載入內容完成"
+    },
+    "first_session_complete": {
+      "name": "first_session_complete",
+      "params": ["levelId", "chapter", "sessionMs"],
+      "trigger": "首次完成任一關卡"
+    },
+    "round_start": {
+      "name": "round_start",
+      "params": ["verb", "axis", "levelId", "chapter"],
+      "trigger": "每回合題目生成後"
+    },
+    "round_result": {
+      "name": "round_result",
+      "params": ["verb", "axis", "levelId", "chapter", "correct", "hintsUsed", "reactionMs"],
+      "trigger": "每次作答判定後"
+    },
+    "hint_used": {
+      "name": "hint_used",
+      "params": ["verb", "levelId", "hintsUsed"],
+      "trigger": "三段式提示任一段觸發"
+    },
+    "level_complete": {
+      "name": "level_complete",
+      "params": ["levelId", "chapter", "correct", "hintsUsed", "sessionMs"],
+      "trigger": "關卡結算"
+    },
+    "chapter_start": {
+      "name": "chapter_start",
+      "params": ["chapter", "levelId"],
+      "trigger": "首次進入某章節"
+    },
+    "dex_unlock": {
+      "name": "dex_unlock",
+      "params": ["dinoId", "chapter"],
+      "trigger": "新恐龍解鎖"
+    },
+    "share_click": {
+      "name": "share_click",
+      "params": ["cardKind", "channel", "referralCode"],
+      "trigger": "點擊分享按鈕"
+    },
+    "share_install": {
+      "name": "share_install",
+      "params": ["referralCode"],
+      "trigger": "經推薦連結首次啟動"
+    },
+    "level_map_view": {
+      "name": "level_map_view",
+      "params": ["chapter"],
+      "trigger": "開啟關卡地圖"
+    },
+    "parent_report_view": {
+      "name": "parent_report_view",
+      "params": [],
+      "trigger": "開啟家長報告"
+    },
+    "paywall_view": {
+      "name": "paywall_view",
+      "params": ["feature"],
+      "trigger": "顯示付費牆"
+    },
+    "purchase": {
+      "name": "purchase",
+      "params": ["plan", "amount"],
+      "trigger": "訂閱完成"
+    },
+    "referral_install": {
+      "name": "referral_install",
+      "params": ["referralCode"],
+      "trigger": "推薦安裝歸因"
+    }
+  }
+}
