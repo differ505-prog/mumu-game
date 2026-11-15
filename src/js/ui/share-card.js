@@ -85,10 +85,10 @@ export function buildShareCard(bundle, progress, kind, payload = {}) {
  * @param {CanvasRenderingContext2D} ctx
  * @param {any} bundle
  * @param {any} progress
- * @param {string} referral
+ * @param {string} _referral
  * @returns {string}
  */
-function drawLearningCard(ctx, bundle, progress, referral) {
+function drawLearningCard(ctx, bundle, progress, _referral) {
     ctx.fillStyle = "#f7fbff";
     ctx.font = "700 58px system-ui, sans-serif";
     ctx.textAlign = "center";

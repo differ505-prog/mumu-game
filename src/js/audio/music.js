@@ -19,9 +19,6 @@ let ambienceEl = null;
 /** @type {any} */
 let musicSource = null;
 
-/** @type {any} */
-let ambienceSource = null;
-
 /** @type {string} */
 let currentId = "";
 
@@ -145,7 +142,6 @@ export function playAmbience(id) {
     if (!built) return;
 
     ambienceEl = built.el;
-    ambienceSource = built;
 
     const end = def.loopEnd || def.durationSec || 0;
     const start = def.loopStart || 0;
@@ -166,7 +162,6 @@ export function stopAmbience() {
         ambienceEl.pause();
         ambienceEl = null;
     }
-    ambienceSource = null;
 }
 
 /**

@@ -5,7 +5,7 @@
  * （允許 console.warn 與 console.error），命中即列印檔案與行號並以 exit code 1 結束。
  */
 
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join, relative } from "node:path";
 

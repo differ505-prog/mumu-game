@@ -7,7 +7,7 @@
  * - 成效前後測對照僅呈現統計結果與顯著性，不逐題列出。
  */
 
-import { verbMastery, masteryPercent } from "../core/mastery.js";
+import { masteryPercent } from "../core/mastery.js";
 import { totalStars } from "../core/progress.js";
 
 /**

@@ -3,10 +3,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check": "tsc --noEmit && eslint . && node tools/check-content.mjs && node tools/check-assets.mjs && node tools/sweep-logs.mjs",
+    "check": "npm run typecheck && npm run lint && npm run check:content && npm run check:assets && npm run sweep",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:src": "eslint src tools",
+    "check:content": "node tools/check-content.mjs",
+    "check:assets": "node tools/check-assets.mjs",
     "sweep": "node tools/sweep-logs.mjs"
   },
   "devDependencies": {

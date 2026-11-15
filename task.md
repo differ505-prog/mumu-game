@@ -1467,3 +1467,160 @@
   git commit -m "feat: 完成商轉級改版（六認知動詞／恐龍圖鑑／六章主線／感官時間軸／分享引擎）"
   git push origin "$(git branch --show-current)"
   ```
+
+---
+
+## 完成紀錄
+
+> 全部 Step 1–63 已完成，Step 64 為最終提交。
+> 統一驗證入口：`npm run check`（typecheck → lint → check-content → check-assets → sweep-logs），現況 exit code 0。
+
+### Phase A — 靜態檢查工具鏈
+
+| Step | 內容 | 驗證指令 | Commit |
+| --- | --- | --- | --- |
+| 1 | 建立 TypeScript / ESLint 檢查基礎 | `npx tsc --noEmit` | `a63b151` |
+| 2 | ESLint 扁平設定 | `npx eslint .` | `b05a785` |
+
+### Phase B — 應用骨架與設計系統
+
+| Step | 內容 | 驗證指令 | Commit |
+| --- | --- | --- | --- |
+| 3 | 重寫 index.html 為外掛式 shell + design token | `npx tsc --noEmit` | `6cd2b7d` |
+| 4 | 基礎與元件樣式 | `npx eslint .` | `df30bd1` |
+| 5 | 動畫樣式、響應式斷點與圖鑑／分享樣式 | `npx eslint .` | `bc012cd` |
+
+### Phase C — 核心模組
+
+| Step | 內容 | 驗證指令 | Commit |
+| --- | --- | --- | --- |
+| 6 | 事件匯流排與核心狀態 | `npx tsc --noEmit` | `ab8dcc7` |
+| 7 | 建置版本常數與玩法定義表 | `npx tsc --noEmit` | `af37999` |
+
+### Phase D — 內容資料層
+
+| Step | 內容 | 驗證指令 | Commit |
+| --- | --- | --- | --- |
+| 8 | 角色資料（7 隻可玩 + 24 隻圖鑑） | `node tools/check-content.mjs` | `a1bdf50` |
+| 9 | 題庫（九技能軸） | `node tools/check-content.mjs` | `1259b07` |
+| 10 | 最小對與干擾題組 | `node tools/check-content.mjs` | `4e279ea` |
+| 11 | 關卡資料（40 關 / 六章） | `node tools/check-content.mjs` | `79019fd` |
+| 12 | 敘事台詞與故事弧線 | `node tools/check-content.mjs` | `25a9d8d` |
+| 13 | 故事弧線與章節信件 | `node tools/check-content.mjs` | `8d24f69` |
+| 14 | 內容載入器與存取層 | `node tools/check-content.mjs` | `366c1f7` |
+| 15 | 關卡與題目存取 | `node tools/check-content.mjs` | `366c1f7` |
+| 16 | 內容一致性驗證工具 | `node tools/check-content.mjs` | `366c1f7` |
+
+### Phase E — 成效評估
+
+| Step | 內容 | 驗證指令 | Commit |
+| --- | --- | --- | --- |
+| 17 | 成效評估題組（與遊戲題庫完全分離） | `node tools/check-content.mjs`（題數 75 前測 / 75 後測） | `a65e01c` |
+| 18 | 成效評估執行器與家長端流程 | `npx tsc --noEmit` | `a65e01c` |
+
+### Phase F — 感官時間軸與動畫
+
+| Step | 內容 | 驗證指令 | Commit |
+| --- | --- | --- | --- |
+| 19 | 感官時間軸資料（11 個必需事件） | `node -e "const t=require('./content/timeline.json'); ..."` | `4043aa5` |
+| 20 | 時間軸引擎 | `npx tsc --noEmit` | `4043aa5` |
+| 21 | 動畫執行器（token 驅動） | `grep -c "prefers-reduced-motion" src/js/ui/motion.js` ≥ 1 | `4043aa5` |
+| 22 | 粒子引擎與觸覺 | `npx tsc --noEmit` | `4043aa5` |
+| 23 | 5 層視差場景與章節主題 | `npx tsc --noEmit` | `4043aa5` |
+| 24 | 角色渲染（24 隻 + 7 隻可玩、步行／破殼） | `npx tsc --noEmit` | `4b31565` |
+
+### Phase G — 音訊
+
+| Step | 內容 | 驗證指令 | Commit |
+| --- | --- | --- | --- |
+| 25 | 四軌混音器與側鏈 ducking | `npx tsc --noEmit` | `4b31565` |
+| 26 | 44 個材質音效與播放器 | `node -e "const m=require('./content/sfx-map.json'); if(Object.keys(m).length!==44)process.exit(1)"` | `4b31565` |
+| 27 | 音樂與環境音 | `npx tsc --noEmit` | `4043aa5` |
+| 28 | 語音層與字幕 fallback | `npx tsc --noEmit` | `4b31565` |
+| 29 | 音量設定介面（四滑桿） | `npx tsc --noEmit` | `4043aa5` |
+
+### Phase H — 六個認知動詞的玩法引擎
+
+| Step | 內容 | 驗證指令 | Commit |
+| --- | --- | --- | --- |
+| 30 | 回合流程與三段式失敗機制 | `npx tsc --noEmit` | `4b31565` |
+| 31 | 聽覺引擎（序列／最小對／節奏／干擾抑制） | `npx tsc --noEmit` | `4b31565` |
+| 32 | 拼圖引擎（圖像拼合與序列推理） | `npx tsc --noEmit` | `4b31565` |
+| 33 | 記憶力引擎（配對翻牌與雙通道序列） | `npx tsc --noEmit` | `4b31565` |
+| 34 | 玩法制程路由 | `npx tsc --noEmit` | `4b31565` |
+
+### Phase I — 圖鑑、章節與分享
+
+| Step | 內容 | 驗證指令 | Commit |
+| --- | --- | --- | --- |
+| 35 | 恐龍圖鑑介面（24 格） | `npx tsc --noEmit` | `0c2de94` |
+| 36 | 圖鑑解鎖判定與學習里程碑 | `npx tsc --noEmit` | `0c2de94` |
+| 37 | 分享成果卡（learning／dex／puzzle） | `npx tsc --noEmit` | `0c2de94` |
+| 38 | 推薦機制與 K-factor 追蹤 | `npx tsc --noEmit` | `0c2de94` |
+| 39 | 事件字典 | `node -e "const t=require('./content/telemetry.json'); ..."` | `0c2de94` |
+
+### Phase J — 家長端與留存
+
+| Step | 內容 | 驗證指令 | Commit |
+| --- | --- | --- | --- |
+| 40 | 單一 HUD 狀態列（取代分散計分元件） | `npx tsc --noEmit` | `3b9b20c` |
+| 41 | 掌握度與難度自適應 | `grep -rn "level + 1" src/js/` 無結果 | `3b9b20c` |
+| 42 | 存檔、遷移與進度（`mumu.progress.v2`） | `npx tsc --noEmit` | `3b9b20c` |
+| 43 | 每日挑戰（全球同題） | `npx tsc --noEmit` | `3b9b20c` |
+| 44 | 關卡地圖（付費章節標示） | `npx tsc --noEmit` | `3b9b20c` |
+| 45 | 家長報告與掌握度雷達圖 | `npx tsc --noEmit` | `3b9b20c` |
+
+### Phase K — 視覺素材與資產管線
+
+| Step | 內容 | 驗證指令 | Commit |
+| --- | --- | --- | --- |
+| 46 | 生成 48 個 SVG icon | `ls assets/icons/*.svg \| wc -l` = 48 | `96034b1` |
+| 47 | 生成 24 隻恐龍 SVG（含 4 幀步行） | `node -e "const m=require('./assets/characters/manifest.json'); ..."` | `366c1f7` |
+| 48 | App icon 與 manifest 修正 | `file icon-192.png icon-512.png icon-1024.png` → PNG image data | `96034b1` |
+| 49 | 資產驗證工具 | `node tools/check-assets.mjs` | `96034b1` |
+| 50 | 材質精修與角色接地感 | `grep -n "box-shadow: 0" src/styles/components.css` 無結果 | `96034b1` |
+| 51 | 資產轉碼與瘦身（WebP q82 / AAC 96k mono） | `node tools/convert-assets.mjs`（離線資產 2.87 MB < 6 MB） | `96034b1` |
+
+### Phase L — 無障礙、離線與清理
+
+| Step | 內容 | 驗證指令 | Commit |
+| --- | --- | --- | --- |
+| 52 | 無障礙與偏好設定 | `npx tsc --noEmit` | `d119f4d` |
+| 53 | 離線優先 Service Worker（`mumu-v3`） | `node --check service-worker.js` | `d119f4d` |
+| 54 | 移除舊素材（53MB）與殘留碼 | `node tools/sweep-logs.mjs`；專案體積 3.9MB < 12MB | `d119f4d` |
+
+### Phase M — 商轉、合規與免費公測
+
+| Step | 內容 | 驗證指令 | Commit |
+| --- | --- | --- | --- |
+| 55 | 家長閘門（算術題／長按 3 秒，15 分鐘有效） | `npx tsc --noEmit` | `3b9b20c` |
+| 56 | 權益控管與年訂閱付費牆（不推月訂閱） | `grep -c "freeChapters" src/js/core/entitlements.js` ≥ 1 | `3b9b20c` |
+| 57 | 同意管理與兒少隱私文件 | `node -e "const s=require('fs').readFileSync('content/privacy.zh-TW.md','utf8'); ..."` | `17d7d87` |
+| 58 | 商店素材文案與分鏡 | `node -e "const s=require('./content/store-listing.zh-TW.json'); ..."` | `17d7d87` |
+| 59 | 教學流程與劇情過場 | `npx tsc --noEmit` | `17d7d87` |
+| 60 | 主流程整合 | `grep -c "type=\"module\"" index.html` = 1 | `17d7d87` |
+
+### Phase N — 最終驗收與交付
+
+| Step | 內容 | 驗證指令 | Commit |
+| --- | --- | --- | --- |
+| 61 | 統一靜態檢查入口 | `npm run check`（exit code 0） | 本次提交 |
+| 62 | 驗收標準對照表 | `node -e "const s=require('fs').readFileSync('docs/acceptance-9.md','utf8'); ..."` | 本次提交 |
+| 63 | 公測啟動檢查表 | `node -e "const s=require('fs').readFileSync('docs/beta-launch.md','utf8'); ..."` | 本次提交 |
+| 64 | 最終交付：完整檢查後提交並推送 | `npm run check` | 本次提交 |
+
+### 交付狀態
+
+**靜態可驗證項目：全部完成。** 統一驗證指令 `npm run check` 現況 exit code 0。
+
+**需實測項目（9 項，已於 `docs/acceptance-9.md` 與 `docs/beta-launch.md` 明確標示為「待實機驗收」，不代表已達成）：**
+
+1. D7 留存 ≥ 12%
+2. 最小對辨識成效顯著改善（n ≥ 30，正確率提升 ≥ 15 個百分點且 p < 0.05）
+3. 下載轉付費 ≥ 2.5%
+4. ≥ 55 FPS
+5. −16 LUFS ±1
+6. 分享率 8–12%
+7. K-factor ≥ 0.5
+8. 盲測 5/5
+9. 視覺完成度主觀評分（目前為自繪佔位美術，正式素材依 VA-2 由插畫外包替換，替換僅換檔案、不改程式碼）

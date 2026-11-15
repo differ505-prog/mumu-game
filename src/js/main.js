@@ -20,24 +20,22 @@ import { haptic } from "./ui/haptics.js";
 import { burst, startAmbientSnow } from "./ui/particles.js";
 import { animate } from "./ui/motion.js";
 import { APP } from "./core/config.js";
-import { VERBS, verbLabel } from "./core/verbs.js";
+import { verbLabel } from "./core/verbs.js";
 import { renderLevelMap } from "./ui/levelmap.js";
 import { renderDex } from "./ui/dex.js";
 import { renderParentReport } from "./ui/parent-report.js";
 import { createAudioSettings } from "./ui/settings-audio.js";
-import { createPreferencesPanel, applyPreferences, announce } from "./ui/a11y.js";
-import { showStoryScene, showLetter as showStoryLetter } from "./ui/story.js";
+import { createPreferencesPanel, applyPreferences } from "./ui/a11y.js";
 import { createTutorial } from "./ui/tutorial.js";
 import { showPaywall } from "./ui/paywall.js";
 import { buildShareCard, shareToLine } from "./ui/share-card.js";
 import { loadProgress, saveProgress, recordLevelResult, unlockDex, updateStreak, todayString } from "./core/progress.js";
 import { recordLearningSample, checkDexUnlock } from "./core/dex.js";
 import { track, trackShare } from "./core/telemetry.js";
-import { referralCode, consumeReferral, storeReferral } from "./core/referral.js";
-import { getEntitlement, setEntitlement } from "./core/entitlements.js";
-import { createMasteryEntry, updateMastery, axisMastery } from "./core/mastery.js";
+import { referralCode, consumeReferral } from "./core/referral.js";
+import { createMasteryEntry, updateMastery } from "./core/mastery.js";
 import { buildScene, setParallax } from "./ui/parallax.js";
-import { setMusicMap, playMusic, musicForTheme } from "./audio/music.js";
+import { setMusicMap } from "./audio/music.js";
 
 /** @type {any} */
 let bundle = null;
@@ -96,7 +94,7 @@ async function boot() {
     buildScene($("scene"));
     applyPreferences(document.body);
     audioSettings = createAudioSettings($("audio-settings-root"));
-    preferencesPanel = createPreferencesPanel($("parent-report-root"), locale);
+    preferencesPanel = createPreferencesPanel($("a11y-root"), locale);
 
     wire();
     startAmbientSnow($("snow-container"));
@@ -704,6 +702,37 @@ function wire() {
         root.querySelector("#share-close")?.addEventListener("click", () => {
             root.classList.add("hidden");
         });
+    });
+
+    // 設定按鈕：開啟音量設定與無障礙偏好
+    const settingsBtn = $("settings-btn");
+    settingsBtn?.addEventListener("click", () => {
+        const root = $("audio-settings-root");
+        root.classList.remove("hidden");
+        audioSettings?.reload();
+
+        // 面板內加上面板切換與關閉
+        if (!root.querySelector("#settings-a11y")) {
+            const toggle = document.createElement("button");
+            toggle.id = "settings-a11y";
+            toggle.className = "level-btn level-btn--secondary";
+            toggle.type = "button";
+            toggle.textContent = locale === "en-US" ? "Accessibility" : "無障礙設定";
+            toggle.addEventListener("click", () => {
+                const a11yRoot = $("a11y-root");
+                a11yRoot.classList.remove("hidden");
+                preferencesPanel?.applyPreferences();
+            });
+            root.appendChild(toggle);
+
+            const close = document.createElement("button");
+            close.id = "settings-close";
+            close.className = "level-btn level-btn--secondary";
+            close.type = "button";
+            close.textContent = locale === "en-US" ? "Close" : "關閉";
+            close.addEventListener("click", () => root.classList.add("hidden"));
+            root.appendChild(close);
+        }
     });
 
     // 視窗改變時切換橫向提示
