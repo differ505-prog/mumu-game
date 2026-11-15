@@ -12,10 +12,13 @@
  */
 
 import { readFileSync, existsSync, readdirSync } from "node:fs";
+import { createRequire } from "node:module";
+import { pathToFileURL } from "node:url";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const require = createRequire(import.meta.url);
 
 /**
  * 輸出。
@@ -267,6 +270,92 @@ function checkVisualSceneDiff() {
         return { ok: false, msg: "場景 sky 色有重複" };
     }
     return { ok: true, msg: `${entries.length} 個場景 sky 色互不相同` };
+}
+
+/**
+ * 5. 程序化場景音樂：每個場景必須有獨立定義，且 (root, tempo) 互不相同。
+ */
+function checkMusicSceneDistinct() {
+    const src = readSrc("src/js/audio/scene-music.js");
+    if (!src) return { ok: false, msg: "src/js/audio/scene-music.js 不存在" };
+
+    // 解析 SCENE_MUSIC 物件
+    const start = src.indexOf("export const SCENE_MUSIC");
+    if (start < 0) return { ok: false, msg: "SCENE_MUSIC 未匯出" };
+    const end = src.indexOf("\n};", start);
+    const block = src.slice(start, end);
+
+    const ids = [...block.matchAll(/^\s{4}"?([a-z0-9-]+)"?:\s*\{/gm)].map((m) => m[1]);
+    if (ids.length < 5) return { ok: false, msg: `場景音樂僅 ${ids.length} 個（需 ≥5）` };
+
+    const combos = [...block.matchAll(/root:\s*(\d+)/g)].map((m) => m[1]);
+    const tempos = [...block.matchAll(/tempo:\s*(\d+)/g)].map((m) => m[1]);
+    if (combos.length !== ids.length || tempos.length !== ids.length) {
+        return { ok: false, msg: "部分場景缺少 root 或 tempo" };
+    }
+
+    const pairs = ids.map((_, i) => `${combos[i]}/${tempos[i]}`);
+    const uniq = new Set(pairs);
+    if (uniq.size !== pairs.length) {
+        return { ok: false, msg: `${pairs.length} 個場景只有 ${uniq.size} 組不同的 (root, tempo)` };
+    }
+    return { ok: true, msg: `${ids.length} 個場景音樂 (root, tempo) 互不相同` };
+}
+
+/**
+ * 6. 程序化音樂必須可渲染：實跑 renderSceneMusic，確認每個場景都能產出非靜音緩衝區。
+ */
+function checkMusicRenderable() {
+    const path = join(root, "src/js/audio/scene-music.js");
+    if (!existsSync(path)) return { ok: false, msg: "scene-music.js 不存在" };
+
+    // 以動態 import 實測（此檔案無瀏覽器相依，僅需 AudioContext 介面）
+    const script = `
+        class FakeCtx {
+            constructor(){ this.sampleRate = 44100; }
+            createBuffer(ch, len){
+                const d = [new Float32Array(len), new Float32Array(len)];
+                return { getChannelData(i){ return d[i]; } };
+            }
+        }
+        globalThis.AudioContext = FakeCtx;
+        const m = await import(${JSON.stringify(pathToFileURL(path).href)});
+        const results = [];
+        for (const k of Object.keys(m.SCENE_MUSIC)) {
+            const buf = m.renderSceneMusic(new FakeCtx(), k, 4);
+            if (!buf) { results.push([k, 0]); continue; }
+            const L = buf.getChannelData(0);
+            let peak = 0;
+            for (let i = 0; i < L.length; i++) { const a = Math.abs(L[i]); if (a > peak) peak = a; }
+            results.push([k, peak]);
+        }
+        console.log(JSON.stringify(results));
+    `;
+    // 同步執行：改用 child_process
+    const { execFileSync } = require("node:child_process");
+    let out = "";
+    try {
+        out = execFileSync(process.execPath, ["--input-type=module", "-e", script], {
+            encoding: "utf8",
+            stdio: ["ignore", "pipe", "ignore"]
+        });
+    } catch {
+        return { ok: false, msg: "renderSceneMusic 實測執行失敗" };
+    }
+
+    let results;
+    try {
+        results = JSON.parse(out.trim().split("\n").pop() || "[]");
+    } catch {
+        return { ok: false, msg: "無法解析實測輸出" };
+    }
+    if (!results.length) return { ok: false, msg: "實測無輸出" };
+
+    const silent = results.filter(([, peak]) => peak < 0.05);
+    if (silent.length) {
+        return { ok: false, msg: `${silent.length} 個場景渲染為靜音：${silent.map(([k]) => k).join(", ")}` };
+    }
+    return { ok: true, msg: `${results.length} 個場景皆渲染出非靜音緩衝區` };
 }
 
 /* ------------------------------------------------------------------ *
@@ -596,6 +685,8 @@ const CHECKS = [
     { id: "music-per-scene", phase: "music", fn: checkMusicPerScene },
     { id: "music-scenes-match", phase: "music", fn: checkMusicScenesMatch },
     { id: "audio-dupes", phase: "music", fn: checkAudioDupes },
+    { id: "music-scene-distinct", phase: "music", fn: checkMusicSceneDistinct },
+    { id: "music-renderable", phase: "music", fn: checkMusicRenderable },
     { id: "story-dino-lines", phase: "story", fn: checkStoryDinoLines },
     { id: "story-letter-length", phase: "story", fn: checkStoryLetterLength },
     { id: "story-lines-count", phase: "story", fn: checkStoryLinesCount },
