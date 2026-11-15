@@ -69,7 +69,7 @@ export function renderLevelMap(root, bundle, progress, locale) {
                                             aria-label="${l.name?.[locale] || l.name?.["zh-TW"] || l.id}">
                                         <span class="levelmap__node-no">${l.id}</span>
                                         <span class="levelmap__node-stars" aria-label="${stars}/3">
-                                            ${[1, 2, 3].map((n) => `<span class="levelmap__star ${n <= stars ? "is-on" : ""}">★</span>`).join("")}
+                                            ${[1, 2, 3].map((n) => `<img class="levelmap__star ${n <= stars ? "is-on" : ""}" src="./assets/icons/star${n <= stars ? "-filled" : ""}.svg" alt="" width="18" height="18" />`).join("")}
                                         </span>
                                     </button>
                                 `;

@@ -476,8 +476,10 @@
     position: relative;
     display: grid;
     place-items: end center;
+    isolation: isolate;
 }
 
+/* 接地陰影：橢圓陰影層 + drop-shadow */
 .char__shadow {
     width: 60%;
     height: 10px;
@@ -485,11 +487,85 @@
     background: rgba(0, 0, 0, .28);
     border-radius: 50%;
     filter: blur(3px);
+    transition: transform var(--t-settle) var(--e-spring),
+                opacity var(--t-settle) var(--e-standard);
 }
 
 .char__art {
     filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .35));
+    transform-origin: 50% 100%;
 }
+
+/* 六種 mood */
+.char--idle .char__art { animation: char-breathe var(--t-hold) var(--e-standard) infinite; }
+.char--listen .char__art { animation: char-lean var(--t-base) var(--e-out); }
+.char--happy .char__art { animation: char-bounce var(--t-base) var(--e-spring); }
+.char--sad .char__art { animation: char-sad var(--t-slow) var(--e-standard); }
+.char--hint .char__art { animation: char-wiggle var(--t-base) var(--e-standard); }
+.char--roar .char__art { animation: char-roar var(--t-scene) var(--e-spring); }
+
+/* 步行循環（4 幀由 JS 切換 src） */
+.char--walk .char__art { animation: char-step var(--t-base) var(--e-linear) infinite; }
+.char--walk .char__shadow { transform: scaleX(.86); opacity: .78; }
+
+/* 破殼演出 */
+.char--hatch .char__art { animation: char-hatch var(--t-epic) var(--e-spring); }
+
+.char--roar .char__shadow {
+    transform: scaleX(1.25);
+    opacity: .5;
+}
+
+@keyframes char-breathe {
+    0%, 100% { transform: scaleY(1); }
+    50% { transform: scaleY(1.03); }
+}
+
+@keyframes char-lean {
+    0% { transform: rotate(0deg); }
+    40% { transform: rotate(-3deg); }
+    100% { transform: rotate(0deg); }
+}
+
+@keyframes char-bounce {
+    0%, 100% { transform: translateY(0); }
+    35% { transform: translateY(-14%); }
+    70% { transform: translateY(3%); }
+}
+
+@keyframes char-sad {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(6%) rotate(-2deg); }
+}
+
+@keyframes char-wiggle {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-4deg); }
+    75% { transform: rotate(4deg); }
+}
+
+@keyframes char-roar {
+    0% { transform: scale(1) translateY(0); }
+    25% { transform: scale(1.12) translateY(-8%); }
+    60% { transform: scale(1.04) translateY(0); }
+    100% { transform: scale(1) translateY(0); }
+}
+
+@keyframes char-step {
+    0% { transform: translateY(0) rotate(0deg); }
+    25% { transform: translateY(-4%) rotate(-2deg); }
+    50% { transform: translateY(0) rotate(0deg); }
+    75% { transform: translateY(-4%) rotate(2deg); }
+    100% { transform: translateY(0) rotate(0deg); }
+}
+
+@keyframes char-hatch {
+    0% { transform: scale(.6) translateY(18%); opacity: .4; }
+    45% { transform: scale(1.06) translateY(-6%); opacity: 1; }
+    75% { transform: scale(.98) translateY(0); }
+    100% { transform: scale(1) translateY(0); }
+}
+
 
 /* ---------- 音量設定 ---------- */
 .audio-settings {

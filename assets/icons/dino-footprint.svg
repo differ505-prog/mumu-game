@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"
+     fill="none" stroke="currentColor"
+     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="dino-footprint">
+  <path d="M8 15c-2.2 0-3.5-1.6-3.5-3.7S6 7.5 8 7.5s3.5 1.7 3.5 3.8S10.2 15 8 15z"/><path d="M15.5 9.5c-1.8 0-3-1.3-3-3s1.2-3 3-3 3 1.3 3 3-1.2 3-3 3z"/><path d="M16 20c-1.6 0-2.6-1.2-2.6-2.7s1-2.7 2.6-2.7 2.7 1.2 2.7 2.7S17.6 20 16 20z"/>
+</svg>

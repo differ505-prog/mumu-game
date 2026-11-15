@@ -271,4 +271,4 @@ for (const c of characters.playable) {
 writeFileSync(join(outDir, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n");
 
 const total = manifest.length * 5 + festive.length;
-console.log(`✓ 產生 ${manifest.length} 隻恐龍（含 4 幀步行）＋ ${festive.length} 隻節慶角色，共 ${total} 個 SVG`);
+console.log(`[OK] 產生 ${manifest.length} 隻恐龍（含 4 幀步行）＋ ${festive.length} 隻節慶角色，共 ${total} 個 SVG`);

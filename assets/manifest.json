@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "generatedAt": "2026-11-15T16:12:40.627Z",
+  "policy": {
+    "webp": {
+      "quality": 82,
+      "maxWidth": 512
+    },
+    "audio": {
+      "codec": "aac",
+      "bitrate": "96k",
+      "channels": 1
+    },
+    "ffmpegAvailable": true
+  },
+  "files": [
+    {
+      "file": "assets/generated/外部資源__Gemini_Generated_Image_drnxlldrnxlldrnx.webp",
+      "size": 33588,
+      "hash": "af11a2ebf92690ff"
+    },
+    {
+      "file": "assets/generated/外部資源__Gemini_Generated_Image_gjv12tgjv12tgjv1.webp",
+      "size": 23692,
+      "hash": "bd7ae05e83dc69b5"
+    },
+    {
+      "file": "assets/generated/外部資源__Gemini_Generated_Image_luepm9luepm9luep.webp",
+      "size": 33582,
+      "hash": "7247183a83dc09a3"
+    },
+    {
+      "file": "assets/generated/外部資源__聖誕老人.webp",
+      "size": 33582,
+      "hash": "7247183a83dc09a3"
+    },
+    {
+      "file": "assets/generated/外部資源__雪人.webp",
+      "size": 23692,
+      "hash": "bd7ae05e83dc69b5"
+    },
+    {
+      "file": "assets/generated/外部資源__馴鹿.webp",
+      "size": 33588,
+      "hash": "af11a2ebf92690ff"
+    },
+    {
+      "file": "assets/audio/外部資源__Jingle Bells.m4a",
+      "size": 553541,
+      "hash": "c25c0e6f4265dd20"
+    },
+    {
+      "file": "assets/audio/外部資源__Silent Night - Instrumental.m4a",
+      "size": 555143,
+      "hash": "7acdbc1de53ae2ca"
+    },
+    {
+      "file": "assets/audio/外部資源__jingle-bells.m4a",
+      "size": 556886,
+      "hash": "0de505e0ef46ed35"
+    },
+    {
+      "file": "assets/audio/外部資源__silent-night.m4a",
+      "size": 554887,
+      "hash": "4add1e549a7f6bc1"
+    }
+  ]
+}

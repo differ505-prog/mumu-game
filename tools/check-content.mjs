@@ -231,9 +231,9 @@ if (minimalPairs) {
 
 /* --- 輸出 --- */
 if (problems.length) {
-    console.error("✗ 內容驗證失敗：");
+    console.error("[FAIL] 內容驗證失敗：");
     for (const p of problems) console.error(`  - ${p}`);
     process.exit(1);
 }
 
-console.log("✓ 內容驗證通過：levels 40／chapters 6／characters 7+24／items 9 軸／narrative 對稱");
+console.log("[PASS] 內容驗證通過：levels 40／chapters 6／characters 7+24／items 9 軸／narrative 對稱");

@@ -58,3 +58,6 @@ assets/generated/
 
 # System Files
 Thumbs.db
+
+# 資產轉碼輸出（由 tools/convert-assets.mjs 產生）
+assets/generated/

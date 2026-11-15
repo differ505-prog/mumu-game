@@ -1,0 +1,242 @@
+[
+  {
+    "id": "star",
+    "group": "feedback",
+    "file": "star.svg"
+  },
+  {
+    "id": "star-filled",
+    "group": "feedback",
+    "file": "star-filled.svg"
+  },
+  {
+    "id": "medal",
+    "group": "feedback",
+    "file": "medal.svg"
+  },
+  {
+    "id": "crown",
+    "group": "feedback",
+    "file": "crown.svg"
+  },
+  {
+    "id": "trophy",
+    "group": "feedback",
+    "file": "trophy.svg"
+  },
+  {
+    "id": "check",
+    "group": "feedback",
+    "file": "check.svg"
+  },
+  {
+    "id": "cross",
+    "group": "feedback",
+    "file": "cross.svg"
+  },
+  {
+    "id": "close-circle",
+    "group": "feedback",
+    "file": "close-circle.svg"
+  },
+  {
+    "id": "hint",
+    "group": "feedback",
+    "file": "hint.svg"
+  },
+  {
+    "id": "heart",
+    "group": "feedback",
+    "file": "heart.svg"
+  },
+  {
+    "id": "rocket",
+    "group": "feedback",
+    "file": "rocket.svg"
+  },
+  {
+    "id": "lock",
+    "group": "ui",
+    "file": "lock.svg"
+  },
+  {
+    "id": "unlock",
+    "group": "ui",
+    "file": "unlock.svg"
+  },
+  {
+    "id": "settings",
+    "group": "ui",
+    "file": "settings.svg"
+  },
+  {
+    "id": "volume",
+    "group": "ui",
+    "file": "volume.svg"
+  },
+  {
+    "id": "volume-mute",
+    "group": "ui",
+    "file": "volume-mute.svg"
+  },
+  {
+    "id": "speaker",
+    "group": "ui",
+    "file": "speaker.svg"
+  },
+  {
+    "id": "play",
+    "group": "ui",
+    "file": "play.svg"
+  },
+  {
+    "id": "pause",
+    "group": "ui",
+    "file": "pause.svg"
+  },
+  {
+    "id": "replay",
+    "group": "ui",
+    "file": "replay.svg"
+  },
+  {
+    "id": "slow",
+    "group": "ui",
+    "file": "slow.svg"
+  },
+  {
+    "id": "music",
+    "group": "ui",
+    "file": "music.svg"
+  },
+  {
+    "id": "back",
+    "group": "ui",
+    "file": "back.svg"
+  },
+  {
+    "id": "close",
+    "group": "ui",
+    "file": "close.svg"
+  },
+  {
+    "id": "home",
+    "group": "ui",
+    "file": "home.svg"
+  },
+  {
+    "id": "chevron",
+    "group": "ui",
+    "file": "chevron.svg"
+  },
+  {
+    "id": "map",
+    "group": "ui",
+    "file": "map.svg"
+  },
+  {
+    "id": "calendar",
+    "group": "ui",
+    "file": "calendar.svg"
+  },
+  {
+    "id": "chart",
+    "group": "ui",
+    "file": "chart.svg"
+  },
+  {
+    "id": "star-chart",
+    "group": "ui",
+    "file": "star-chart.svg"
+  },
+  {
+    "id": "shield",
+    "group": "ui",
+    "file": "shield.svg"
+  },
+  {
+    "id": "parent",
+    "group": "ui",
+    "file": "parent.svg"
+  },
+  {
+    "id": "dino-footprint",
+    "group": "game",
+    "file": "dino-footprint.svg"
+  },
+  {
+    "id": "dino-egg",
+    "group": "game",
+    "file": "dino-egg.svg"
+  },
+  {
+    "id": "roar",
+    "group": "game",
+    "file": "roar.svg"
+  },
+  {
+    "id": "echo",
+    "group": "game",
+    "file": "echo.svg"
+  },
+  {
+    "id": "twin",
+    "group": "game",
+    "file": "twin.svg"
+  },
+  {
+    "id": "drum",
+    "group": "game",
+    "file": "drum.svg"
+  },
+  {
+    "id": "maze",
+    "group": "game",
+    "file": "maze.svg"
+  },
+  {
+    "id": "leaf",
+    "group": "game",
+    "file": "leaf.svg"
+  },
+  {
+    "id": "gift",
+    "group": "game",
+    "file": "gift.svg"
+  },
+  {
+    "id": "bell",
+    "group": "hud",
+    "file": "bell.svg"
+  },
+  {
+    "id": "candle",
+    "group": "hud",
+    "file": "candle.svg"
+  },
+  {
+    "id": "light",
+    "group": "hud",
+    "file": "light.svg"
+  },
+  {
+    "id": "snowflake",
+    "group": "hud",
+    "file": "snowflake.svg"
+  },
+  {
+    "id": "tree",
+    "group": "hud",
+    "file": "tree.svg"
+  },
+  {
+    "id": "house",
+    "group": "hud",
+    "file": "house.svg"
+  },
+  {
+    "id": "puzzle",
+    "group": "game",
+    "file": "puzzle.svg"
+  }
+]

@@ -2,7 +2,7 @@
   "music": {
     "daily": {
       "id": "daily",
-      "file": "./外部資源/jingle-bells.mp3",
+      "file": "./assets/audio/外部資源__jingle-bells.m4a",
       "loopStart": 0,
       "loopEnd": 30,
       "durationSec": 30,
@@ -11,7 +11,7 @@
     },
     "celebrate": {
       "id": "celebrate",
-      "file": "./外部資源/jingle-bells.mp3",
+      "file": "./assets/audio/外部資源__jingle-bells.m4a",
       "loopStart": 0,
       "loopEnd": 12,
       "durationSec": 12,
@@ -20,7 +20,7 @@
     },
     "night": {
       "id": "night",
-      "file": "./外部資源/silent-night.mp3",
+      "file": "./assets/audio/外部資源__silent-night.m4a",
       "loopStart": 0,
       "loopEnd": 45,
       "durationSec": 45,
@@ -31,7 +31,7 @@
   "chapters": {
     "christmas": {
       "id": "chapter.theme.christmas",
-      "file": "./外部資源/jingle-bells.mp3",
+      "file": "./assets/audio/外部資源__jingle-bells.m4a",
       "loopStart": 0,
       "loopEnd": 30,
       "durationSec": 30,
@@ -40,7 +40,7 @@
     },
     "valley": {
       "id": "chapter.theme.valley",
-      "file": "./外部資源/jingle-bells.mp3",
+      "file": "./assets/audio/外部資源__jingle-bells.m4a",
       "loopStart": 0,
       "loopEnd": 30,
       "durationSec": 30,
@@ -49,7 +49,7 @@
     },
     "forest": {
       "id": "chapter.theme.forest",
-      "file": "./外部資源/silent-night.mp3",
+      "file": "./assets/audio/外部資源__silent-night.m4a",
       "loopStart": 0,
       "loopEnd": 45,
       "durationSec": 45,
@@ -58,7 +58,7 @@
     },
     "ice-age": {
       "id": "chapter.theme.ice-age",
-      "file": "./外部資源/silent-night.mp3",
+      "file": "./assets/audio/外部資源__silent-night.m4a",
       "loopStart": 0,
       "loopEnd": 45,
       "durationSec": 45,
@@ -67,7 +67,7 @@
     },
     "north": {
       "id": "chapter.theme.north",
-      "file": "./外部資源/silent-night.mp3",
+      "file": "./assets/audio/外部資源__silent-night.m4a",
       "loopStart": 0,
       "loopEnd": 45,
       "durationSec": 45,
@@ -78,7 +78,7 @@
   "ambience": {
     "snow": {
       "id": "ambience.snow",
-      "file": "./外部資源/silent-night.mp3",
+      "file": "./assets/audio/外部資源__silent-night.m4a",
       "loopStart": 0,
       "loopEnd": 45,
       "durationSec": 45,
