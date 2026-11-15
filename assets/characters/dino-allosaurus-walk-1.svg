@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none" role="img" aria-label="dino-allosaurus">
+  <g transform="translate(0 0) rotate(0 256 280)">
+    <path d="M300 330 C 380 320 440 280 470 240 C 455 300 400 350 320 372 Z" fill="#2c3e50" />
+    <path d="M150 245 C 150 195 195 165 250 168 C 305 170 328 205 322 258 C 316 312 285 340 232 340 C 178 340 150 308 150 245 Z" fill="#e67e22" />
+    <path d="M205 200 C 200 165 218 138 252 130 C 288 122 315 140 318 168 C 320 192 300 208 268 212 Z" fill="#e67e22" />
+    <path d="M250 128 C 288 106 330 112 348 134 C 332 140 300 144 276 142 Z" fill="#e67e22" />
+    <path d="M320 122 L 344 118 L 322 132 Z" fill="#f39c12" />
+    <circle cx="300" cy="132" r="6" fill="#f39c12" />
+    <circle cx="300" cy="132" r="2.5" fill="#1b1b1b" />
+    <path d="M292 142 L 298 156 L 304 141 Z" fill="#ffffff" />
+    <path d="M310 140 L 315 152 L 320 139 Z" fill="#ffffff" />
+    <path d="M184 320 L 176 380 L 204 380 L 212 320 Z" fill="#2c3e50" transform="translate(0 0)" />
+    <path d="M266 320 L 258 380 L 286 380 L 294 320 Z" fill="#2c3e50" transform="translate(0 0)" />
+    <path d="M214 306 L 210 340 L 226 340 L 230 306 Z" fill="#2c3e50" />
+    <path d="M244 306 L 240 340 L 256 340 L 260 306 Z" fill="#2c3e50" />
+  </g>
+</svg>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none" role="img" aria-label="dino-ankylosaurus">
+  <g transform="translate(0 -5) rotate(0 256 280)">
+    <path d="M300 340 C 370 340 430 360 470 390 C 420 396 360 380 305 362 Z" fill="#9b59b6" />
+    <path d="M150 245 C 150 195 195 165 250 168 C 305 170 328 205 322 258 C 316 312 285 340 232 340 C 178 340 150 308 150 245 Z" fill="#2980b9" />
+    <path d="M196 220 C 188 188 210 162 246 158 C 280 154 300 170 298 194 C 296 216 274 226 244 230 Z" fill="#2980b9" />
+    <ellipse cx="250" cy="180" rx="44" ry="26" fill="#2980b9" transform="rotate(-6 250 180)" />
+    <circle cx="272" cy="176" r="5" fill="#ffffff" />
+    <circle cx="272" cy="176" r="2.5" fill="#1b1b1b" />
+    <ellipse cx="474" cy="396" rx="26" ry="22" fill="#9b59b6" />
+    <path d="M186 186 L 176 150 L 200 180 Z" fill="#f39c12" />
+    <path d="M214 176 L 208 138 L 232 172 Z" fill="#f39c12" />
+    <path d="M184 320 L 176 380 L 204 380 L 212 320 Z" fill="#9b59b6" transform="translate(0 0)" />
+    <path d="M266 320 L 258 380 L 286 380 L 294 320 Z" fill="#9b59b6" transform="translate(0 0)" />
+    <path d="M214 306 L 210 340 L 226 340 L 230 306 Z" fill="#9b59b6" />
+    <path d="M244 306 L 240 340 L 256 340 L 260 306 Z" fill="#9b59b6" />
+  </g>
+</svg>

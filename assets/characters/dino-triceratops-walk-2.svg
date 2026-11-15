@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none" role="img" aria-label="dino-triceratops">
+  <g transform="translate(0 -3) rotate(-1.5 256 280)">
+    <path d="M300 340 C 370 340 430 360 470 390 C 420 396 360 380 305 362 Z" fill="#c0392b" />
+    <path d="M150 245 C 150 195 195 165 250 168 C 305 170 328 205 322 258 C 316 312 285 340 232 340 C 178 340 150 308 150 245 Z" fill="#4a9d5f" />
+    <path d="M196 215 C 186 180 206 152 244 146 C 280 140 302 156 302 184 C 302 208 280 222 248 226 Z" fill="#4a9d5f" />
+    <ellipse cx="252" cy="168" rx="56" ry="34" fill="#4a9d5f" transform="rotate(-8 252 168)" />
+    <path d="M206 190 C 190 200 186 220 196 236 C 216 232 230 214 232 194 Z" fill="#c0392b" />
+    <path d="M212 142 L 204 96 L 224 138 Z" fill="#f39c12" />
+    <path d="M244 134 L 244 84 L 262 134 Z" fill="#f39c12" />
+    <path d="M276 140 L 288 96 L 296 146 Z" fill="#f39c12" />
+    <circle cx="272" cy="162" r="6" fill="#ffffff" />
+    <circle cx="272" cy="162" r="3" fill="#1b1b1b" />
+    <path d="M184 320 L 176 380 L 204 380 L 212 320 Z" fill="#c0392b" transform="translate(0 4)" />
+    <path d="M266 320 L 258 380 L 286 380 L 294 320 Z" fill="#c0392b" transform="translate(0 -4)" />
+    <path d="M214 306 L 210 340 L 226 340 L 230 306 Z" fill="#c0392b" />
+    <path d="M244 306 L 240 340 L 256 340 L 260 306 Z" fill="#c0392b" />
+  </g>
+</svg>

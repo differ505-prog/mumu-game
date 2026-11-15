@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none" role="img" aria-label="dino-brachiosaurus">
+  <g transform="translate(0 0) rotate(0 256 280)">
+    <path d="M300 340 C 370 340 430 360 470 390 C 420 396 360 380 305 362 Z" fill="#27ae60" />
+    <path d="M150 250 C 150 200 190 175 245 178 C 300 180 320 210 315 265 C 310 320 280 345 230 345 C 180 345 150 315 150 250 Z" fill="#d98b28" />
+    <path d="M175 240 C 140 210 132 160 148 120 C 158 96 186 92 198 114 C 210 138 200 180 205 226 Z" fill="#d98b28" />
+    <ellipse cx="170" cy="108" rx="42" ry="30" fill="#d98b28" transform="rotate(-14 170 108)" />
+    <circle cx="152" cy="98" r="6" fill="#f39c12" />
+    <circle cx="152" cy="98" r="2.5" fill="#1b1b1b" />
+    <path d="M182 330 L 172 396 L 198 396 L 206 330 Z" fill="#27ae60" transform="translate(0 0)" />
+    <path d="M268 330 L 258 396 L 284 396 L 292 330 Z" fill="#27ae60" transform="translate(0 0)" />
+  </g>
+</svg>

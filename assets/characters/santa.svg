@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none" role="img" aria-label="santa">
+  <ellipse cx="256" cy="330" rx="96" ry="104" fill="#c0392b" />
+  <path d="M162 300 C 200 340 312 340 350 300 L 350 400 C 312 430 200 430 162 400 Z" fill="#7b241c" />
+  <circle cx="256" cy="190" r="72" fill="#f6d9c4" />
+  <path d="M184 168 C 200 118 312 118 328 168 C 300 148 212 148 184 168 Z" fill="#ffffff" />
+  <path d="M176 150 C 196 100 316 100 336 150 C 336 122 300 104 256 104 C 212 104 176 122 176 150 Z" fill="#ffffff" />
+  <circle cx="256" cy="96" r="20" fill="#ffffff" />
+  <circle cx="228" cy="192" r="7" fill="#1b1b1b" />
+  <circle cx="284" cy="192" r="7" fill="#1b1b1b" />
+  <ellipse cx="256" cy="228" rx="44" ry="26" fill="#ffffff" />
+  <path d="M228 210 C 244 202 268 202 284 210" stroke="#f1c40f" stroke-width="4" fill="none" stroke-linecap="round" />
+  <path d="M150 366 L 362 366 L 362 396 L 150 396 Z" fill="#f1c40f" />
+  <rect x="244" y="352" width="24" height="28" rx="4" fill="#ffffff" />
+</svg>

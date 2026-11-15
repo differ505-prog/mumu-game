@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none" role="img" aria-label="reindeer">
+  <ellipse cx="256" cy="320" rx="98" ry="82" fill="#a0522d" />
+  <ellipse cx="256" cy="300" rx="62" ry="52" fill="#6b3a1e" />
+  <circle cx="256" cy="188" r="62" fill="#a0522d" />
+  <ellipse cx="256" cy="212" rx="34" ry="26" fill="#6b3a1e" />
+  <circle cx="228" cy="176" r="7" fill="#1b1b1b" />
+  <circle cx="284" cy="176" r="7" fill="#1b1b1b" />
+  <ellipse cx="256" cy="210" rx="12" ry="9" fill="#1b1b1b" />
+  <path d="M206 140 C 190 92 206 52 232 44" stroke="#6b3a1e" stroke-width="11" fill="none" stroke-linecap="round" />
+  <path d="M306 140 C 322 92 306 52 280 44" stroke="#6b3a1e" stroke-width="11" fill="none" stroke-linecap="round" />
+  <path d="M220 96 C 238 84 254 92 250 110 C 236 116 224 108 220 96 Z" fill="#f1c40f" />
+  <path d="M292 96 C 274 84 258 92 262 110 C 276 116 288 108 292 96 Z" fill="#f1c40f" />
+  <circle cx="256" cy="60" r="14" fill="#f1c40f" />
+  <path d="M172 316 L 140 400" stroke="#6b3a1e" stroke-width="16" stroke-linecap="round" />
+  <path d="M340 316 L 372 400" stroke="#6b3a1e" stroke-width="16" stroke-linecap="round" />
+</svg>

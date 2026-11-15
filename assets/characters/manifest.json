@@ -1,0 +1,578 @@
+[
+  {
+    "id": "dino-triceratops",
+    "file": "dino-triceratops.svg",
+    "walkFrames": [
+      "dino-triceratops-walk-1.svg",
+      "dino-triceratops-walk-2.svg",
+      "dino-triceratops-walk-3.svg",
+      "dino-triceratops-walk-4.svg"
+    ],
+    "hasAlpha": true,
+    "bbox": {
+      "x": 100,
+      "y": 44,
+      "width": 380,
+      "height": 372
+    },
+    "palette": {
+      "primary": "#4a9d5f",
+      "secondary": "#c0392b",
+      "accent": "#f39c12"
+    },
+    "roar": "deep",
+    "dexNo": 1
+  },
+  {
+    "id": "dino-trex",
+    "file": "dino-trex.svg",
+    "walkFrames": [
+      "dino-trex-walk-1.svg",
+      "dino-trex-walk-2.svg",
+      "dino-trex-walk-3.svg",
+      "dino-trex-walk-4.svg"
+    ],
+    "hasAlpha": true,
+    "bbox": {
+      "x": 100,
+      "y": 44,
+      "width": 380,
+      "height": 372
+    },
+    "palette": {
+      "primary": "#2f8f8a",
+      "secondary": "#2980b9",
+      "accent": "#f39c12"
+    },
+    "roar": "loud",
+    "dexNo": 2
+  },
+  {
+    "id": "dino-brachiosaurus",
+    "file": "dino-brachiosaurus.svg",
+    "walkFrames": [
+      "dino-brachiosaurus-walk-1.svg",
+      "dino-brachiosaurus-walk-2.svg",
+      "dino-brachiosaurus-walk-3.svg",
+      "dino-brachiosaurus-walk-4.svg"
+    ],
+    "hasAlpha": true,
+    "bbox": {
+      "x": 100,
+      "y": 44,
+      "width": 380,
+      "height": 372
+    },
+    "palette": {
+      "primary": "#d98b28",
+      "secondary": "#27ae60",
+      "accent": "#f39c12"
+    },
+    "roar": "soft",
+    "dexNo": 3
+  },
+  {
+    "id": "dino-pteranodon",
+    "file": "dino-pteranodon.svg",
+    "walkFrames": [
+      "dino-pteranodon-walk-1.svg",
+      "dino-pteranodon-walk-2.svg",
+      "dino-pteranodon-walk-3.svg",
+      "dino-pteranodon-walk-4.svg"
+    ],
+    "hasAlpha": true,
+    "bbox": {
+      "x": 100,
+      "y": 44,
+      "width": 380,
+      "height": 372
+    },
+    "palette": {
+      "primary": "#8e44ad",
+      "secondary": "#e67e22",
+      "accent": "#f39c12"
+    },
+    "roar": "sharp",
+    "dexNo": 4
+  },
+  {
+    "id": "dino-stegosaurus",
+    "file": "dino-stegosaurus.svg",
+    "walkFrames": [
+      "dino-stegosaurus-walk-1.svg",
+      "dino-stegosaurus-walk-2.svg",
+      "dino-stegosaurus-walk-3.svg",
+      "dino-stegosaurus-walk-4.svg"
+    ],
+    "hasAlpha": true,
+    "bbox": {
+      "x": 100,
+      "y": 44,
+      "width": 380,
+      "height": 372
+    },
+    "palette": {
+      "primary": "#5a6b7a",
+      "secondary": "#16a085",
+      "accent": "#f39c12"
+    },
+    "roar": "mid",
+    "dexNo": 5
+  },
+  {
+    "id": "dino-velociraptor",
+    "file": "dino-velociraptor.svg",
+    "walkFrames": [
+      "dino-velociraptor-walk-1.svg",
+      "dino-velociraptor-walk-2.svg",
+      "dino-velociraptor-walk-3.svg",
+      "dino-velociraptor-walk-4.svg"
+    ],
+    "hasAlpha": true,
+    "bbox": {
+      "x": 100,
+      "y": 44,
+      "width": 380,
+      "height": 372
+    },
+    "palette": {
+      "primary": "#c0392b",
+      "secondary": "#7f8c8d",
+      "accent": "#f39c12"
+    },
+    "roar": "sharp",
+    "dexNo": 6
+  },
+  {
+    "id": "dino-ankylosaurus",
+    "file": "dino-ankylosaurus.svg",
+    "walkFrames": [
+      "dino-ankylosaurus-walk-1.svg",
+      "dino-ankylosaurus-walk-2.svg",
+      "dino-ankylosaurus-walk-3.svg",
+      "dino-ankylosaurus-walk-4.svg"
+    ],
+    "hasAlpha": true,
+    "bbox": {
+      "x": 100,
+      "y": 44,
+      "width": 380,
+      "height": 372
+    },
+    "palette": {
+      "primary": "#2980b9",
+      "secondary": "#9b59b6",
+      "accent": "#f39c12"
+    },
+    "roar": "mid",
+    "dexNo": 7
+  },
+  {
+    "id": "dino-parasaurolophus",
+    "file": "dino-parasaurolophus.svg",
+    "walkFrames": [
+      "dino-parasaurolophus-walk-1.svg",
+      "dino-parasaurolophus-walk-2.svg",
+      "dino-parasaurolophus-walk-3.svg",
+      "dino-parasaurolophus-walk-4.svg"
+    ],
+    "hasAlpha": true,
+    "bbox": {
+      "x": 100,
+      "y": 44,
+      "width": 380,
+      "height": 372
+    },
+    "palette": {
+      "primary": "#27ae60",
+      "secondary": "#d35400",
+      "accent": "#f39c12"
+    },
+    "roar": "warm",
+    "dexNo": 8
+  },
+  {
+    "id": "dino-allosaurus",
+    "file": "dino-allosaurus.svg",
+    "walkFrames": [
+      "dino-allosaurus-walk-1.svg",
+      "dino-allosaurus-walk-2.svg",
+      "dino-allosaurus-walk-3.svg",
+      "dino-allosaurus-walk-4.svg"
+    ],
+    "hasAlpha": true,
+    "bbox": {
+      "x": 100,
+      "y": 44,
+      "width": 380,
+      "height": 372
+    },
+    "palette": {
+      "primary": "#e67e22",
+      "secondary": "#2c3e50",
+      "accent": "#f39c12"
+    },
+    "roar": "loud",
+    "dexNo": 9
+  },
+  {
+    "id": "dino-carnotaurus",
+    "file": "dino-carnotaurus.svg",
+    "walkFrames": [
+      "dino-carnotaurus-walk-1.svg",
+      "dino-carnotaurus-walk-2.svg",
+      "dino-carnotaurus-walk-3.svg",
+      "dino-carnotaurus-walk-4.svg"
+    ],
+    "hasAlpha": true,
+    "bbox": {
+      "x": 100,
+      "y": 44,
+      "width": 380,
+      "height": 372
+    },
+    "palette": {
+      "primary": "#16a085",
+      "secondary": "#1abc9c",
+      "accent": "#f39c12"
+    },
+    "roar": "loud",
+    "dexNo": 10
+  },
+  {
+    "id": "dino-iguanodon",
+    "file": "dino-iguanodon.svg",
+    "walkFrames": [
+      "dino-iguanodon-walk-1.svg",
+      "dino-iguanodon-walk-2.svg",
+      "dino-iguanodon-walk-3.svg",
+      "dino-iguanodon-walk-4.svg"
+    ],
+    "hasAlpha": true,
+    "bbox": {
+      "x": 100,
+      "y": 44,
+      "width": 380,
+      "height": 372
+    },
+    "palette": {
+      "primary": "#7f8c8d",
+      "secondary": "#8e44ad",
+      "accent": "#f39c12"
+    },
+    "roar": "mid",
+    "dexNo": 11
+  },
+  {
+    "id": "dino-trachodon",
+    "file": "dino-trachodon.svg",
+    "walkFrames": [
+      "dino-trachodon-walk-1.svg",
+      "dino-trachodon-walk-2.svg",
+      "dino-trachodon-walk-3.svg",
+      "dino-trachodon-walk-4.svg"
+    ],
+    "hasAlpha": true,
+    "bbox": {
+      "x": 100,
+      "y": 44,
+      "width": 380,
+      "height": 372
+    },
+    "palette": {
+      "primary": "#9b59b6",
+      "secondary": "#c0392b",
+      "accent": "#f39c12"
+    },
+    "roar": "warm",
+    "dexNo": 12
+  },
+  {
+    "id": "dino-tyrannosaurus",
+    "file": "dino-tyrannosaurus.svg",
+    "walkFrames": [
+      "dino-tyrannosaurus-walk-1.svg",
+      "dino-tyrannosaurus-walk-2.svg",
+      "dino-tyrannosaurus-walk-3.svg",
+      "dino-tyrannosaurus-walk-4.svg"
+    ],
+    "hasAlpha": true,
+    "bbox": {
+      "x": 100,
+      "y": 44,
+      "width": 380,
+      "height": 372
+    },
+    "palette": {
+      "primary": "#d35400",
+      "secondary": "#34495e",
+      "accent": "#f39c12"
+    },
+    "roar": "loud",
+    "dexNo": 13
+  },
+  {
+    "id": "dino-diplodocus",
+    "file": "dino-diplodocus.svg",
+    "walkFrames": [
+      "dino-diplodocus-walk-1.svg",
+      "dino-diplodocus-walk-2.svg",
+      "dino-diplodocus-walk-3.svg",
+      "dino-diplodocus-walk-4.svg"
+    ],
+    "hasAlpha": true,
+    "bbox": {
+      "x": 100,
+      "y": 44,
+      "width": 380,
+      "height": 372
+    },
+    "palette": {
+      "primary": "#2c3e50",
+      "secondary": "#e91e63",
+      "accent": "#f39c12"
+    },
+    "roar": "soft",
+    "dexNo": 14
+  },
+  {
+    "id": "dino-compysognathus",
+    "file": "dino-compysognathus.svg",
+    "walkFrames": [
+      "dino-compysognathus-walk-1.svg",
+      "dino-compysognathus-walk-2.svg",
+      "dino-compysognathus-walk-3.svg",
+      "dino-compysognathus-walk-4.svg"
+    ],
+    "hasAlpha": true,
+    "bbox": {
+      "x": 100,
+      "y": 44,
+      "width": 380,
+      "height": 372
+    },
+    "palette": {
+      "primary": "#1abc9c",
+      "secondary": "#f39c12",
+      "accent": "#f39c12"
+    },
+    "roar": "sharp",
+    "dexNo": 15
+  },
+  {
+    "id": "dino-dilophosaurus",
+    "file": "dino-dilophosaurus.svg",
+    "walkFrames": [
+      "dino-dilophosaurus-walk-1.svg",
+      "dino-dilophosaurus-walk-2.svg",
+      "dino-dilophosaurus-walk-3.svg",
+      "dino-dilophosaurus-walk-4.svg"
+    ],
+    "hasAlpha": true,
+    "bbox": {
+      "x": 100,
+      "y": 44,
+      "width": 380,
+      "height": 372
+    },
+    "palette": {
+      "primary": "#8e44ad",
+      "secondary": "#2980b9",
+      "accent": "#f39c12"
+    },
+    "roar": "sharp",
+    "dexNo": 16
+  },
+  {
+    "id": "dino-tyrannosaurus-scout",
+    "file": "dino-tyrannosaurus-scout.svg",
+    "walkFrames": [
+      "dino-tyrannosaurus-scout-walk-1.svg",
+      "dino-tyrannosaurus-scout-walk-2.svg",
+      "dino-tyrannosaurus-scout-walk-3.svg",
+      "dino-tyrannosaurus-scout-walk-4.svg"
+    ],
+    "hasAlpha": true,
+    "bbox": {
+      "x": 100,
+      "y": 44,
+      "width": 380,
+      "height": 372
+    },
+    "palette": {
+      "primary": "#c0392b",
+      "secondary": "#27ae60",
+      "accent": "#f39c12"
+    },
+    "roar": "loud",
+    "dexNo": 17
+  },
+  {
+    "id": "dino-spinosaurus",
+    "file": "dino-spinosaurus.svg",
+    "walkFrames": [
+      "dino-spinosaurus-walk-1.svg",
+      "dino-spinosaurus-walk-2.svg",
+      "dino-spinosaurus-walk-3.svg",
+      "dino-spinosaurus-walk-4.svg"
+    ],
+    "hasAlpha": true,
+    "bbox": {
+      "x": 100,
+      "y": 44,
+      "width": 380,
+      "height": 372
+    },
+    "palette": {
+      "primary": "#34495e",
+      "secondary": "#8e44ad",
+      "accent": "#f39c12"
+    },
+    "roar": "deep",
+    "dexNo": 18
+  },
+  {
+    "id": "dino-maiasaura",
+    "file": "dino-maiasaura.svg",
+    "walkFrames": [
+      "dino-maiasaura-walk-1.svg",
+      "dino-maiasaura-walk-2.svg",
+      "dino-maiasaura-walk-3.svg",
+      "dino-maiasaura-walk-4.svg"
+    ],
+    "hasAlpha": true,
+    "bbox": {
+      "x": 100,
+      "y": 44,
+      "width": 380,
+      "height": 372
+    },
+    "palette": {
+      "primary": "#e91e63",
+      "secondary": "#16a085",
+      "accent": "#f39c12"
+    },
+    "roar": "warm",
+    "dexNo": 19
+  },
+  {
+    "id": "dino-oviraptor",
+    "file": "dino-oviraptor.svg",
+    "walkFrames": [
+      "dino-oviraptor-walk-1.svg",
+      "dino-oviraptor-walk-2.svg",
+      "dino-oviraptor-walk-3.svg",
+      "dino-oviraptor-walk-4.svg"
+    ],
+    "hasAlpha": true,
+    "bbox": {
+      "x": 100,
+      "y": 44,
+      "width": 380,
+      "height": 372
+    },
+    "palette": {
+      "primary": "#f39c12",
+      "secondary": "#4a9d5f",
+      "accent": "#f39c12"
+    },
+    "roar": "warm",
+    "dexNo": 20
+  },
+  {
+    "id": "dino-eoraptor",
+    "file": "dino-eoraptor.svg",
+    "walkFrames": [
+      "dino-eoraptor-walk-1.svg",
+      "dino-eoraptor-walk-2.svg",
+      "dino-eoraptor-walk-3.svg",
+      "dino-eoraptor-walk-4.svg"
+    ],
+    "hasAlpha": true,
+    "bbox": {
+      "x": 100,
+      "y": 44,
+      "width": 380,
+      "height": 372
+    },
+    "palette": {
+      "primary": "#2980b9",
+      "secondary": "#2f8f8a",
+      "accent": "#f39c12"
+    },
+    "roar": "sharp",
+    "dexNo": 21
+  },
+  {
+    "id": "dino-ceratosaurus",
+    "file": "dino-ceratosaurus.svg",
+    "walkFrames": [
+      "dino-ceratosaurus-walk-1.svg",
+      "dino-ceratosaurus-walk-2.svg",
+      "dino-ceratosaurus-walk-3.svg",
+      "dino-ceratosaurus-walk-4.svg"
+    ],
+    "hasAlpha": true,
+    "bbox": {
+      "x": 100,
+      "y": 44,
+      "width": 380,
+      "height": 372
+    },
+    "palette": {
+      "primary": "#27ae60",
+      "secondary": "#d98b28",
+      "accent": "#f39c12"
+    },
+    "roar": "sharp",
+    "dexNo": 22
+  },
+  {
+    "id": "dino-giganotosaurus",
+    "file": "dino-giganotosaurus.svg",
+    "walkFrames": [
+      "dino-giganotosaurus-walk-1.svg",
+      "dino-giganotosaurus-walk-2.svg",
+      "dino-giganotosaurus-walk-3.svg",
+      "dino-giganotosaurus-walk-4.svg"
+    ],
+    "hasAlpha": true,
+    "bbox": {
+      "x": 100,
+      "y": 44,
+      "width": 380,
+      "height": 372
+    },
+    "palette": {
+      "primary": "#8e44ad",
+      "secondary": "#8e44ad",
+      "accent": "#f39c12"
+    },
+    "roar": "loud",
+    "dexNo": 23
+  },
+  {
+    "id": "dino-mosasaurus",
+    "file": "dino-mosasaurus.svg",
+    "walkFrames": [
+      "dino-mosasaurus-walk-1.svg",
+      "dino-mosasaurus-walk-2.svg",
+      "dino-mosasaurus-walk-3.svg",
+      "dino-mosasaurus-walk-4.svg"
+    ],
+    "hasAlpha": true,
+    "bbox": {
+      "x": 100,
+      "y": 44,
+      "width": 380,
+      "height": 372
+    },
+    "palette": {
+      "primary": "#16a085",
+      "secondary": "#5a6b7a",
+      "accent": "#f39c12"
+    },
+    "roar": "deep",
+    "dexNo": 24
+  }
+]

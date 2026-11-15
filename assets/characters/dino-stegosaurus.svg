@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none" role="img" aria-label="dino-stegosaurus">
+  <g transform="translate(0 0) rotate(0 256 280)">
+    <path d="M300 340 C 370 340 430 360 470 390 C 420 396 360 380 305 362 Z" fill="#16a085" />
+    <path d="M150 245 C 150 195 195 165 250 168 C 305 170 328 205 322 258 C 316 312 285 340 232 340 C 178 340 150 308 150 245 Z" fill="#5a6b7a" />
+    <path d="M196 218 C 188 184 212 156 248 152 C 284 148 306 164 304 190 C 302 214 280 226 248 230 Z" fill="#5a6b7a" />
+    <ellipse cx="252" cy="176" rx="46" ry="26" fill="#5a6b7a" transform="rotate(-12 252 176)" />
+    <circle cx="276" cy="168" r="6" fill="#ffffff" />
+    <circle cx="276" cy="168" r="3" fill="#1b1b1b" />
+    <path d="M170 190 L 182 140 L 202 186 Z" fill="#16a085" />
+    <path d="M204 176 L 218 122 L 240 172 Z" fill="#16a085" />
+    <path d="M242 170 L 258 118 L 280 168 Z" fill="#16a085" />
+    <path d="M282 176 L 296 130 L 314 184 Z" fill="#16a085" />
+    <path d="M184 320 L 176 380 L 204 380 L 212 320 Z" fill="#16a085" transform="translate(0 0)" />
+    <path d="M266 320 L 258 380 L 286 380 L 294 320 Z" fill="#16a085" transform="translate(0 0)" />
+    <path d="M214 306 L 210 340 L 226 340 L 230 306 Z" fill="#16a085" />
+    <path d="M244 306 L 240 340 L 256 340 L 260 306 Z" fill="#16a085" />
+  </g>
+</svg>
