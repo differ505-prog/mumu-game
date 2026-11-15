@@ -6,6 +6,7 @@
  */
 
 import { bus, context } from "./mixer.js";
+import { renderSceneMusic, SCENE_MUSIC } from "./scene-music.js";
 
 /** @type {any} */
 let musicMap = { music: {}, chapters: {}, ambience: {} };
@@ -21,6 +22,18 @@ let musicSource = null;
 
 /** @type {string} */
 let currentId = "";
+
+/** 程序化音樂緩衝區快取（同一場景只渲染一次）。 @type {Map<string, AudioBuffer>} */
+const sceneBuffers = new Map();
+
+/** @type {AudioBufferSourceNode | null} */
+let sceneSource = null;
+
+/** @type {GainNode | null} */
+let sceneGain = null;
+
+/** 目前播放中的程序化場景。 @type {string} */
+let currentSceneId = "";
 
 /**
  * 載入音樂定義。
@@ -70,6 +83,12 @@ function buildSource(file, gainDb, track) {
  * @param {string} id
  */
 export function playMusic(id) {
+    // 場景鍵改走程序化軌道，讓呼叫端不必分辨兩套機制
+    if (SCENE_MUSIC[id]) {
+        playSceneMusic(id);
+        return;
+    }
+
     const def = lookup(id);
     if (!def) return;
     if (currentId === id && musicEl && !musicEl.paused) return;
@@ -103,6 +122,7 @@ export function playMusic(id) {
  * @param {number} fadeMs
  */
 export function stopMusic(fadeMs = 400) {
+    stopSceneMusic(fadeMs);
     if (!musicEl || !musicSource) return;
     const el = musicEl;
     const src = musicSource;
@@ -123,6 +143,111 @@ export function stopMusic(fadeMs = 400) {
         try {
             el.pause();
             src.src.disconnect();
+        } catch {
+            // 已斷線時忽略
+        }
+    }, fadeMs + 40);
+}
+
+/**
+ * 判斷某場景是否有程序化音樂。
+ * @param {string} sceneId
+ * @returns {boolean}
+ */
+export function hasSceneMusic(sceneId) {
+    return Boolean(SCENE_MUSIC[sceneId]);
+}
+
+/**
+ * 播放程序化場景音樂。
+ *
+ * 規範：同一場景只渲染一次（快取）；不得與檔案音樂同時播放；
+ * 節點停止時必須 disconnect()，避免記憶體洩漏。
+ *
+ * @param {string} sceneId
+ * @param {{ gainDb?:number, seconds?:number }} [opts]
+ * @returns {boolean} 是否成功啟動
+ */
+export function playSceneMusic(sceneId, opts = {}) {
+    if (!SCENE_MUSIC[sceneId]) return false;
+    if (currentSceneId === sceneId && sceneSource) return true;
+
+    const ctx = context();
+    if (!ctx) return false;
+
+    stopSceneMusic(700);
+    stopMusic(700);
+
+    let buffer = sceneBuffers.get(sceneId);
+    if (!buffer) {
+        buffer = renderSceneMusic(ctx, sceneId, opts.seconds ?? 24);
+        if (!buffer) return false;
+        sceneBuffers.set(sceneId, buffer);
+    }
+
+    const dest = bus("music");
+    if (!dest) return false;
+
+    const src = ctx.createBufferSource();
+    src.buffer = buffer;
+    src.loop = true;
+
+    const gain = ctx.createGain();
+    const gainDb = opts.gainDb ?? -15;
+    gain.gain.value = Math.pow(10, gainDb / 20);
+
+    src.connect(gain);
+    gain.connect(dest);
+
+    const now = ctx.currentTime;
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.linearRampToValueAtTime(gain.gain.value, now + 1.2);
+
+    src.start(0);
+
+    sceneSource = src;
+    sceneGain = gain;
+    currentSceneId = sceneId;
+
+    return true;
+}
+
+/**
+ * 停止程序化場景音樂（淡出）。
+ * @param {number} fadeMs
+ */
+export function stopSceneMusic(fadeMs = 800) {
+    if (!sceneSource || !sceneGain) return;
+
+    const src = sceneSource;
+    const gain = sceneGain;
+    sceneSource = null;
+    sceneGain = null;
+    currentSceneId = "";
+
+    const ctx = context();
+    if (!ctx) {
+        try {
+            src.stop();
+        } catch {
+            // 已停止時忽略
+        }
+        return;
+    }
+
+    const now = ctx.currentTime;
+    try {
+        gain.gain.cancelScheduledValues(now);
+        gain.gain.setValueAtTime(gain.gain.value, now);
+        gain.gain.linearRampToValueAtTime(0.0001, now + fadeMs / 1000);
+    } catch {
+        // 節點可能已被斷線
+    }
+    setTimeout(() => {
+        try {
+            src.stop();
+            src.disconnect();
+            gain.disconnect();
         } catch {
             // 已斷線時忽略
         }
