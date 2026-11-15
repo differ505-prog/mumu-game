@@ -6,6 +6,28 @@
  */
 
 /**
+ * 兒童／家長雙層文案（由 main.js 注入）。
+ * @type {any}
+ */
+let voiceData = null;
+
+/**
+ * 注入雙層文案資料。
+ * @param {any} data
+ */
+export function setChildVoice(data) {
+    voiceData = data || null;
+}
+
+/**
+ * 取得雙層文案資料。
+ * @returns {any}
+ */
+export function childVoice() {
+    return voiceData;
+}
+
+/**
  * 技能軸對應的解鎖條件欄位。
  */
 const AXIS_FIELD = {
@@ -145,16 +167,93 @@ function evaluateCondition(cond, progress) {
 
 /**
  * 產生解鎖條件的人類可讀文字。
+ *
+ * 規範：view = "child"（預設）時只使用兒童語言（誘因式），
+ * 不得出現任何認知心理學或教育評量術語；
+ * view = "parent" 時保留正式技能名，供家長端使用。
+ *
+ * @param {any} bundle
+ * @param {any} progress
+ * @param {string} dinoId
+ * @param {string} locale
+ * @param {"child"|"parent"} [view]
+ * @returns {string}
+ */
+export function unlockConditionText(bundle, progress, dinoId, locale, view = "child") {
+    if (view === "child") {
+        return childUnlockText(bundle, progress, dinoId, locale);
+    }
+    return parentUnlockText(bundle, progress, dinoId, locale);
+}
+
+/**
+ * 兒童版解鎖條件文字 — 誘因式，非作業指令。
  * @param {any} bundle
  * @param {any} progress
  * @param {string} dinoId
  * @param {string} locale
  * @returns {string}
  */
-export function unlockConditionText(bundle, progress, dinoId, locale) {
+export function childUnlockText(bundle, progress, dinoId, locale) {
+    const entry = bundle?.dex?.find((/** @type {any} */ d) => d.id === dinoId);
+    const cond = entry?.unlockCondition || entry?.unlock || {};
+    const voice = childVoice();
+    const key = locale === "en-US" ? "en-US" : "zh-TW";
+
+    const verbName = voice?.verbChildLabel?.[cond.type]?.[key] || "";
+    const template = voice?.unlockChild?.[cond.type]?.[key];
+
+    if (!template) {
+        return voice?.childNotSet?.[key] || (key === "en-US" ? "Play a few rounds to find out" : "再玩幾場就會出現");
+    }
+
+    let n = cond.count || 0;
+    if (cond.type === "minimal-pair") n = remaining(cond, axisStats(progress, "minimalPairCorrect").correct);
+    else if (cond.type === "sequence") n = remaining(cond, axisStats(progress, "sequenceCorrect").correct);
+    else if (cond.type === "rhythm") n = remaining(cond, axisStats(progress, "rhythmCorrect").correct);
+    else if (cond.type === "interference") n = remaining(cond, axisStats(progress, "interferenceCorrect").correct);
+    else if (cond.type === "pitch") n = remaining(cond, axisStats(progress, "pitchCorrect").correct);
+    else if (cond.type === "puzzle") n = remaining(cond, axisStats(progress, "puzzleCorrect").correct);
+    else if (cond.type === "memory") n = remaining(cond, axisStats(progress, "memoryCorrect").correct);
+    else if (cond.type === "stars") n = remaining(cond, totalStars(progress));
+    else if (cond.type === "chapter") n = Math.max(0, (cond.chapter || 0) - (progress?.chapter || 0));
+    else if (cond.type === "accuracy") n = Math.round((cond.rate || 0.8) * 100);
+
+    let text = template.replace(/\{n\}/g, String(n)).replace(/\{verb\}/g, verbName);
+
+    const suffix = voice?.childSuffix?.[key];
+    if (suffix) text += suffix;
+
+    if (cond.locale) {
+        const ls = voice?.localeSuffix?.[key];
+        if (ls) text += ls;
+    }
+    if (cond.noHint === true) {
+        const ns = voice?.noHintSuffix?.[key];
+        if (ns) text += ns;
+    }
+
+    return text;
+}
+
+/**
+ * 家長版解鎖條件文字 — 正式技能名與數據。
+ * @param {any} bundle
+ * @param {any} progress
+ * @param {string} dinoId
+ * @param {string} locale
+ * @returns {string}
+ */
+export function parentUnlockText(bundle, progress, dinoId, locale) {
     const entry = bundle?.dex?.find((/** @type {any} */ d) => d.id === dinoId);
     const cond = entry?.unlockCondition || entry?.unlock || {};
     const en = locale === "en-US";
+    const voice = childVoice();
+    const key = en ? "en-US" : "zh-TW";
+    const formal = voice?.parentVerbLabel?.[cond.type]?.[key] || "";
+    const parentRateLabel = voice?.parentRateLabel?.[key] || "";
+    const puzzleUnit = voice?.parentPuzzleUnit?.[key] || "";
+    const memoryUnit = voice?.parentMemoryUnit?.[key] || "";
 
     switch (cond.type) {
         case "chapter":
@@ -164,35 +263,35 @@ export function unlockConditionText(bundle, progress, dinoId, locale) {
         case "minimal-pair":
             return en
                 ? `Get ${cond.count} minimal-pair answers right`
-                : `再答對 ${remaining(cond, axisStats(progress, "minimalPairCorrect").correct)} 次最小對辨識`;
+                : `再答對 ${remaining(cond, axisStats(progress, "minimalPairCorrect").correct)} 次${formal}`;
         case "sequence":
             return en
                 ? `Get ${cond.count} sequences right`
-                : `再答對 ${remaining(cond, axisStats(progress, "sequenceCorrect").correct)} 次序列回憶`;
+                : `再答對 ${remaining(cond, axisStats(progress, "sequenceCorrect").correct)} 次${formal}`;
         case "rhythm":
             return en
                 ? `Get ${cond.count} rhythms right`
-                : `再答對 ${remaining(cond, axisStats(progress, "rhythmCorrect").correct)} 次節奏模仿`;
+                : `再答對 ${remaining(cond, axisStats(progress, "rhythmCorrect").correct)} 次${formal}`;
         case "interference":
             return en
                 ? `Get ${cond.count} interference tasks right`
-                : `再答對 ${remaining(cond, axisStats(progress, "interferenceCorrect").correct)} 次干擾抑制`;
+                : `再答對 ${remaining(cond, axisStats(progress, "interferenceCorrect").correct)} 次${formal}`;
         case "pitch":
             return en
                 ? `Get ${cond.count} pitch matches right`
-                : `再答對 ${remaining(cond, axisStats(progress, "pitchCorrect").correct)} 次音高模仿`;
+                : `再答對 ${remaining(cond, axisStats(progress, "pitchCorrect").correct)} 次${formal}`;
         case "puzzle":
             return en
                 ? `Complete ${cond.count} puzzles`
-                : `再完成 ${remaining(cond, axisStats(progress, "puzzleCorrect").correct)} 個拼圖`;
+                : `再完成 ${remaining(cond, axisStats(progress, "puzzleCorrect").correct)} 個${puzzleUnit}`;
         case "memory":
             return en
                 ? `Complete ${cond.count} memory games`
-                : `再完成 ${remaining(cond, axisStats(progress, "memoryCorrect").correct)} 個記憶遊戲`;
+                : `再完成 ${remaining(cond, axisStats(progress, "memoryCorrect").correct)} 個${memoryUnit}`;
         case "accuracy":
             return en
                 ? `Reach ${Math.round((cond.rate || 0.8) * 100)}% accuracy`
-                : `達到 ${Math.round((cond.rate || 0.8) * 100)}% 正確率`;
+                : `達到 ${Math.round((cond.rate || 0.8) * 100)}% ${parentRateLabel}`;
         case "stars":
             return en
                 ? `Collect ${cond.count} stars`

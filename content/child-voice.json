@@ -1,17 +1,36 @@
 {
   "_comment": "雙層文案 — 孩子版（child）與家長版（parent）分離。孩子的介面上不得出現任何認知心理學或教育評量術語。",
   "_principle": "孩子看到的是『收集恐龍的誘因』，家長看到的是『技能的數據』。同一件事兩套語言。",
-
   "verbChildLabel": {
-    "sequence": { "zh-TW": "小耳朵任務", "en-US": "Little Ears" },
-    "minimal-pair": { "zh-TW": "找不同", "en-US": "Spot the Difference" },
-    "rhythm": { "zh-TW": "打拍子", "en-US": "Clap Along" },
-    "interference": { "zh-TW": "穿過風雪", "en-US": "Through the Storm" },
-    "pitch": { "zh-TW": "高低聲", "en-US": "High and Low" },
-    "puzzle": { "zh-TW": "拼骨頭", "en-US": "Piece Together" },
-    "memory": { "zh-TW": "足跡石林", "en-US": "Tracks Grove" }
+    "sequence": {
+      "zh-TW": "小耳朵任務",
+      "en-US": "Little Ears"
+    },
+    "minimal-pair": {
+      "zh-TW": "找不同",
+      "en-US": "Spot the Difference"
+    },
+    "rhythm": {
+      "zh-TW": "打拍子",
+      "en-US": "Clap Along"
+    },
+    "interference": {
+      "zh-TW": "穿過風雪",
+      "en-US": "Through the Storm"
+    },
+    "pitch": {
+      "zh-TW": "高低聲",
+      "en-US": "High and Low"
+    },
+    "puzzle": {
+      "zh-TW": "拼骨頭",
+      "en-US": "Piece Together"
+    },
+    "memory": {
+      "zh-TW": "足跡石林",
+      "en-US": "Tracks Grove"
+    }
   },
-
   "verbChildHint": {
     "sequence": {
       "zh-TW": "聖誕老人唸出一串聲音，聽完輪到你",
@@ -42,7 +61,6 @@
       "en-US": "Remember the footprints and find the lost dino"
     }
   },
-
   "unlockChild": {
     "minimal-pair": {
       "zh-TW": "再答對 {n} 次「{verb}」",
@@ -85,53 +103,52 @@
       "en-US": "Get {n} more answers right"
     }
   },
-
   "childSuffix": {
     "zh-TW": "就能帶牠回家",
     "en-US": "to bring it home"
   },
-
   "childReady": {
     "zh-TW": "牠在等你帶牠回家！",
     "en-US": "It is waiting for you!"
   },
-
   "childNotSet": {
     "zh-TW": "再玩幾場就會出現",
     "en-US": "Play a few rounds to find out"
   },
-
   "localeSuffix": {
     "zh-TW": "（要聽中文的題目）",
     "en-US": "（English questions only）"
   },
-
   "noHintSuffix": {
     "zh-TW": "（而且不要用提示）",
     "en-US": "（without using hints）"
   },
-
   "dexProgressLabel": {
     "zh-TW": "收集進度",
     "en-US": "Collection"
   },
-
   "dexUnlockedBadge": {
     "zh-TW": "已加入隊伍",
     "en-US": "In your team"
   },
-
   "dexLockedSilhouette": {
     "zh-TW": "還在雪地裡",
     "en-US": "Still out there"
   },
-
   "shareChildTitle": {
-    "learning": { "zh-TW": "我學會了新東西！", "en-US": "I learned something new!" },
-    "dex": { "zh-TW": "我的恐龍隊伍", "en-US": "My dino team" },
-    "puzzle": { "zh-TW": "我拼好了恐龍！", "en-US": "I built a dinosaur!" }
+    "learning": {
+      "zh-TW": "我學會了新東西！",
+      "en-US": "I learned something new!"
+    },
+    "dex": {
+      "zh-TW": "我的恐龍隊伍",
+      "en-US": "My dino team"
+    },
+    "puzzle": {
+      "zh-TW": "我拼好了恐龍！",
+      "en-US": "I built a dinosaur!"
+    }
   },
-
   "shareChildBody": {
     "learning": {
       "zh-TW": "我學會了聽出聲音的小秘密",
@@ -146,22 +163,52 @@
       "en-US": "I put a dinosaur back together"
     }
   },
-
   "parentVerbLabel": {
-    "sequence": { "zh-TW": "序列回憶", "en-US": "Sequence Recall" },
-    "minimal-pair": { "zh-TW": "最小對辨識", "en-US": "Minimal Pair Discrimination" },
-    "rhythm": { "zh-TW": "節奏模仿", "en-US": "Rhythm Imitation" },
-    "interference": { "zh-TW": "干擾抑制", "en-US": "Interference Control" },
-    "pitch": { "zh-TW": "音高模仿", "en-US": "Pitch Imitation" },
-    "puzzle": { "zh-TW": "圖像拼合", "en-US": "Visual Assembly" },
-    "memory": { "zh-TW": "記憶配對", "en-US": "Memory Matching" }
+    "sequence": {
+      "zh-TW": "序列回憶",
+      "en-US": "Sequence Recall"
+    },
+    "minimal-pair": {
+      "zh-TW": "最小對辨識",
+      "en-US": "Minimal Pair Discrimination"
+    },
+    "rhythm": {
+      "zh-TW": "節奏模仿",
+      "en-US": "Rhythm Imitation"
+    },
+    "interference": {
+      "zh-TW": "干擾抑制",
+      "en-US": "Interference Control"
+    },
+    "pitch": {
+      "zh-TW": "音高模仿",
+      "en-US": "Pitch Imitation"
+    },
+    "puzzle": {
+      "zh-TW": "圖像拼合",
+      "en-US": "Visual Assembly"
+    },
+    "memory": {
+      "zh-TW": "記憶配對",
+      "en-US": "Memory Matching"
+    }
   },
-
+  "parentRateLabel": {
+    "zh-TW": "正確率",
+    "en-US": "accuracy"
+  },
+  "parentPuzzleUnit": {
+    "zh-TW": "拼圖",
+    "en-US": "puzzles"
+  },
+  "parentMemoryUnit": {
+    "zh-TW": "記憶遊戲",
+    "en-US": "memory games"
+  },
   "hudLevelLabel": {
     "zh-TW": "第 {n} 關",
     "en-US": "Level {n}"
   },
-
   "childScoreLabel": {
     "zh-TW": "星星",
     "en-US": "Stars"

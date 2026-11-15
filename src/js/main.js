@@ -30,7 +30,7 @@ import { createTutorial } from "./ui/tutorial.js";
 import { showPaywall } from "./ui/paywall.js";
 import { buildShareCard, shareToLine } from "./ui/share-card.js";
 import { loadProgress, saveProgress, recordLevelResult, unlockDex, updateStreak, todayString } from "./core/progress.js";
-import { recordLearningSample, checkDexUnlock } from "./core/dex.js";
+import { recordLearningSample, checkDexUnlock, setChildVoice } from "./core/dex.js";
 import { track, trackShare } from "./core/telemetry.js";
 import { referralCode, consumeReferral } from "./core/referral.js";
 import { createMasteryEntry, updateMastery } from "./core/mastery.js";
@@ -89,6 +89,7 @@ async function boot() {
     await loadTimeline();
     await loadSfx();
     await loadMusic();
+    await loadChildVoice();
 
     // 場景與偏好
     buildScene($("scene"));
@@ -124,6 +125,18 @@ async function loadSfx() {
         if (res.ok) setSfxMap(await res.json());
     } catch (err) {
         console.warn("[main] 音效定義載入失敗", err);
+    }
+}
+
+/**
+ * 載入兒童／家長雙層文案。
+ */
+async function loadChildVoice() {
+    try {
+        const res = await fetch("./content/child-voice.json", { cache: "no-cache" });
+        if (res.ok) setChildVoice(await res.json());
+    } catch (err) {
+        console.warn("[main] 兒童文案載入失敗", err);
     }
 }
 
