@@ -1,0 +1,323 @@
+{
+  "playable": [
+    {
+      "id": "santa",
+      "name": { "zh-TW": "聖誕老人", "en-US": "Santa" },
+      "kind": "santa",
+      "playable": true,
+      "unlock": { "type": "start", "chapter": 0 },
+      "art": { "file": "./assets/characters/santa.svg", "hasAlpha": true },
+      "palette": { "primary": "#c0392b", "secondary": "#7b241c", "accent": "#f1c40f" },
+      "voice": { "pitch": 1.0, "rate": 0.85, "blurb": { "zh-TW": "準備好要派送禮物了", "en-US": "Ready to deliver the gifts" } },
+      "traits": { "roar": "warm", "idle": "breathe", "celebrate": "jump", "walk": "heavy" }
+    },
+    {
+      "id": "snowman",
+      "name": { "zh-TW": "雪人", "en-US": "Snowman" },
+      "kind": "snowman",
+      "playable": true,
+      "unlock": { "type": "start", "chapter": 0 },
+      "art": { "file": "./assets/characters/snowman.svg", "hasAlpha": true },
+      "palette": { "primary": "#ecf0f1", "secondary": "#95a5a6", "accent": "#e74c3c" },
+      "voice": { "pitch": 0.9, "rate": 0.8, "blurb": { "zh-TW": "在雪地裡等著一起玩", "en-US": "Waiting in the snow to play" } },
+      "traits": { "roar": "soft", "idle": "sway", "celebrate": "spin", "walk": "hop" }
+    },
+    {
+      "id": "reindeer",
+      "name": { "zh-TW": "馴鹿", "en-US": "Reindeer" },
+      "kind": "reindeer",
+      "playable": true,
+      "unlock": { "type": "start", "chapter": 0 },
+      "art": { "file": "./assets/characters/reindeer.svg", "hasAlpha": true },
+      "palette": { "primary": "#a0522d", "secondary": "#6b3a1e", "accent": "#f1c40f" },
+      "voice": { "pitch": 1.05, "rate": 0.9, "blurb": { "zh-TW": "跑得最快，總是第一個到", "en-US": "The fastest, always first" } },
+      "traits": { "roar": "mid", "idle": "sway", "celebrate": "leap", "walk": "light" }
+    },
+    {
+      "id": "dino-triceratops",
+      "name": { "zh-TW": "三角龍", "en-US": "Triceratops" },
+      "kind": "dino",
+      "playable": true,
+      "unlock": { "type": "chapter", "chapter": 1 },
+      "art": { "file": "./assets/characters/dino-triceratops.svg", "hasAlpha": true },
+      "palette": { "primary": "#4a9d5f", "secondary": "#2f6f45", "accent": "#f39c12" },
+      "voice": { "pitch": 1.15, "rate": 0.85, "blurb": { "zh-TW": "厚實的角與溫柔的眼神", "en-US": "Three horns and gentle eyes" } },
+      "traits": { "roar": "deep", "idle": "sway", "celebrate": "stomp", "walk": "heavy" }
+    },
+    {
+      "id": "dino-trex",
+      "name": { "zh-TW": "暴龍", "en-US": "T-Rex" },
+      "kind": "dino",
+      "playable": true,
+      "unlock": { "type": "chapter", "chapter": 1 },
+      "art": { "file": "./assets/characters/dino-trex.svg", "hasAlpha": true },
+      "palette": { "primary": "#5a6b7a", "secondary": "#37474f", "accent": "#e74c3c" },
+      "voice": { "pitch": 1.0, "rate": 0.8, "blurb": { "zh-TW": "力氣最大但怕聽錯", "en-US": "The strongest, but afraid of mishearing" } },
+      "traits": { "roar": "loud", "idle": "sway", "celebrate": "stomp", "walk": "heavy" }
+    },
+    {
+      "id": "dino-brachiosaurus",
+      "name": { "zh-TW": "腕龍", "en-US": "Brachiosaurus" },
+      "kind": "dino",
+      "playable": true,
+      "unlock": { "type": "chapter", "chapter": 2 },
+      "art": { "file": "./assets/characters/dino-brachiosaurus.svg", "hasAlpha": true },
+      "palette": { "primary": "#2f8f8a", "secondary": "#1f5f5b", "accent": "#f1c40f" },
+      "voice": { "pitch": 0.95, "rate": 0.8, "blurb": { "zh-TW": "脖子太長所以聽得很遠", "en-US": "A neck so long it hears far away" } },
+      "traits": { "roar": "soft", "idle": "sway", "celebrate": "raise", "walk": "heavy" }
+    },
+    {
+      "id": "dino-pteranodon",
+      "name": { "zh-TW": "翼龍", "en-US": "Pteranodon" },
+      "kind": "dino",
+      "playable": true,
+      "unlock": { "type": "chapter", "chapter": 3 },
+      "art": { "file": "./assets/characters/dino-pteranodon.svg", "hasAlpha": true },
+      "palette": { "primary": "#8e44ad", "secondary": "#5b2c6f", "accent": "#f1c40f" },
+      "voice": { "pitch": 1.2, "rate": 0.9, "blurb": { "zh-TW": "從天空聽見最遠的聲音", "en-US": "Hears the farthest sound from the sky" } },
+      "traits": { "roar": "sharp", "idle": "hover", "celebrate": "fly", "walk": "fly" }
+    }
+  ],
+  "dex": [
+    {
+      "id": "dino-triceratops",
+      "name": { "zh-TW": "三角龍", "en-US": "Triceratops" },
+      "dexNo": 1,
+      "unlockCondition": { "type": "minimal-pair-correct", "count": 8, "locale": "zh-TW" },
+      "roar": "deep",
+      "personality": { "zh-TW": "厚實的角與溫柔的眼神，牠是第一個聽懂孩子的人。", "en-US": "Three horns and gentle eyes; the first to truly hear the child." },
+      "walkFrames": 4,
+      "art": { "file": "./assets/characters/dino-triceratops.svg", "hasAlpha": true }
+    },
+    {
+      "id": "dino-trex",
+      "name": { "zh-TW": "暴龍", "en-US": "T-Rex" },
+      "dexNo": 2,
+      "unlockCondition": { "type": "sequence-correct", "count": 5, "noHint": true },
+      "roar": "loud",
+      "personality": { "zh-TW": "力氣最大但怕聽錯，答錯時會不好意思地低下頭。", "en-US": "The strongest of all, but shy about mishearing." },
+      "walkFrames": 4,
+      "art": { "file": "./assets/characters/dino-trex.svg", "hasAlpha": true }
+    },
+    {
+      "id": "dino-brachiosaurus",
+      "name": { "zh-TW": "腕龍", "en-US": "Brachiosaurus" },
+      "dexNo": 3,
+      "unlockCondition": { "type": "rhythm-correct", "count": 8 },
+      "roar": "soft",
+      "personality": { "zh-TW": "脖子太長所以聽得很遠，是孩子學節奏的同伴。", "en-US": "A neck so long it hears far; a companion for learning rhythm." },
+      "walkFrames": 4,
+      "art": { "file": "./assets/characters/dino-brachiosaurus.svg", "hasAlpha": true }
+    },
+    {
+      "id": "dino-pteranodon",
+      "name": { "zh-TW": "翼龍", "en-US": "Pteranodon" },
+      "dexNo": 4,
+      "unlockCondition": { "type": "minimal-pair-correct", "count": 10, "locale": "en-US" },
+      "roar": "sharp",
+      "personality": { "zh-TW": "從天空聽見最遠的聲音，替孩子帶回答案。", "en-US": "Hears the farthest sound, bringing back the answer." },
+      "walkFrames": 4,
+      "art": { "file": "./assets/characters/dino-pteranodon.svg", "hasAlpha": true }
+    },
+    {
+      "id": "dino-stegosaurus",
+      "name": { "zh-TW": "劍龍", "en-US": "Stegosaurus" },
+      "dexNo": 5,
+      "unlockCondition": { "type": "sequence-correct", "count": 6 },
+      "roar": "mid",
+      "personality": { "zh-TW": "背上的骨板會隨節奏震動，是節奏小助手。", "en-US": "The plates on its back pulse with the beat." },
+      "walkFrames": 4,
+      "art": { "file": "./assets/characters/dino-stegosaurus.svg", "hasAlpha": true }
+    },
+    {
+      "id": "dino-velociraptor",
+      "name": { "zh-TW": "迅猛龍", "en-US": "Velociraptor" },
+      "dexNo": 6,
+      "unlockCondition": { "type": "interference-correct", "count": 6 },
+      "roar": "sharp",
+      "personality": { "zh-TW": "跑得最快，所以在干擾音裡總是第一個答對。", "en-US": "The fastest, so always first through the noise." },
+      "walkFrames": 4,
+      "art": { "file": "./assets/characters/dino-velociraptor.svg", "hasAlpha": true }
+    },
+    {
+      "id": "dino-ankylosaurus",
+      "name": { "zh-TW": "甲龍", "en-US": "Ankylosaurus" },
+      "dexNo": 7,
+      "unlockCondition": { "type": "pitch-correct", "count": 3 },
+      "roar": "mid",
+      "personality": { "zh-TW": "尾巴有配重，敲起來像鼓，是節奏裡的重音。", "en-US": "A clubbed tail that sounds like a drum." },
+      "walkFrames": 4,
+      "art": { "file": "./assets/characters/dino-ankylosaurus.svg", "hasAlpha": true }
+    },
+    {
+      "id": "dino-parasaurolophus",
+      "name": { "zh-TW": "副栉龍", "en-US": "Parasaurolophus" },
+      "dexNo": 8,
+      "unlockCondition": { "type": "minimal-pair-correct", "count": 12 },
+      "roar": "warm",
+      "personality": { "zh-TW": "頭上的冠狀骨會發聲，會重複孩子的音。", "en-US": "Its crest sounds, repeating the child's sound." },
+      "walkFrames": 4,
+      "art": { "file": "./assets/characters/dino-parasaurolophus.svg", "hasAlpha": true }
+    },
+    {
+      "id": "dino-allosaurus",
+      "name": { "zh-TW": "異特龍", "en-US": "Allosaurus" },
+      "dexNo": 9,
+      "unlockCondition": { "type": "sequence-correct", "count": 7 },
+      "roar": "loud",
+      "personality": { "zh-TW": "很會模仿別人的叫聲，卻常搞錯順序。", "en-US": "Great at copying roars, often muddles the order." },
+      "walkFrames": 4,
+      "art": { "file": "./assets/characters/dino-allosaurus.svg", "hasAlpha": true }
+    },
+    {
+      "id": "dino-carnotaurus",
+      "name": { "zh-TW": "肉食龍", "en-US": "Carnotaurus" },
+      "dexNo": 10,
+      "unlockCondition": { "type": "minimal-pair-correct", "count": 14, "locale": "zh-TW" },
+      "roar": "loud",
+      "personality": { "zh-TW": "頭上的角很特別，能分辨很細微的聲音差別。", "en-US": "Distinct horns; hears the finest differences." },
+      "walkFrames": 4,
+      "art": { "file": "./assets/characters/dino-carnotaurus.svg", "hasAlpha": true }
+    },
+    {
+      "id": "dino-iguanodon",
+      "name": { "zh-TW": "禽龍", "en-US": "Iguanodon" },
+      "dexNo": 11,
+      "unlockCondition": { "type": "rhythm-correct", "count": 10 },
+      "roar": "mid",
+      "personality": { "zh-TW": "會用拇指上的骨刺打拍子，是節奏老師。", "en-US": "Keeps time with its thumb spike." },
+      "walkFrames": 4,
+      "art": { "file": "./assets/characters/dino-iguanodon.svg", "hasAlpha": true }
+    },
+    {
+      "id": "dino-trachodon",
+      "name": { "zh-TW": "鴨嘴龍", "en-US": "Trachodon" },
+      "dexNo": 12,
+      "unlockCondition": { "type": "sequence-correct", "count": 8 },
+      "roar": "warm",
+      "personality": { "zh-TW": "嘴巴扁扁的，最會長長地哼出節拍。", "en-US": "A flat bill for long, drawn-out beats." },
+      "walkFrames": 4,
+      "art": { "file": "./assets/characters/dino-trachodon.svg", "hasAlpha": true }
+    },
+    {
+      "id": "dino-tyrannosaurus",
+      "name": { "zh-TW": "暴君龍", "en-US": "Tyrannosaurus" },
+      "dexNo": 13,
+      "unlockCondition": { "type": "interference-correct", "count": 8 },
+      "roar": "loud",
+      "personality": { "zh-TW": "所有恐龍裡最有威嚴，孩子卻一點也不怕牠。", "en-US": "The most imposing of all, yet the child is not afraid." },
+      "walkFrames": 4,
+      "art": { "file": "./assets/characters/dino-tyrannosaurus.svg", "hasAlpha": true }
+    },
+    {
+      "id": "dino-diplodocus",
+      "name": { "zh-TW": "梁龍", "en-US": "Diplodocus" },
+      "dexNo": 14,
+      "unlockCondition": { "type": "sequence-correct", "count": 9 },
+      "roar": "soft",
+      "personality": { "zh-TW": "尾巴超長，記得最長的序列。", "en-US": "A very long tail that remembers the longest sequences." },
+      "walkFrames": 4,
+      "art": { "file": "./assets/characters/dino-diplodocus.svg", "hasAlpha": true }
+    },
+    {
+      "id": "dino-compysognathus",
+      "name": { "zh-TW": "小翼龍", "en-US": "Compsognathus" },
+      "dexNo": 15,
+      "unlockCondition": { "type": "pitch-correct", "count": 5 },
+      "roar": "sharp",
+      "personality": { "zh-TW": "體型最小，聲音卻最尖銳。", "en-US": "The smallest, yet the sharpest of voices." },
+      "walkFrames": 4,
+      "art": { "file": "./assets/characters/dino-compysognathus.svg", "hasAlpha": true }
+    },
+    {
+      "id": "dino-dilophosaurus",
+      "name": { "zh-TW": "雙冠龍", "en-US": "Dilophosaurus" },
+      "dexNo": 16,
+      "unlockCondition": { "type": "rhythm-correct", "count": 12 },
+      "roar": "sharp",
+      "personality": { "zh-TW": "頭上的兩片冠狀骨會張開，像在唱歌。", "en-US": "Its twin crests open wide, as if singing." },
+      "walkFrames": 4,
+      "art": { "file": "./assets/characters/dino-dilophosaurus.svg", "hasAlpha": true }
+    },
+    {
+      "id": "dino-tyrannosaurus-scout",
+      "name": { "zh-TW": "偵察暴龍", "en-US": "Scout Rex" },
+      "dexNo": 17,
+      "unlockCondition": { "type": "minimal-pair-correct", "count": 16, "locale": "en-US" },
+      "roar": "loud",
+      "personality": { "zh-TW": "在迷宮裡帶路，專找干擾音裡的正確答案。", "en-US": "Guides the maze, finding the answer inside the noise." },
+      "walkFrames": 4,
+      "art": { "file": "./assets/characters/dino-tyrannosaurus-scout.svg", "hasAlpha": true }
+    },
+    {
+      "id": "dino-spinosaurus",
+      "name": { "zh-TW": "棘龍", "en-US": "Spinosaurus" },
+      "dexNo": 18,
+      "unlockCondition": { "type": "interference-correct", "count": 10 },
+      "roar": "deep",
+      "personality": { "zh-TW": "背上的帆船能接收水面傳來的聲音。", "en-US": "The sail on its back catches sounds across water." },
+      "walkFrames": 4,
+      "art": { "file": "./assets/characters/dino-spinosaurus.svg", "hasAlpha": true }
+    },
+    {
+      "id": "dino-maiasaura",
+      "name": { "zh-TW": "好媽媽龍", "en-US": "Maiasaura" },
+      "dexNo": 19,
+      "unlockCondition": { "type": "rhythm-correct", "count": 14 },
+      "roar": "warm",
+      "personality": { "zh-TW": "照顧恐龍蛋的媽媽，也照顧初學的孩子。", "en-US": "A mother of eggs, and of beginners." },
+      "walkFrames": 4,
+      "art": { "file": "./assets/characters/dino-maiasaura.svg", "hasAlpha": true }
+    },
+    {
+      "id": "dino-oviraptor",
+      "name": { "zh-TW": "盜蛋龍", "en-US": "Oviraptor" },
+      "dexNo": 20,
+      "unlockCondition": { "type": "puzzle-complete", "count": 3 },
+      "roar": "warm",
+      "personality": { "zh-TW": "名字叫偷蛋，其實很會照顧別人的蛋。", "en-US": "Named egg-thief, yet a devoted carer." },
+      "walkFrames": 4,
+      "art": { "file": "./assets/characters/dino-oviraptor.svg", "hasAlpha": true }
+    },
+    {
+      "id": "dino-eoraptor",
+      "name": { "zh-TW": "曉龍", "en-US": "Eoraptor" },
+      "dexNo": 21,
+      "unlockCondition": { "type": "sequence-correct", "count": 10 },
+      "roar": "sharp",
+      "personality": { "zh-TW": "恐龍裡最古老的一種，代表故事的最開始。", "en-US": "The oldest of the dinosaurs; the story's beginning." },
+      "walkFrames": 4,
+      "art": { "file": "./assets/characters/dino-eoraptor.svg", "hasAlpha": true }
+    },
+    {
+      "id": "dino-ceratosaurus",
+      "name": { "zh-TW": "角鼻龍", "en-US": "Ceratosaurus" },
+      "dexNo": 22,
+      "unlockCondition": { "type": "interference-correct", "count": 12 },
+      "roar": "sharp",
+      "personality": { "zh-TW": "鼻上的角像指南針，幫你分辨方向與音色。", "en-US": "A horn like a compass, telling sounds apart." },
+      "walkFrames": 4,
+      "art": { "file": "./assets/characters/dino-ceratosaurus.svg", "hasAlpha": true }
+    },
+    {
+      "id": "dino-giganotosaurus",
+      "name": { "zh-TW": "巨型南極龍", "en-US": "Giganotosaurus" },
+      "dexNo": 23,
+      "unlockCondition": { "type": "minimal-pair-correct", "count": 20 },
+      "roar": "loud",
+      "personality": { "zh-TW": "聲音大得驚人，卻會耐心等孩子答完。", "en-US": "A booming voice, yet waits patiently for the answer." },
+      "walkFrames": 4,
+      "art": { "file": "./assets/characters/dino-giganotosaurus.svg", "hasAlpha": true }
+    },
+    {
+      "id": "dino-mosasaurus",
+      "name": { "zh-TW": "滄龍", "en-US": "Mosasaurus" },
+      "dexNo": 24,
+      "unlockCondition": { "type": "puzzle-complete", "count": 8 },
+      "roar": "deep",
+      "personality": { "zh-TW": "住在深海，聲音能傳得比誰都遠。", "en-US": "Lives in the deep sea; its voice travels furthest." },
+      "walkFrames": 4,
+      "art": { "file": "./assets/characters/dino-mosasaurus.svg", "hasAlpha": true }
+    }
+  ]
+}
