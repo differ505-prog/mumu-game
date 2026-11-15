@@ -4,7 +4,7 @@
  * 規範：未解鎖顯示剪影與**真實學習條件文字**，進度條顯示實際完成度。
  */
 
-import { checkDexUnlock, dexUnlockProgress, unlockConditionText } from "../core/dex.js";
+import { checkDexUnlock, dexUnlockProgress, unlockConditionText, childVoice } from "../core/dex.js";
 import { itemLabel } from "../data/items.js";
 
 /**
@@ -16,12 +16,14 @@ import { itemLabel } from "../data/items.js";
  */
 export function renderDex(root, bundle, progress, locale) {
     const dex = bundle?.dex || [];
+    const voice = childVoice() || {};
+    const key = locale === "en-US" ? "en-US" : "zh-TW";
 
     root.innerHTML = `
         <div class="dex-header">
             <h2>${locale === "en-US" ? "Dinosaur Encyclopedia" : "恐龍圖鑑"}</h2>
             <p class="dex-count">
-                ${locale === "en-US" ? "Unlocked" : "已解鎖"}
+                ${voice.dexProgressLabel?.[key] || (locale === "en-US" ? "Collection" : "收集進度")}
                 ${(progress.unlockedDex || []).length} / ${dex.length}
             </p>
         </div>
@@ -31,7 +33,7 @@ export function renderDex(root, bundle, progress, locale) {
                 const pct = dexUnlockProgress(bundle, progress, d.id);
                 const name = d.name?.[locale] || d.name?.["zh-TW"] || d.id;
                 const milestone = d.personality?.[locale] || d.personality?.["zh-TW"] || "";
-                const condText = unlockConditionText(bundle, progress, d.id, locale);
+                const condText = unlockConditionText(bundle, progress, d.id, locale, "child");
 
                 return `
                     <div class="dex-entry ${unlocked ? "dex-entry--unlocked" : "dex-entry--locked"}"
@@ -51,7 +53,9 @@ export function renderDex(root, bundle, progress, locale) {
                         </div>
                         <div class="dex-entry__no">No.${d.dexNo}</div>
                         <div class="dex-entry__name">${unlocked ? name : "???"}</div>
-                        <div class="dex-entry__milestone">${unlocked ? milestone : condText}</div>
+                        <div class="dex-entry__milestone">${unlocked
+                            ? (voice.dexUnlockedBadge?.[key] || milestone)
+                            : `${voice.dexLockedSilhouette?.[key] || ""} ${condText}`}</div>
                         ${unlocked ? "" : `
                             <div class="dex-entry__progress" role="progressbar"
                                  aria-valuenow="${Math.round(pct * 100)}" aria-valuemin="0" aria-valuemax="100">
@@ -95,7 +99,7 @@ export function renderDex(root, bundle, progress, locale) {
 export function dexUnlockState(bundle, progress, dinoId) {
     return {
         unlocked: checkDexUnlock(bundle, progress, dinoId),
-        condition: unlockConditionText(bundle, progress, dinoId, "zh-TW"),
+        condition: unlockConditionText(bundle, progress, dinoId, "zh-TW", "child"),
         progressPct: Math.round(dexUnlockProgress(bundle, progress, dinoId) * 100)
     };
 }
