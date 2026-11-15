@@ -1,0 +1,103 @@
+/* ============================================================
+   Responsive — 以 clamp() 取代 px 硬編碼，三組斷點
+   ============================================================ */
+
+:root {
+    --content-max: 1100px;
+    --option-min: 140px;
+}
+
+/* ---------- 直向：單欄 ---------- */
+@media (orientation: portrait) {
+    #game-container {
+        flex-direction: column;
+    }
+
+    #tv-view,
+    #controls-view {
+        flex: 1 1 0;
+    }
+
+    .mode-options {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    #character-img {
+        max-height: 32dvh;
+    }
+
+    #toolbar {
+        flex-direction: row;
+        right: auto;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    #toast-layer {
+        bottom: calc(env(safe-area-inset-bottom) + 140px);
+    }
+}
+
+/* ---------- 橫向且高度受限：緊湊模式 ---------- */
+@media (orientation: landscape) and (max-height: 800px) {
+    :root {
+        --touch-min: 56px;
+        --option-min: 110px;
+        --fs-2xl: 26px;
+    }
+
+    .mode-options {
+        grid-template-columns: repeat(6, 1fr);
+        gap: var(--s-2);
+    }
+
+    .hud__chapter,
+    .hud__level,
+    .hud__score {
+        font-size: var(--fs-xs);
+    }
+
+    #character-img {
+        max-height: 40dvh;
+    }
+
+    .overlay h1 {
+        font-size: var(--fs-xl);
+    }
+}
+
+/* ---------- 寬螢幕：置中並放大 ---------- */
+@media (min-width: 1200px) {
+    .mode-options,
+    .dex-grid {
+        grid-template-columns: repeat(6, 1fr);
+        max-width: var(--content-max);
+    }
+
+    .overlay {
+        padding: var(--s-8) var(--s-6);
+    }
+}
+
+/* ---------- 觸控目標尺寸補償（避免 iOS 縮放） ---------- */
+@media (hover: none) and (pointer: coarse) {
+    .control-btn,
+    .option-btn,
+    .tool-btn,
+    .level-btn {
+        min-height: max(var(--touch-min), 44px);
+    }
+}
+
+/* ---------- 列印：僅輸出信件 ---------- */
+@media print {
+
+    body>* {
+        display: none !important;
+    }
+
+    .story-letter,
+    .story-letter * {
+        display: block !important;
+    }
+}

@@ -1,0 +1,495 @@
+/* ============================================================
+   Motion — 動畫 token 化
+   規則：duration 一律 var(--t-*)，easing 一律 var(--e-*)。
+   ============================================================ */
+
+/* ---------- 通用動畫 ---------- */
+@keyframes pop {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.18);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes pop-in {
+    0% {
+        transform: scale(.6);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes rise {
+    0% {
+        transform: translateY(12px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes drift {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(24px);
+    }
+}
+
+@keyframes pulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .55;
+    }
+}
+
+@keyframes shake {
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    20% {
+        transform: translateX(-10px);
+    }
+
+    40% {
+        transform: translateX(10px);
+    }
+
+    60% {
+        transform: translateX(-6px);
+    }
+
+    80% {
+        transform: translateX(6px);
+    }
+}
+
+@keyframes nod {
+    0%,
+    100% {
+        transform: translateY(0) rotate(0);
+    }
+
+    50% {
+        transform: translateY(6px) rotate(3deg);
+    }
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-14px);
+    }
+}
+
+@keyframes medal-bounce {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.25);
+    }
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes zzz {
+    0% {
+        transform: translate(0, 0);
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translate(10px, -10px);
+        opacity: 0;
+    }
+}
+
+@keyframes aurora-shift {
+    0% {
+        transform: translateX(0) scaleY(1);
+        opacity: .45;
+    }
+
+    50% {
+        transform: translateX(6%) scaleY(1.15);
+        opacity: .65;
+    }
+
+    100% {
+        transform: translateX(-4%) scaleY(.95);
+        opacity: .45;
+    }
+}
+
+/* ---------- 粒子與慶祝 ---------- */
+@keyframes sparkle {
+    0% {
+        transform: scale(0) rotate(0);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.3) rotate(180deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(0) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+@keyframes fireworks {
+    0% {
+        transform: scale(.2);
+        opacity: 0;
+    }
+
+    30% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1.6);
+        opacity: 0;
+    }
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(-10vh) rotate(0);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+@keyframes catch-fish {
+    0% {
+        transform: translateY(-30px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fly-gift {
+    0% {
+        transform: translate(0, 0) scale(.5);
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translate(var(--gift-dx, 100px), var(--gift-dy, -120px)) scale(1);
+        opacity: 0;
+    }
+}
+
+/* ---------- 角色 ---------- */
+@keyframes santa-breathe {
+
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+    }
+
+    50% {
+        transform: translateY(-4px) scale(1.015);
+    }
+}
+
+@keyframes dino-blink {
+    0%,
+    92%,
+    100% {
+        transform: scaleY(1);
+    }
+
+    96% {
+        transform: scaleY(.88);
+    }
+}
+
+@keyframes dino-roar {
+    0% {
+        transform: scale(1) rotate(0);
+    }
+
+    25% {
+        transform: scale(1.12) rotate(-4deg);
+    }
+
+    50% {
+        transform: scale(1.06) rotate(4deg);
+    }
+
+    100% {
+        transform: scale(1) rotate(0);
+    }
+}
+
+/* 4 幀步行循環 */
+@keyframes dino-step-1 {
+    0%,
+    100% {
+        transform: translateY(0) rotate(0);
+    }
+
+    50% {
+        transform: translateY(-3px) rotate(-1.5deg);
+    }
+}
+
+@keyframes dino-step-2 {
+    0%,
+    100% {
+        transform: translateY(0) rotate(0);
+    }
+
+    50% {
+        transform: translateY(-5px) rotate(0);
+    }
+}
+
+@keyframes dino-step-3 {
+    0%,
+    100% {
+        transform: translateY(0) rotate(0);
+    }
+
+    50% {
+        transform: translateY(-3px) rotate(1.5deg);
+    }
+}
+
+@keyframes dino-step-4 {
+    0%,
+    100% {
+        transform: translateY(0) rotate(0);
+    }
+
+    50% {
+        transform: translateY(-1px) rotate(0);
+    }
+}
+
+@keyframes dino-hatch {
+    0% {
+        transform: scale(.7) rotate(-8deg);
+        opacity: 0;
+    }
+
+    40% {
+        transform: scale(1.15) rotate(6deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1) rotate(0);
+        opacity: 1;
+    }
+}
+
+/* ---------- 拼圖與翻牌 ---------- */
+@keyframes piece-snap {
+    0% {
+        transform: scale(1.12);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes card-flip {
+    0% {
+        transform: rotateY(0);
+    }
+
+    100% {
+        transform: rotateY(180deg);
+    }
+}
+
+/* ---------- 動畫套用類別（由 motion.js 掛載） ---------- */
+.anim-pop {
+    animation: pop var(--t-settle) var(--e-spring);
+}
+
+.anim-pop-in {
+    animation: pop-in var(--t-enter) var(--e-spring);
+}
+
+.anim-fade-in {
+    animation: fadeIn var(--t-enter) var(--e-decelerate);
+}
+
+.anim-rise {
+    animation: rise var(--t-enter) var(--e-decelerate);
+}
+
+.anim-shake {
+    animation: shake var(--t-base) var(--e-standard);
+}
+
+.anim-nod {
+    animation: nod var(--t-settle) var(--e-standard);
+}
+
+.anim-bounce {
+    animation: bounce var(--t-hold) var(--e-standard);
+}
+
+.anim-medal-bounce {
+    animation: medal-bounce var(--t-settle) var(--e-spring);
+}
+
+.anim-float {
+    animation: float var(--t-scene) var(--e-standard) infinite;
+}
+
+.anim-sparkle {
+    animation: sparkle var(--t-settle) var(--e-standard) forwards;
+}
+
+.anim-fireworks {
+    animation: fireworks var(--t-epic) var(--e-decelerate) forwards;
+}
+
+.anim-fall {
+    animation: fall var(--t-epic) var(--e-linear) forwards;
+}
+
+.anim-catch-fish {
+    animation: catch-fish var(--t-settle) var(--e-spring);
+}
+
+.anim-fly-gift {
+    animation: fly-gift var(--t-scene) var(--e-decelerate) forwards;
+}
+
+.anim-roar {
+    animation: dino-roar var(--t-scene) var(--e-standard);
+}
+
+.anim-hatch {
+    animation: dino-hatch var(--t-settle) var(--e-spring);
+}
+
+.anim-piece-snap {
+    animation: piece-snap var(--t-base) var(--e-spring);
+}
+
+.anim-card-flip {
+    animation: card-flip var(--t-base) var(--e-standard);
+}
+
+/* 角色狀態 */
+.char--idle .char__art {
+    animation: santa-breathe var(--t-scene) var(--e-standard) infinite;
+}
+
+.char--walk .char__art {
+    animation: dino-step-2 var(--t-hold) var(--e-standard) infinite;
+}
+
+.char--roar .char__art {
+    animation: dino-roar var(--t-scene) var(--e-standard);
+}
+
+.char--hatch .char__art {
+    animation: dino-hatch var(--t-settle) var(--e-spring);
+}
+
+/* ============================================================
+   動效降級：尊重系統偏好，並可由家長設定強制關閉
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 1ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 1ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* 家長設定強制關閉（由 a11y.js 設定 data-reduced-motion） */
+[data-reduced-motion="on"] *,
+[data-reduced-motion="on"] *::before,
+[data-reduced-motion="on"] *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+}
