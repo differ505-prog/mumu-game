@@ -1,0 +1,540 @@
+/* ============================================================
+   Components — 共用元件
+   ============================================================ */
+
+/* ---------- 遮罩層 ---------- */
+.overlay {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-overlay);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-2);
+    padding: var(--s-6) var(--s-4);
+    background: radial-gradient(ellipse at 50% 40%, rgba(22, 41, 79, .96) 0%, rgba(10, 26, 60, .99) 100%);
+    text-align: center;
+    overflow-y: auto;
+}
+
+.overlay h1 {
+    font-size: var(--fs-2xl);
+    color: var(--text-primary);
+}
+
+.overlay p {
+    font-size: var(--fs-md);
+    color: var(--text-secondary);
+}
+
+.overlay-cta {
+    margin-top: var(--s-5);
+    font-size: var(--fs-sm);
+    color: var(--text-muted);
+    animation: pulse var(--t-hold) var(--e-standard) infinite;
+}
+
+.overlay-icon {
+    color: var(--accent-warm);
+    display: grid;
+    place-items: center;
+}
+
+/* ---------- 模式／角色選項 ---------- */
+.mode-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--s-4);
+    width: 100%;
+    max-width: 900px;
+    margin-top: var(--s-4);
+}
+
+.mode-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--s-2);
+    min-height: var(--touch-min);
+    padding: var(--s-4);
+    background: var(--bg-panel);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--r-lg);
+    box-shadow: var(--mat-border-light), var(--mat-shadow-1);
+    transition: transform var(--t-micro) var(--e-standard), border-color var(--t-base) var(--e-standard);
+}
+
+.mode-option:active {
+    transform: scale(.96);
+}
+
+.mode-option--locked {
+    opacity: .45;
+    pointer-events: none;
+}
+
+.mode-option__art {
+    width: clamp(72px, 16vw, 120px);
+    height: clamp(72px, 16vw, 120px);
+    object-fit: contain;
+}
+
+.mode-icon {
+    font-size: var(--fs-2xl);
+    line-height: 1;
+}
+
+.mode-title {
+    font-size: var(--fs-md);
+    color: var(--text-primary);
+}
+
+.mode-desc {
+    font-size: var(--fs-xs);
+    color: var(--text-muted);
+}
+
+.mode-option__tag {
+    padding: var(--s-1) var(--s-2);
+    font-size: var(--fs-xs);
+    color: var(--c-night-900);
+    background: var(--accent-warm);
+    border-radius: var(--r-full);
+}
+
+/* ---------- 控制按鈕 ---------- */
+.controls-grid {
+    display: grid;
+    gap: var(--touch-gap);
+    width: 100%;
+    padding: var(--s-3);
+}
+
+.grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-6 {
+    grid-template-columns: repeat(6, 1fr);
+}
+
+.control-btn {
+    display: grid;
+    place-items: center;
+    min-width: var(--touch-min);
+    min-height: var(--touch-min);
+    padding: var(--s-2);
+    font-size: var(--fs-xl);
+    background: var(--bg-panel);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--r-md);
+    box-shadow: var(--mat-border-light), var(--mat-shadow-1);
+    transition: transform var(--t-micro) var(--e-standard), background var(--t-base) var(--e-standard);
+}
+
+.control-btn:active {
+    transform: scale(.96);
+}
+
+.control-btn:disabled {
+    opacity: .4;
+    pointer-events: none;
+}
+
+.control-btn--correct {
+    background: rgba(39, 174, 96, .28);
+    border-color: var(--c-green-500);
+}
+
+.control-btn--wrong {
+    background: rgba(192, 57, 43, .22);
+    border-color: var(--c-red-400);
+}
+
+.control-btn__label {
+    font-size: var(--fs-xs);
+    color: var(--text-secondary);
+}
+
+.option-btn {
+    display: grid;
+    place-items: center;
+    min-height: var(--touch-min);
+    padding: var(--s-3);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--r-md);
+    box-shadow: var(--mat-border-light), var(--mat-shadow-1);
+    transition: transform var(--t-micro) var(--e-standard);
+}
+
+.option-btn:active {
+    transform: scale(.96);
+}
+
+/* ---------- 回合完成 ---------- */
+#level-complete-container {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-4);
+    background: rgba(10, 26, 60, .72);
+    backdrop-filter: blur(3px);
+}
+
+.level-btn {
+    min-width: 140px;
+    min-height: var(--touch-min);
+    padding: var(--s-3) var(--s-5);
+    font-size: var(--fs-md);
+    color: var(--c-night-900);
+    background: var(--accent-warm);
+    border-radius: var(--r-md);
+    box-shadow: var(--mat-shadow-1);
+    transition: transform var(--t-micro) var(--e-standard);
+}
+
+.level-btn:active {
+    transform: scale(.96);
+}
+
+.level-btn--secondary {
+    color: var(--text-primary);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-soft);
+}
+
+/* ---------- 進度與徽章 ---------- */
+.progress-ring {
+    width: 44px;
+    height: 44px;
+    transform: rotate(-90deg);
+}
+
+.progress-ring__track {
+    fill: none;
+    stroke: rgba(207, 228, 242, .18);
+    stroke-width: 5;
+}
+
+.progress-ring__value {
+    fill: none;
+    stroke: var(--accent-warm);
+    stroke-width: 5;
+    stroke-linecap: round;
+    transition: stroke-dashoffset var(--t-settle) var(--e-standard);
+}
+
+.star-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-1);
+    font-size: var(--fs-sm);
+    color: var(--text-secondary);
+}
+
+.medal-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    opacity: .35;
+    transition: opacity var(--t-base) var(--e-standard);
+}
+
+.medal-icon--earned {
+    opacity: 1;
+}
+
+/* ---------- 圖鑑 ---------- */
+.dex-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: var(--s-3);
+    width: 100%;
+    max-width: 900px;
+    margin-top: var(--s-4);
+}
+
+.dex-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--s-1);
+    padding: var(--s-3);
+    background: var(--bg-panel);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--r-md);
+    box-shadow: var(--mat-border-light);
+}
+
+.dex-card--locked {
+    opacity: .5;
+}
+
+.dex-card__art {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+}
+
+.dex-card__name {
+    font-size: var(--fs-sm);
+    color: var(--text-primary);
+}
+
+.dex-card__condition {
+    font-size: var(--fs-xs);
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.dex-card__progress {
+    width: 100%;
+    height: 4px;
+    background: rgba(207, 228, 242, .18);
+    border-radius: var(--r-full);
+    overflow: hidden;
+}
+
+.dex-card__progress-fill {
+    height: 100%;
+    background: var(--accent-warm);
+    transition: width var(--t-settle) var(--e-standard);
+}
+
+/* ---------- 分享成果卡 ---------- */
+.share-card-preview {
+    width: min(320px, 80vw);
+    aspect-ratio: 4 / 5;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--r-lg);
+    box-shadow: var(--mat-shadow-2);
+    object-fit: cover;
+}
+
+/* ---------- 章節橫幅 ---------- */
+.chapter-banner {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-3);
+    background: rgba(10, 26, 60, .9);
+    text-align: center;
+}
+
+.chapter-banner__title {
+    font-size: var(--fs-2xl);
+    color: var(--accent-warm);
+}
+
+.chapter-banner__body {
+    font-size: var(--fs-md);
+    color: var(--text-secondary);
+    max-width: 32ch;
+}
+
+/* ---------- 教學 ---------- */
+.tutorial-highlight {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 3px;
+    border-radius: var(--r-md);
+    animation: pulse var(--t-hold) var(--e-standard) infinite;
+}
+
+/* ---------- 家長閘門 ---------- */
+.parent-gate {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--s-4);
+    padding: var(--s-6);
+    background: var(--bg-panel);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--r-lg);
+    box-shadow: var(--mat-shadow-2);
+}
+
+.parent-gate__question {
+    font-size: var(--fs-xl);
+    color: var(--text-primary);
+}
+
+.parent-gate__input {
+    width: 120px;
+    padding: var(--s-3);
+    font-size: var(--fs-xl);
+    text-align: center;
+    color: var(--text-primary);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--r-md);
+}
+
+/* ---------- Toast ---------- */
+.toast {
+    padding: var(--s-2) var(--s-4);
+    font-size: var(--fs-sm);
+    color: var(--text-primary);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--r-full);
+    box-shadow: var(--mat-shadow-1);
+    animation: fadeIn var(--t-enter) var(--e-decelerate);
+}
+
+.toast--good {
+    border-color: var(--c-green-500);
+}
+
+.toast--warn {
+    border-color: var(--c-amber-500);
+}
+
+/* ---------- 拼圖 ---------- */
+.puzzle-board {
+    display: grid;
+    gap: var(--s-1);
+    padding: var(--s-2);
+    background: var(--bg-panel);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--r-md);
+}
+
+.puzzle-piece {
+    aspect-ratio: 1;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid var(--border-soft);
+    border-radius: var(--r-sm);
+    transition: transform var(--t-base) var(--e-standard);
+}
+
+.puzzle-piece--placed {
+    opacity: .9;
+}
+
+/* ---------- 記憶翻牌 ---------- */
+.memory-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--touch-gap);
+    width: min(360px, 80vw);
+}
+
+.dex-card--memory {
+    aspect-ratio: 1;
+    perspective: 800px;
+    cursor: pointer;
+}
+
+.dex-card--memory .memory-face {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    border-radius: var(--r-md);
+    backface-visibility: hidden;
+    transition: transform var(--t-base) var(--e-standard);
+}
+
+.memory-face--back {
+    background: var(--c-dino-teal);
+}
+
+.memory-face--front {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-soft);
+    transform: rotateY(180deg);
+}
+
+.dex-card--memory.is-flipped .memory-face--back {
+    transform: rotateY(180deg);
+}
+
+.dex-card--memory.is-flipped .memory-face--front {
+    transform: rotateY(0);
+}
+
+.dex-card--memory.is-matched {
+    opacity: .55;
+    pointer-events: none;
+}
+
+/* ---------- 角色容器 ---------- */
+.char {
+    position: relative;
+    display: grid;
+    place-items: end center;
+}
+
+.char__shadow {
+    width: 60%;
+    height: 10px;
+    margin-top: calc(-1 * var(--s-1));
+    background: rgba(0, 0, 0, .28);
+    border-radius: 50%;
+    filter: blur(3px);
+}
+
+.char__art {
+    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .35));
+}
+
+/* ---------- 音量設定 ---------- */
+.audio-settings {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+    width: min(360px, 80vw);
+    padding: var(--s-5);
+    background: var(--bg-panel);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--r-lg);
+}
+
+.audio-slider {
+    display: grid;
+    grid-template-columns: 5em 1fr auto;
+    align-items: center;
+    gap: var(--s-3);
+    font-size: var(--fs-sm);
+    color: var(--text-secondary);
+}
+
+.audio-slider input[type="range"] {
+    width: 100%;
+    accent-color: var(--accent-warm);
+}
+
+/* ---------- 雷達圖 ---------- */
+.radar-chart {
+    width: min(320px, 80vw);
+    height: auto;
+}
+
+.radar-chart__axis {
+    stroke: var(--border-soft);
+    stroke-width: 1;
+}
+
+.radar-chart__label {
+    fill: var(--text-muted);
+    font-size: 11px;
+}
+
+.radar-chart__value {
+    fill: rgba(241, 196, 15, .22);
+    stroke: var(--accent-warm);
+    stroke-width: 2;
+}
