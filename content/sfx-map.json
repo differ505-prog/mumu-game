@@ -1,0 +1,1454 @@
+{
+  "ui.tap": {
+    "id": "ui.tap",
+    "category": "ui",
+    "wave": "sine",
+    "gainDb": -8,
+    "durationMs": 60,
+    "variants": [
+      {
+        "freq": 880,
+        "freqEnd": 880,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.041999999999999996
+      },
+      {
+        "freq": 985.6000000000001,
+        "freqEnd": 985.6000000000001,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.047999999999999994
+      },
+      {
+        "freq": 1091.2,
+        "freqEnd": 1091.2,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.05399999999999999
+      }
+    ]
+  },
+  "ui.soft-low": {
+    "id": "ui.soft-low",
+    "category": "ui",
+    "wave": "sine",
+    "gainDb": -10,
+    "durationMs": 220,
+    "variants": [
+      {
+        "freq": 320,
+        "freqEnd": 240,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.154
+      },
+      {
+        "freq": 358.40000000000003,
+        "freqEnd": 268.8,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.176
+      },
+      {
+        "freq": 396.8,
+        "freqEnd": 297.6,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.19799999999999998
+      }
+    ]
+  },
+  "ui.hint": {
+    "id": "ui.hint",
+    "category": "ui",
+    "wave": "triangle",
+    "gainDb": -10,
+    "durationMs": 180,
+    "variants": [
+      {
+        "freq": 660,
+        "freqEnd": 990,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.126
+      },
+      {
+        "freq": 739.2,
+        "freqEnd": 1108.8000000000002,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.144
+      },
+      {
+        "freq": 818.4,
+        "freqEnd": 1227.6,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.16199999999999998
+      }
+    ]
+  },
+  "ui.listen": {
+    "id": "ui.listen",
+    "category": "ui",
+    "wave": "sine",
+    "gainDb": -12,
+    "durationMs": 160,
+    "variants": [
+      {
+        "freq": 520,
+        "freqEnd": 700,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.11199999999999999
+      },
+      {
+        "freq": 582.4000000000001,
+        "freqEnd": 784.0000000000001,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.128
+      },
+      {
+        "freq": 644.8,
+        "freqEnd": 868,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.144
+      }
+    ]
+  },
+  "ui.snap": {
+    "id": "ui.snap",
+    "category": "ui",
+    "wave": "square",
+    "gainDb": -10,
+    "durationMs": 50,
+    "variants": [
+      {
+        "freq": 1200,
+        "freqEnd": 800,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.034999999999999996
+      },
+      {
+        "freq": 1344.0000000000002,
+        "freqEnd": 896.0000000000001,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.04
+      },
+      {
+        "freq": 1488,
+        "freqEnd": 992,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.045
+      }
+    ]
+  },
+  "ui.back": {
+    "id": "ui.back",
+    "category": "ui",
+    "wave": "sine",
+    "gainDb": -12,
+    "durationMs": 120,
+    "variants": [
+      {
+        "freq": 600,
+        "freqEnd": 400,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.08399999999999999
+      },
+      {
+        "freq": 672.0000000000001,
+        "freqEnd": 448.00000000000006,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.09599999999999999
+      },
+      {
+        "freq": 744,
+        "freqEnd": 496,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.10799999999999998
+      }
+    ]
+  },
+  "ui.confirm": {
+    "id": "ui.confirm",
+    "category": "ui",
+    "wave": "triangle",
+    "gainDb": -8,
+    "durationMs": 140,
+    "variants": [
+      {
+        "freq": 700,
+        "freqEnd": 1000,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.098
+      },
+      {
+        "freq": 784.0000000000001,
+        "freqEnd": 1120,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.112
+      },
+      {
+        "freq": 868,
+        "freqEnd": 1240,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.126
+      }
+    ]
+  },
+  "ui.page": {
+    "id": "ui.page",
+    "category": "ui",
+    "wave": "sine",
+    "gainDb": -14,
+    "durationMs": 130,
+    "variants": [
+      {
+        "freq": 400,
+        "freqEnd": 600,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.091
+      },
+      {
+        "freq": 448.00000000000006,
+        "freqEnd": 672.0000000000001,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.104
+      },
+      {
+        "freq": 496,
+        "freqEnd": 744,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.11699999999999999
+      }
+    ]
+  },
+  "wood.tap": {
+    "id": "wood.tap",
+    "category": "wood",
+    "wave": "triangle",
+    "gainDb": -12,
+    "durationMs": 90,
+    "variants": [
+      {
+        "freq": 400,
+        "freqEnd": 300,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.063
+      },
+      {
+        "freq": 448.00000000000006,
+        "freqEnd": 336.00000000000006,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.072
+      },
+      {
+        "freq": 496,
+        "freqEnd": 372,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.08099999999999999
+      }
+    ]
+  },
+  "wood.knock": {
+    "id": "wood.knock",
+    "category": "wood",
+    "wave": "triangle",
+    "gainDb": -10,
+    "durationMs": 140,
+    "variants": [
+      {
+        "freq": 220,
+        "freqEnd": 180,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.098
+      },
+      {
+        "freq": 246.40000000000003,
+        "freqEnd": 201.60000000000002,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.112
+      },
+      {
+        "freq": 272.8,
+        "freqEnd": 223.2,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.126
+      }
+    ]
+  },
+  "wood.roll": {
+    "id": "wood.roll",
+    "category": "wood",
+    "wave": "sine",
+    "gainDb": -14,
+    "durationMs": 260,
+    "variants": [
+      {
+        "freq": 180,
+        "freqEnd": 120,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.182
+      },
+      {
+        "freq": 201.60000000000002,
+        "freqEnd": 134.4,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.208
+      },
+      {
+        "freq": 223.2,
+        "freqEnd": 148.8,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.23399999999999999
+      }
+    ]
+  },
+  "wood.step": {
+    "id": "wood.step",
+    "category": "wood",
+    "wave": "triangle",
+    "gainDb": -14,
+    "durationMs": 80,
+    "variants": [
+      {
+        "freq": 340,
+        "freqEnd": 260,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.055999999999999994
+      },
+      {
+        "freq": 380.8,
+        "freqEnd": 291.20000000000005,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.064
+      },
+      {
+        "freq": 421.6,
+        "freqEnd": 322.4,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.072
+      }
+    ]
+  },
+  "wood.open": {
+    "id": "wood.open",
+    "category": "wood",
+    "wave": "triangle",
+    "gainDb": -12,
+    "durationMs": 200,
+    "variants": [
+      {
+        "freq": 300,
+        "freqEnd": 200,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.13999999999999999
+      },
+      {
+        "freq": 336.00000000000006,
+        "freqEnd": 224.00000000000003,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.16
+      },
+      {
+        "freq": 372,
+        "freqEnd": 248,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.18
+      }
+    ]
+  },
+  "metal.clink": {
+    "id": "metal.clink",
+    "category": "metal",
+    "wave": "square",
+    "gainDb": -12,
+    "durationMs": 180,
+    "variants": [
+      {
+        "freq": 1400,
+        "freqEnd": 1100,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.126
+      },
+      {
+        "freq": 1568.0000000000002,
+        "freqEnd": 1232.0000000000002,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.144
+      },
+      {
+        "freq": 1736,
+        "freqEnd": 1364,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.16199999999999998
+      }
+    ]
+  },
+  "metal.ring": {
+    "id": "metal.ring",
+    "category": "metal",
+    "wave": "sine",
+    "gainDb": -12,
+    "durationMs": 400,
+    "variants": [
+      {
+        "freq": 2000,
+        "freqEnd": 1600,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.27999999999999997
+      },
+      {
+        "freq": 2240,
+        "freqEnd": 1792.0000000000002,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.32
+      },
+      {
+        "freq": 2480,
+        "freqEnd": 1984,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.36
+      }
+    ]
+  },
+  "metal.tap": {
+    "id": "metal.tap",
+    "category": "metal",
+    "wave": "triangle",
+    "gainDb": -14,
+    "durationMs": 110,
+    "variants": [
+      {
+        "freq": 900,
+        "freqEnd": 700,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.077
+      },
+      {
+        "freq": 1008.0000000000001,
+        "freqEnd": 784.0000000000001,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.088
+      },
+      {
+        "freq": 1116,
+        "freqEnd": 868,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.09899999999999999
+      }
+    ]
+  },
+  "metal.chain": {
+    "id": "metal.chain",
+    "category": "metal",
+    "wave": "square",
+    "gainDb": -14,
+    "durationMs": 220,
+    "variants": [
+      {
+        "freq": 900,
+        "freqEnd": 1300,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.154
+      },
+      {
+        "freq": 1008.0000000000001,
+        "freqEnd": 1456.0000000000002,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.176
+      },
+      {
+        "freq": 1116,
+        "freqEnd": 1612,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.19799999999999998
+      }
+    ]
+  },
+  "glass.chime": {
+    "id": "glass.chime",
+    "category": "glass",
+    "wave": "sine",
+    "gainDb": -10,
+    "durationMs": 320,
+    "variants": [
+      {
+        "freq": 1800,
+        "freqEnd": 2400,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.22399999999999998
+      },
+      {
+        "freq": 2016.0000000000002,
+        "freqEnd": 2688.0000000000005,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.256
+      },
+      {
+        "freq": 2232,
+        "freqEnd": 2976,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.288
+      }
+    ]
+  },
+  "glass.tinkle": {
+    "id": "glass.tinkle",
+    "category": "glass",
+    "wave": "sine",
+    "gainDb": -12,
+    "durationMs": 200,
+    "variants": [
+      {
+        "freq": 2200,
+        "freqEnd": 2600,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.13999999999999999
+      },
+      {
+        "freq": 2464.0000000000005,
+        "freqEnd": 2912.0000000000005,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.16
+      },
+      {
+        "freq": 2728,
+        "freqEnd": 3224,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.18
+      }
+    ]
+  },
+  "glass.break": {
+    "id": "glass.break",
+    "category": "glass",
+    "wave": "triangle",
+    "gainDb": -10,
+    "durationMs": 260,
+    "variants": [
+      {
+        "freq": 1600,
+        "freqEnd": 600,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.182
+      },
+      {
+        "freq": 1792.0000000000002,
+        "freqEnd": 672.0000000000001,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.208
+      },
+      {
+        "freq": 1984,
+        "freqEnd": 744,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.23399999999999999
+      }
+    ]
+  },
+  "glass.bell": {
+    "id": "glass.bell",
+    "category": "glass",
+    "wave": "sine",
+    "gainDb": -10,
+    "durationMs": 700,
+    "variants": [
+      {
+        "freq": 1568,
+        "freqEnd": 2093,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.48999999999999994
+      },
+      {
+        "freq": 1756.16,
+        "freqEnd": 2344.1600000000003,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.5599999999999999
+      },
+      {
+        "freq": 1944.32,
+        "freqEnd": 2595.32,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.6299999999999999
+      }
+    ]
+  },
+  "paper.flip": {
+    "id": "paper.flip",
+    "category": "paper",
+    "wave": "sine",
+    "gainDb": -14,
+    "durationMs": 120,
+    "variants": [
+      {
+        "freq": 900,
+        "freqEnd": 1600,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.08399999999999999
+      },
+      {
+        "freq": 1008.0000000000001,
+        "freqEnd": 1792.0000000000002,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.09599999999999999
+      },
+      {
+        "freq": 1116,
+        "freqEnd": 1984,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.10799999999999998
+      }
+    ]
+  },
+  "paper.unfold": {
+    "id": "paper.unfold",
+    "category": "paper",
+    "wave": "sine",
+    "gainDb": -14,
+    "durationMs": 220,
+    "variants": [
+      {
+        "freq": 700,
+        "freqEnd": 1200,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.154
+      },
+      {
+        "freq": 784.0000000000001,
+        "freqEnd": 1344.0000000000002,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.176
+      },
+      {
+        "freq": 868,
+        "freqEnd": 1488,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.19799999999999998
+      }
+    ]
+  },
+  "paper.crumple": {
+    "id": "paper.crumple",
+    "category": "paper",
+    "wave": "triangle",
+    "gainDb": -14,
+    "durationMs": 260,
+    "variants": [
+      {
+        "freq": 1100,
+        "freqEnd": 700,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.182
+      },
+      {
+        "freq": 1232.0000000000002,
+        "freqEnd": 784.0000000000001,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.208
+      },
+      {
+        "freq": 1364,
+        "freqEnd": 868,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.23399999999999999
+      }
+    ]
+  },
+  "paper.write": {
+    "id": "paper.write",
+    "category": "paper",
+    "wave": "sine",
+    "gainDb": -16,
+    "durationMs": 90,
+    "variants": [
+      {
+        "freq": 1300,
+        "freqEnd": 1500,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.063
+      },
+      {
+        "freq": 1456.0000000000002,
+        "freqEnd": 1680.0000000000002,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.072
+      },
+      {
+        "freq": 1612,
+        "freqEnd": 1860,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.08099999999999999
+      }
+    ]
+  },
+  "snow.step": {
+    "id": "snow.step",
+    "category": "snow",
+    "wave": "sine",
+    "gainDb": -16,
+    "durationMs": 160,
+    "variants": [
+      {
+        "freq": 500,
+        "freqEnd": 300,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.11199999999999999
+      },
+      {
+        "freq": 560,
+        "freqEnd": 336.00000000000006,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.128
+      },
+      {
+        "freq": 620,
+        "freqEnd": 372,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.144
+      }
+    ]
+  },
+  "snow.crush": {
+    "id": "snow.crush",
+    "category": "snow",
+    "wave": "sine",
+    "gainDb": -16,
+    "durationMs": 200,
+    "variants": [
+      {
+        "freq": 380,
+        "freqEnd": 220,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.13999999999999999
+      },
+      {
+        "freq": 425.6,
+        "freqEnd": 246.40000000000003,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.16
+      },
+      {
+        "freq": 471.2,
+        "freqEnd": 272.8,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.18
+      }
+    ]
+  },
+  "snow.wind": {
+    "id": "snow.wind",
+    "category": "snow",
+    "wave": "sine",
+    "gainDb": -18,
+    "durationMs": 800,
+    "variants": [
+      {
+        "freq": 300,
+        "freqEnd": 200,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.5599999999999999
+      },
+      {
+        "freq": 336.00000000000006,
+        "freqEnd": 224.00000000000003,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.64
+      },
+      {
+        "freq": 372,
+        "freqEnd": 248,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.72
+      }
+    ]
+  },
+  "snow.shimmer": {
+    "id": "snow.shimmer",
+    "category": "snow",
+    "wave": "sine",
+    "gainDb": -14,
+    "durationMs": 500,
+    "variants": [
+      {
+        "freq": 2400,
+        "freqEnd": 3000,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.35
+      },
+      {
+        "freq": 2688.0000000000005,
+        "freqEnd": 3360.0000000000005,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.39999999999999997
+      },
+      {
+        "freq": 2976,
+        "freqEnd": 3720,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.44999999999999996
+      }
+    ]
+  },
+  "water.drop": {
+    "id": "water.drop",
+    "category": "water",
+    "wave": "sine",
+    "gainDb": -12,
+    "durationMs": 200,
+    "variants": [
+      {
+        "freq": 1200,
+        "freqEnd": 700,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.13999999999999999
+      },
+      {
+        "freq": 1344.0000000000002,
+        "freqEnd": 784.0000000000001,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.16
+      },
+      {
+        "freq": 1488,
+        "freqEnd": 868,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.18
+      }
+    ]
+  },
+  "water.bubble": {
+    "id": "water.bubble",
+    "category": "water",
+    "wave": "sine",
+    "gainDb": -14,
+    "durationMs": 180,
+    "variants": [
+      {
+        "freq": 700,
+        "freqEnd": 1400,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.126
+      },
+      {
+        "freq": 784.0000000000001,
+        "freqEnd": 1568.0000000000002,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.144
+      },
+      {
+        "freq": 868,
+        "freqEnd": 1736,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.16199999999999998
+      }
+    ]
+  },
+  "water.splash": {
+    "id": "water.splash",
+    "category": "water",
+    "wave": "sine",
+    "gainDb": -12,
+    "durationMs": 300,
+    "variants": [
+      {
+        "freq": 500,
+        "freqEnd": 200,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.21
+      },
+      {
+        "freq": 560,
+        "freqEnd": 224.00000000000003,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.23999999999999996
+      },
+      {
+        "freq": 620,
+        "freqEnd": 248,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.26999999999999996
+      }
+    ]
+  },
+  "water.stream": {
+    "id": "water.stream",
+    "category": "water",
+    "wave": "sine",
+    "gainDb": -16,
+    "durationMs": 600,
+    "variants": [
+      {
+        "freq": 900,
+        "freqEnd": 600,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.42
+      },
+      {
+        "freq": 1008.0000000000001,
+        "freqEnd": 672.0000000000001,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.4799999999999999
+      },
+      {
+        "freq": 1116,
+        "freqEnd": 744,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.5399999999999999
+      }
+    ]
+  },
+  "cloth.rustle": {
+    "id": "cloth.rustle",
+    "category": "cloth",
+    "wave": "sine",
+    "gainDb": -18,
+    "durationMs": 180,
+    "variants": [
+      {
+        "freq": 600,
+        "freqEnd": 400,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.126
+      },
+      {
+        "freq": 672.0000000000001,
+        "freqEnd": 448.00000000000006,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.144
+      },
+      {
+        "freq": 744,
+        "freqEnd": 496,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.16199999999999998
+      }
+    ]
+  },
+  "cloth.ribbon": {
+    "id": "cloth.ribbon",
+    "category": "cloth",
+    "wave": "sine",
+    "gainDb": -14,
+    "durationMs": 240,
+    "variants": [
+      {
+        "freq": 1400,
+        "freqEnd": 1900,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.16799999999999998
+      },
+      {
+        "freq": 1568.0000000000002,
+        "freqEnd": 2128,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.19199999999999998
+      },
+      {
+        "freq": 1736,
+        "freqEnd": 2356,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.21599999999999997
+      }
+    ]
+  },
+  "dino.roar.deep": {
+    "id": "dino.roar.deep",
+    "category": "dino",
+    "wave": "sawtooth",
+    "gainDb": -6,
+    "durationMs": 700,
+    "variants": [
+      {
+        "freq": 110,
+        "freqEnd": 70,
+        "filterType": "lowpass",
+        "filterFreq": 1400,
+        "attack": 0.06,
+        "release": 0.48999999999999994
+      },
+      {
+        "freq": 123.20000000000002,
+        "freqEnd": 78.4,
+        "filterType": "lowpass",
+        "filterFreq": 1400,
+        "attack": 0.06,
+        "release": 0.5599999999999999
+      },
+      {
+        "freq": 136.4,
+        "freqEnd": 86.8,
+        "filterType": "lowpass",
+        "filterFreq": 1400,
+        "attack": 0.06,
+        "release": 0.6299999999999999
+      }
+    ]
+  },
+  "dino.roar.loud": {
+    "id": "dino.roar.loud",
+    "category": "dino",
+    "wave": "sawtooth",
+    "gainDb": -4,
+    "durationMs": 650,
+    "variants": [
+      {
+        "freq": 180,
+        "freqEnd": 90,
+        "filterType": "lowpass",
+        "filterFreq": 1400,
+        "attack": 0.06,
+        "release": 0.45499999999999996
+      },
+      {
+        "freq": 201.60000000000002,
+        "freqEnd": 100.80000000000001,
+        "filterType": "lowpass",
+        "filterFreq": 1400,
+        "attack": 0.06,
+        "release": 0.52
+      },
+      {
+        "freq": 223.2,
+        "freqEnd": 111.6,
+        "filterType": "lowpass",
+        "filterFreq": 1400,
+        "attack": 0.06,
+        "release": 0.585
+      }
+    ]
+  },
+  "dino.roar.soft": {
+    "id": "dino.roar.soft",
+    "category": "dino",
+    "wave": "sine",
+    "gainDb": -8,
+    "durationMs": 600,
+    "variants": [
+      {
+        "freq": 220,
+        "freqEnd": 150,
+        "filterType": "lowpass",
+        "filterFreq": 1400,
+        "attack": 0.06,
+        "release": 0.42
+      },
+      {
+        "freq": 246.40000000000003,
+        "freqEnd": 168.00000000000003,
+        "filterType": "lowpass",
+        "filterFreq": 1400,
+        "attack": 0.06,
+        "release": 0.4799999999999999
+      },
+      {
+        "freq": 272.8,
+        "freqEnd": 186,
+        "filterType": "lowpass",
+        "filterFreq": 1400,
+        "attack": 0.06,
+        "release": 0.5399999999999999
+      }
+    ]
+  },
+  "dino.roar.sharp": {
+    "id": "dino.roar.sharp",
+    "category": "dino",
+    "wave": "sawtooth",
+    "gainDb": -6,
+    "durationMs": 550,
+    "variants": [
+      {
+        "freq": 300,
+        "freqEnd": 160,
+        "filterType": "lowpass",
+        "filterFreq": 1400,
+        "attack": 0.06,
+        "release": 0.385
+      },
+      {
+        "freq": 336.00000000000006,
+        "freqEnd": 179.20000000000002,
+        "filterType": "lowpass",
+        "filterFreq": 1400,
+        "attack": 0.06,
+        "release": 0.44
+      },
+      {
+        "freq": 372,
+        "freqEnd": 198.4,
+        "filterType": "lowpass",
+        "filterFreq": 1400,
+        "attack": 0.06,
+        "release": 0.495
+      }
+    ]
+  },
+  "dino.roar.mid": {
+    "id": "dino.roar.mid",
+    "category": "dino",
+    "wave": "sawtooth",
+    "gainDb": -6,
+    "durationMs": 620,
+    "variants": [
+      {
+        "freq": 150,
+        "freqEnd": 95,
+        "filterType": "lowpass",
+        "filterFreq": 1400,
+        "attack": 0.06,
+        "release": 0.434
+      },
+      {
+        "freq": 168.00000000000003,
+        "freqEnd": 106.4,
+        "filterType": "lowpass",
+        "filterFreq": 1400,
+        "attack": 0.06,
+        "release": 0.49599999999999994
+      },
+      {
+        "freq": 186,
+        "freqEnd": 117.8,
+        "filterType": "lowpass",
+        "filterFreq": 1400,
+        "attack": 0.06,
+        "release": 0.5579999999999999
+      }
+    ]
+  },
+  "dino.roar.warm": {
+    "id": "dino.roar.warm",
+    "category": "dino",
+    "wave": "triangle",
+    "gainDb": -8,
+    "durationMs": 650,
+    "variants": [
+      {
+        "freq": 200,
+        "freqEnd": 130,
+        "filterType": "lowpass",
+        "filterFreq": 1400,
+        "attack": 0.06,
+        "release": 0.45499999999999996
+      },
+      {
+        "freq": 224.00000000000003,
+        "freqEnd": 145.60000000000002,
+        "filterType": "lowpass",
+        "filterFreq": 1400,
+        "attack": 0.06,
+        "release": 0.52
+      },
+      {
+        "freq": 248,
+        "freqEnd": 161.2,
+        "filterType": "lowpass",
+        "filterFreq": 1400,
+        "attack": 0.06,
+        "release": 0.585
+      }
+    ]
+  },
+  "ui.error": {
+    "id": "ui.error",
+    "category": "ui",
+    "wave": "square",
+    "gainDb": -12,
+    "durationMs": 200,
+    "variants": [
+      {
+        "freq": 200.0,
+        "freqEnd": 150.0,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.13999999999999999
+      },
+      {
+        "freq": 224.00000000000003,
+        "freqEnd": 168.00000000000003,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.16
+      },
+      {
+        "freq": 248.0,
+        "freqEnd": 186.0,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.18
+      }
+    ]
+  },
+  "ui.tick": {
+    "id": "ui.tick",
+    "category": "ui",
+    "wave": "sine",
+    "gainDb": -16,
+    "durationMs": 40,
+    "variants": [
+      {
+        "freq": 1500.0,
+        "freqEnd": 1500.0,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.027999999999999997
+      },
+      {
+        "freq": 1680.0000000000002,
+        "freqEnd": 1680.0000000000002,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.032
+      },
+      {
+        "freq": 1860.0,
+        "freqEnd": 1860.0,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.036
+      }
+    ]
+  },
+  "ui.swoosh": {
+    "id": "ui.swoosh",
+    "category": "ui",
+    "wave": "sine",
+    "gainDb": -16,
+    "durationMs": 260,
+    "variants": [
+      {
+        "freq": 400.0,
+        "freqEnd": 1400.0,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.182
+      },
+      {
+        "freq": 448.00000000000006,
+        "freqEnd": 1568.0000000000002,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.208
+      },
+      {
+        "freq": 496.0,
+        "freqEnd": 1736.0,
+        "filterType": "lowpass",
+        "filterFreq": 7000,
+        "attack": 0.005,
+        "release": 0.23399999999999999
+      }
+    ]
+  }
+}

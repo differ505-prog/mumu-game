@@ -1,0 +1,100 @@
+{
+  "events": {
+    "round:correct": {
+      "tracks": {
+        "motion": [
+          { "at": 0, "target": ".control-btn", "anim": "press", "duration": "var(--t-micro)" },
+          { "at": 120, "target": ".control-btn", "anim": "release", "duration": "var(--t-settle)", "easing": "var(--e-spring)" }
+        ],
+        "audio": [
+          { "at": 0, "clip": "ui.tap", "gain": -6 },
+          { "at": 120, "clip": "chime.bell" }
+        ],
+        "voice": [{ "at": 450, "context": "encourage" }],
+        "scene": [{ "at": 0, "effect": "sparkle", "count": 12 }]
+      }
+    },
+    "round:wrong": {
+      "tracks": {
+        "motion": [
+          { "at": 0, "target": "#character-img", "anim": "shake", "duration": "var(--t-base)" }
+        ],
+        "audio": [{ "at": 0, "clip": "ui.soft-low", "gain": -9 }],
+        "voice": [{ "at": 300, "context": "comfort" }],
+        "scene": [{ "at": 300, "effect": "pulse-hint" }]
+      }
+    },
+    "round:hint": {
+      "tracks": {
+        "motion": [{ "at": 0, "target": ".option-btn", "anim": "pop-in" }],
+        "audio": [{ "at": 0, "clip": "ui.hint" }],
+        "voice": [{ "at": 0, "context": "hint" }],
+        "scene": []
+      }
+    },
+    "round:listen": {
+      "tracks": {
+        "motion": [{ "at": 0, "target": "#character-img", "anim": "dino-blink" }],
+        "audio": [{ "at": 0, "clip": "ui.listen" }],
+        "voice": [],
+        "scene": [{ "at": 0, "effect": "sound-wave" }]
+      }
+    },
+    "level:complete": {
+      "tracks": {
+        "motion": [{ "at": 0, "target": ".scene__layer", "anim": "fireworks", "duration": "var(--t-epic)" }],
+        "audio": [{ "at": 0, "clip": "fanfare.short" }],
+        "voice": [{ "at": 0, "context": "celebrate" }],
+        "scene": [{ "at": 0, "effect": "string-lights" }]
+      }
+    },
+    "level:start": {
+      "tracks": {
+        "motion": [{ "at": 0, "target": ".chapter-banner", "anim": "fadeIn", "duration": "var(--t-scene)" }],
+        "audio": [{ "at": 0, "clip": "chapter.theme" }],
+        "voice": [],
+        "scene": [{ "at": 0, "effect": "theme-shift" }]
+      }
+    },
+    "dex:unlock": {
+      "tracks": {
+        "motion": [{ "at": 0, "target": "#dex-root", "anim": "fireworks", "duration": "var(--t-epic)" }],
+        "audio": [{ "at": 0, "clip": "fanfare.short" }],
+        "voice": [{ "at": 0, "context": "celebrate" }],
+        "scene": [{ "at": 0, "effect": "string-lights" }]
+      }
+    },
+    "dino:roar": {
+      "tracks": {
+        "motion": [{ "at": 0, "target": "#character-img", "anim": "dino-roar", "duration": "var(--t-scene)" }],
+        "audio": [{ "at": 0, "clip": "dino.roar.deep" }],
+        "voice": [],
+        "scene": [{ "at": 0, "effect": "ground-shake" }]
+      }
+    },
+    "puzzle:piece-snap": {
+      "tracks": {
+        "motion": [{ "at": 0, "target": ".puzzle-piece", "anim": "piece-snap", "duration": "var(--t-base)" }],
+        "audio": [{ "at": 0, "clip": "ui.snap" }],
+        "voice": [],
+        "scene": []
+      }
+    },
+    "puzzle:complete": {
+      "tracks": {
+        "motion": [{ "at": 0, "target": ".puzzle-board", "anim": "pop-in" }],
+        "audio": [{ "at": 0, "clip": "fanfare.short" }],
+        "voice": [{ "at": 200, "context": "celebrate" }],
+        "scene": [{ "at": 200, "effect": "egg-hatch" }]
+      }
+    },
+    "memory:flip": {
+      "tracks": {
+        "motion": [{ "at": 0, "target": ".dex-card--memory", "anim": "card-flip", "duration": "var(--t-base)" }],
+        "audio": [{ "at": 0, "clip": "paper.flip" }],
+        "voice": [],
+        "scene": []
+      }
+    }
+  }
+}

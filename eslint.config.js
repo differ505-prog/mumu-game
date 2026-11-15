@@ -18,6 +18,12 @@ export default [
     }
   },
   {
+    files: ["tools/**/*.mjs"],
+    rules: {
+      "no-console": "off"
+    }
+  },
+  {
     files: ["service-worker.js"],
     languageOptions: {
       ecmaVersion: 2022,
