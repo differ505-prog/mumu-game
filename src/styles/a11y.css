@@ -1,0 +1,67 @@
+/* ============================================================
+   Accessibility — 無障礙樣式
+   ============================================================ */
+
+/* 螢幕閱讀器專用 */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* 焦點可視 */
+:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+    border-radius: var(--r-sm);
+}
+
+/* 高對比偏好 */
+@media (prefers-contrast: more) {
+
+    :root {
+        --border-soft: rgba(247, 251, 255, .55);
+        --text-muted: var(--text-secondary);
+    }
+
+    .control-btn,
+    .option-btn,
+    .mode-option {
+        border-width: 2px;
+    }
+}
+
+/* 色覺友善：顏色題加入符號冗餘編碼 */
+[data-colorblind="on"] .control-btn__label::before {
+    content: "◆ ";
+    color: var(--accent-warm);
+}
+
+[data-colorblind="on"] .dex-card__shape {
+    filter: contrast(1.4);
+}
+
+/* 觸覺開關（由 a11y.js 設定） */
+[data-haptics="off"] .tool-btn {
+    opacity: .6;
+}
+
+/* 列印：僅輸出信件 */
+@media print {
+
+    body>* {
+        display: none !important;
+    }
+
+    .story-letter,
+    .story-letter * {
+        display: block !important;
+        color: #000;
+    }
+}
