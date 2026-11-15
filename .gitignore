@@ -49,5 +49,12 @@ pids
 # Optional eslint cache
 .eslintcache
 
+# Node
+node_modules/
+dist/
+
+# Rebuildable generated assets
+assets/generated/
+
 # System Files
 Thumbs.db
