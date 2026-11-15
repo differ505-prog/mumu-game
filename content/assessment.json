@@ -1,0 +1,1764 @@
+{
+  "version": 1,
+  "design": "獨立於遊戲題庫；同一認知目標、不同題面，避免練習效應",
+  "pretest": {
+    "phonological-awareness": {
+      "zh-TW": [
+        {
+          "id": "as-zh-01",
+          "prompt": "爸爸的爸爸叫什麼？",
+          "options": [
+            "爸爸",
+            "婆婆",
+            "哥哥"
+          ],
+          "answer": "爸爸",
+          "skill": "initial"
+        },
+        {
+          "id": "as-zh-02",
+          "prompt": "哪個是「ㄅㄨ」？",
+          "options": [
+            "ㄅㄨ",
+            "ㄈㄨ",
+            "ㄅㄤ"
+          ],
+          "answer": "ㄅㄨ",
+          "skill": "initial"
+        },
+        {
+          "id": "as-zh-03",
+          "prompt": "「大」去掉一點是什麼？",
+          "options": [
+            "太",
+            "犬",
+            "天"
+          ],
+          "answer": "太",
+          "skill": "initial"
+        },
+        {
+          "id": "as-zh-04",
+          "prompt": "哪個字是「口」和「巴」組成的？",
+          "options": [
+            "吧",
+            "肥",
+            "色"
+          ],
+          "answer": "吧",
+          "skill": "initial"
+        },
+        {
+          "id": "as-zh-05",
+          "prompt": "哪個詞和「媽」的第一個音相同？",
+          "options": [
+            "馬",
+            "麻",
+            "嗎"
+          ],
+          "answer": "麻",
+          "skill": "initial"
+        },
+        {
+          "id": "as-zh-06",
+          "prompt": "哪個詞和「花」的第一個音相同？",
+          "options": [
+            "家",
+            "他",
+            "湖"
+          ],
+          "answer": "家",
+          "skill": "initial"
+        },
+        {
+          "id": "as-zh-07",
+          "prompt": "「水」和「誰」的第一個音一樣嗎？",
+          "options": [
+            "一樣",
+            "不一樣"
+          ],
+          "answer": "不一樣",
+          "skill": "initial"
+        },
+        {
+          "id": "as-zh-08",
+          "prompt": "哪個是「ㄍㄨㄚ」？",
+          "options": [
+            "瓜",
+            "掛",
+            "刷"
+          ],
+          "answer": "瓜",
+          "skill": "initial"
+        },
+        {
+          "id": "as-zh-09",
+          "prompt": "哪個詞和「四」的第一個音相同？",
+          "options": [
+            "死",
+            "思",
+            "西"
+          ],
+          "answer": "思",
+          "skill": "initial"
+        },
+        {
+          "id": "as-zh-10",
+          "prompt": "「新」和「心」的第一個音一樣嗎？",
+          "options": [
+            "一樣",
+            "不一樣"
+          ],
+          "answer": "一樣",
+          "skill": "initial"
+        },
+        {
+          "id": "as-zh-11",
+          "prompt": "哪個詞和「狗」的第一個音相同？",
+          "options": [
+            "購",
+            "咕",
+            "故"
+          ],
+          "answer": "咕",
+          "skill": "initial"
+        },
+        {
+          "id": "as-zh-12",
+          "prompt": "哪個字有「ㄕ」這個音？",
+          "options": [
+            "師",
+            "飛",
+            "魚"
+          ],
+          "answer": "師",
+          "skill": "initial"
+        }
+      ],
+      "en-US": [
+        {
+          "id": "as-en-01",
+          "prompt": "Which word starts with the same sound: ship, sheep?",
+          "options": [
+            "ship",
+            "sheep",
+            "slip"
+          ],
+          "answer": "sheep",
+          "skill": "vowel"
+        },
+        {
+          "id": "as-en-02",
+          "prompt": "Which word starts with the same sound: fish, fist?",
+          "options": [
+            "fish",
+            "fist",
+            "miss"
+          ],
+          "answer": "fist",
+          "skill": "onset"
+        },
+        {
+          "id": "as-en-03",
+          "prompt": "Which word starts with the same sound: bed, pet?",
+          "options": [
+            "bed",
+            "pet",
+            "red"
+          ],
+          "answer": "pet",
+          "skill": "onset"
+        },
+        {
+          "id": "as-en-04",
+          "prompt": "Which word starts with the same sound: boat, goat?",
+          "options": [
+            "boat",
+            "goat",
+            "both"
+          ],
+          "answer": "goat",
+          "skill": "onset"
+        },
+        {
+          "id": "as-en-05",
+          "prompt": "Which word starts with the same sound: cat, cap?",
+          "options": [
+            "cat",
+            "cap",
+            "can"
+          ],
+          "answer": "cap",
+          "skill": "onset"
+        },
+        {
+          "id": "as-en-06",
+          "prompt": "Which word starts with the same sound: sun, son?",
+          "options": [
+            "sun",
+            "son",
+            "sin"
+          ],
+          "answer": "son",
+          "skill": "vowel"
+        },
+        {
+          "id": "as-en-07",
+          "prompt": "Which word starts with the same sound: pin, bin?",
+          "options": [
+            "pin",
+            "bin",
+            "pen"
+          ],
+          "answer": "bin",
+          "skill": "onset"
+        },
+        {
+          "id": "as-en-08",
+          "prompt": "Which word starts with the same sound: rice, lice?",
+          "options": [
+            "rice",
+            "lice",
+            "ride"
+          ],
+          "answer": "lice",
+          "skill": "onset"
+        },
+        {
+          "id": "as-en-09",
+          "prompt": "Which word starts with the same sound: four, for?",
+          "options": [
+            "four",
+            "for",
+            "fur"
+          ],
+          "answer": "for",
+          "skill": "vowel"
+        },
+        {
+          "id": "as-en-10",
+          "prompt": "Which word starts with the same sound: hat, hut?",
+          "options": [
+            "hat",
+            "hut",
+            "hit"
+          ],
+          "answer": "hut",
+          "skill": "onset"
+        },
+        {
+          "id": "as-en-11",
+          "prompt": "Which word starts with the same sound: park, puck?",
+          "options": [
+            "park",
+            "puck",
+            "pack"
+          ],
+          "answer": "puck",
+          "skill": "onset"
+        },
+        {
+          "id": "as-en-12",
+          "prompt": "Which word starts with the same sound: wet, vet?",
+          "options": [
+            "wet",
+            "vet",
+            "net"
+          ],
+          "answer": "vet",
+          "skill": "vowel"
+        }
+      ]
+    },
+    "auditory-sequence": {
+      "zh-TW": [
+        {
+          "id": "as-seq-01",
+          "prompt": "依序複誦：紅、藍、綠",
+          "items": [
+            "紅",
+            "藍",
+            "綠"
+          ],
+          "skill": "sequence"
+        },
+        {
+          "id": "as-seq-02",
+          "prompt": "依序複誦：狗、貓、鳥、魚",
+          "items": [
+            "狗",
+            "貓",
+            "鳥",
+            "魚"
+          ],
+          "skill": "sequence"
+        },
+        {
+          "id": "as-seq-03",
+          "prompt": "依序複誦：一、二、三、四",
+          "items": [
+            "一",
+            "二",
+            "三",
+            "四"
+          ],
+          "skill": "sequence"
+        },
+        {
+          "id": "as-seq-04",
+          "prompt": "依序複誦：跳、跑、走、停",
+          "items": [
+            "跳",
+            "跑",
+            "走",
+            "停"
+          ],
+          "skill": "sequence"
+        },
+        {
+          "id": "as-seq-05",
+          "prompt": "依序複誦：蘋果、香蕉、葡萄",
+          "items": [
+            "蘋果",
+            "香蕉",
+            "葡萄"
+          ],
+          "skill": "sequence"
+        },
+        {
+          "id": "as-seq-06",
+          "prompt": "依序複誦：開、關、開、關",
+          "items": [
+            "開",
+            "關",
+            "開",
+            "關"
+          ],
+          "skill": "sequence"
+        },
+        {
+          "id": "as-seq-07",
+          "prompt": "依序複誦：爸爸、媽媽、哥哥、弟弟",
+          "items": [
+            "爸爸",
+            "媽媽",
+            "哥哥",
+            "弟弟"
+          ],
+          "skill": "sequence"
+        },
+        {
+          "id": "as-seq-08",
+          "prompt": "依序複誦：白、黑、白、黑",
+          "items": [
+            "白",
+            "黑",
+            "白",
+            "黑"
+          ],
+          "skill": "sequence"
+        }
+      ],
+      "en-US": [
+        {
+          "id": "as-seq-en-01",
+          "prompt": "Repeat in order: apple, banana, cherry",
+          "items": [
+            "apple",
+            "banana",
+            "cherry"
+          ],
+          "skill": "sequence"
+        },
+        {
+          "id": "as-seq-en-02",
+          "prompt": "Repeat in order: one, two, three, four",
+          "items": [
+            "one",
+            "two",
+            "three",
+            "four"
+          ],
+          "skill": "sequence"
+        },
+        {
+          "id": "as-seq-en-03",
+          "prompt": "Repeat in order: red, green, blue",
+          "items": [
+            "red",
+            "green",
+            "blue"
+          ],
+          "skill": "sequence"
+        },
+        {
+          "id": "as-seq-en-04",
+          "prompt": "Repeat in order: cat, dog, bird, fish",
+          "items": [
+            "cat",
+            "dog",
+            "bird",
+            "fish"
+          ],
+          "skill": "sequence"
+        },
+        {
+          "id": "as-seq-en-05",
+          "prompt": "Repeat in order: jump, hop, run, stop",
+          "items": [
+            "jump",
+            "hop",
+            "run",
+            "stop"
+          ],
+          "skill": "sequence"
+        },
+        {
+          "id": "as-seq-en-06",
+          "prompt": "Repeat in order: up, down, left, right",
+          "items": [
+            "up",
+            "down",
+            "left",
+            "right"
+          ],
+          "skill": "sequence"
+        },
+        {
+          "id": "as-seq-en-07",
+          "prompt": "Repeat in order: open, shut, open, shut",
+          "items": [
+            "open",
+            "shut",
+            "open",
+            "shut"
+          ],
+          "skill": "sequence"
+        },
+        {
+          "id": "as-seq-en-08",
+          "prompt": "Repeat in order: mother, father, sister, brother",
+          "items": [
+            "mother",
+            "father",
+            "sister",
+            "brother"
+          ],
+          "skill": "sequence"
+        }
+      ]
+    },
+    "spatial-memory": {
+      "zh-TW": [
+        {
+          "id": "as-mem-01",
+          "prompt": "哪一格剛才出現過恐龍足跡？",
+          "grid": 9,
+          "answerIndex": 4,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-02",
+          "prompt": "哪一格剛才出現過恐龍足跡？",
+          "grid": 9,
+          "answerIndex": 0,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-03",
+          "prompt": "哪一格剛才出現過恐龍足跡？",
+          "grid": 9,
+          "answerIndex": 8,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-04",
+          "prompt": "哪一格剛才出現過恐龍足跡？",
+          "grid": 9,
+          "answerIndex": 2,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-05",
+          "prompt": "哪一格剛才出現過恐龍足跡？",
+          "grid": 9,
+          "answerIndex": 6,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-06",
+          "prompt": "哪一格剛才出現過計數器？",
+          "grid": 9,
+          "answerIndex": 3,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-07",
+          "prompt": "哪一格剛才出現過恐龍足跡？",
+          "grid": 9,
+          "answerIndex": 7,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-08",
+          "prompt": "哪一格剛才出現過星星？",
+          "grid": 9,
+          "answerIndex": 1,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-09",
+          "prompt": "哪一格剛才出現過恐龍足跡？",
+          "grid": 9,
+          "answerIndex": 5,
+          "skill": "spatial"
+        }
+      ],
+      "en-US": [
+        {
+          "id": "as-mem-en-01",
+          "prompt": "Which grid cell had the dinosaur footprint?",
+          "grid": 9,
+          "answerIndex": 4,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-en-02",
+          "prompt": "Which grid cell had the dinosaur footprint?",
+          "grid": 9,
+          "answerIndex": 0,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-en-03",
+          "prompt": "Which grid cell had the dinosaur footprint?",
+          "grid": 9,
+          "answerIndex": 8,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-en-04",
+          "prompt": "Which grid cell had the counter?",
+          "grid": 9,
+          "answerIndex": 2,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-en-05",
+          "prompt": "Which grid cell had the dinosaur footprint?",
+          "grid": 9,
+          "answerIndex": 6,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-en-06",
+          "prompt": "Which grid cell had the star?",
+          "grid": 9,
+          "answerIndex": 1,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-en-07",
+          "prompt": "Which grid cell had the dinosaur footprint?",
+          "grid": 9,
+          "answerIndex": 7,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-en-08",
+          "prompt": "Which grid cell had the dinosaur footprint?",
+          "grid": 9,
+          "answerIndex": 3,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-en-09",
+          "prompt": "Which grid cell had the counter?",
+          "grid": 9,
+          "answerIndex": 5,
+          "skill": "spatial"
+        }
+      ]
+    },
+    "pattern-reasoning": {
+      "zh-TW": [
+        {
+          "id": "as-pat-01",
+          "prompt": "接下來是哪一個？",
+          "sequence": [
+            "red",
+            "blue",
+            "red",
+            "blue"
+          ],
+          "options": [
+            "red",
+            "blue",
+            "green"
+          ],
+          "answer": "red",
+          "skill": "abab"
+        },
+        {
+          "id": "as-pat-02",
+          "prompt": "接下來是哪一個？",
+          "sequence": [
+            "circle",
+            "square",
+            "circle",
+            "square"
+          ],
+          "options": [
+            "circle",
+            "square",
+            "star"
+          ],
+          "answer": "circle",
+          "skill": "abab"
+        },
+        {
+          "id": "as-pat-03",
+          "prompt": "接下來是哪一個？",
+          "sequence": [
+            "a",
+            "a",
+            "b",
+            "b"
+          ],
+          "options": [
+            "a",
+            "b",
+            "c"
+          ],
+          "answer": "a",
+          "skill": "aabb"
+        },
+        {
+          "id": "as-pat-04",
+          "prompt": "接下來是哪一個？",
+          "sequence": [
+            "fish",
+            "bird",
+            "fish",
+            "bird"
+          ],
+          "options": [
+            "fish",
+            "bird",
+            "crab"
+          ],
+          "answer": "fish",
+          "skill": "abab"
+        },
+        {
+          "id": "as-pat-05",
+          "prompt": "接下來是哪一個？",
+          "sequence": [
+            "big",
+            "small",
+            "big",
+            "small"
+          ],
+          "options": [
+            "big",
+            "small",
+            "medium"
+          ],
+          "answer": "big",
+          "skill": "abab"
+        },
+        {
+          "id": "as-pat-06",
+          "prompt": "接下來是哪一個？",
+          "sequence": [
+            "a",
+            "b",
+            "c",
+            "a"
+          ],
+          "options": [
+            "b",
+            "c",
+            "d"
+          ],
+          "answer": "b",
+          "skill": "abc"
+        },
+        {
+          "id": "as-pat-07",
+          "prompt": "接下來是哪一個？",
+          "sequence": [
+            "one",
+            "two",
+            "one",
+            "two"
+          ],
+          "options": [
+            "one",
+            "two",
+            "three"
+          ],
+          "answer": "one",
+          "skill": "abab"
+        },
+        {
+          "id": "as-pat-08",
+          "prompt": "接下來是哪一個？",
+          "sequence": [
+            "cat",
+            "dog",
+            "cat",
+            "dog"
+          ],
+          "options": [
+            "cat",
+            "dog",
+            "bird"
+          ],
+          "answer": "cat",
+          "skill": "abab"
+        },
+        {
+          "id": "as-pat-09",
+          "prompt": "接下來是哪一個？",
+          "sequence": [
+            "a",
+            "a",
+            "b",
+            "a"
+          ],
+          "options": [
+            "a",
+            "b",
+            "c"
+          ],
+          "answer": "a",
+          "skill": "aab"
+        }
+      ],
+      "en-US": [
+        {
+          "id": "as-pat-en-01",
+          "prompt": "What comes next?",
+          "sequence": [
+            "red",
+            "blue",
+            "red",
+            "blue"
+          ],
+          "options": [
+            "red",
+            "blue",
+            "green"
+          ],
+          "answer": "red",
+          "skill": "abab"
+        },
+        {
+          "id": "as-pat-en-02",
+          "prompt": "What comes next?",
+          "sequence": [
+            "triangle",
+            "circle",
+            "triangle",
+            "circle"
+          ],
+          "options": [
+            "triangle",
+            "circle",
+            "square"
+          ],
+          "answer": "triangle",
+          "skill": "abab"
+        },
+        {
+          "id": "as-pat-en-03",
+          "prompt": "What comes next?",
+          "sequence": [
+            "x",
+            "x",
+            "y",
+            "y"
+          ],
+          "options": [
+            "x",
+            "y",
+            "z"
+          ],
+          "answer": "x",
+          "skill": "aabb"
+        },
+        {
+          "id": "as-pat-en-04",
+          "prompt": "What comes next?",
+          "sequence": [
+            "cat",
+            "dog",
+            "cat",
+            "dog"
+          ],
+          "options": [
+            "cat",
+            "dog",
+            "bird"
+          ],
+          "answer": "cat",
+          "skill": "abab"
+        },
+        {
+          "id": "as-pat-en-05",
+          "prompt": "What comes next?",
+          "sequence": [
+            "one",
+            "two",
+            "one",
+            "two"
+          ],
+          "options": [
+            "one",
+            "two",
+            "three"
+          ],
+          "answer": "one",
+          "skill": "abab"
+        },
+        {
+          "id": "as-pat-en-06",
+          "prompt": "What comes next?",
+          "sequence": [
+            "a",
+            "b",
+            "c",
+            "a"
+          ],
+          "options": [
+            "b",
+            "c",
+            "d"
+          ],
+          "answer": "b",
+          "skill": "abc"
+        },
+        {
+          "id": "as-pat-en-07",
+          "prompt": "What comes next?",
+          "sequence": [
+            "big",
+            "small",
+            "big",
+            "small"
+          ],
+          "options": [
+            "big",
+            "small",
+            "medium"
+          ],
+          "answer": "big",
+          "skill": "abab"
+        },
+        {
+          "id": "as-pat-en-08",
+          "prompt": "What comes next?",
+          "sequence": [
+            "fish",
+            "bird",
+            "fish",
+            "bird"
+          ],
+          "options": [
+            "fish",
+            "bird",
+            "crab"
+          ],
+          "answer": "fish",
+          "skill": "abab"
+        }
+      ]
+    }
+  },
+  "posttest": {
+    "phonological-awareness": {
+      "zh-TW": [
+        {
+          "id": "as-zh-01-p",
+          "prompt": "爸爸的爸爸叫什麼？",
+          "options": [
+            "婆婆",
+            "哥哥",
+            "爸爸"
+          ],
+          "answer": 2,
+          "skill": "initial"
+        },
+        {
+          "id": "as-zh-02-p",
+          "prompt": "哪個是「ㄅㄨ」？",
+          "options": [
+            "ㄈㄨ",
+            "ㄅㄤ",
+            "ㄅㄨ"
+          ],
+          "answer": 2,
+          "skill": "initial"
+        },
+        {
+          "id": "as-zh-03-p",
+          "prompt": "「大」去掉一點是什麼？",
+          "options": [
+            "犬",
+            "天",
+            "太"
+          ],
+          "answer": 2,
+          "skill": "initial"
+        },
+        {
+          "id": "as-zh-04-p",
+          "prompt": "哪個字是「口」和「巴」組成的？",
+          "options": [
+            "肥",
+            "色",
+            "吧"
+          ],
+          "answer": 2,
+          "skill": "initial"
+        },
+        {
+          "id": "as-zh-05-p",
+          "prompt": "哪個詞和「媽」的第一個音相同？",
+          "options": [
+            "麻",
+            "嗎",
+            "馬"
+          ],
+          "answer": 0,
+          "skill": "initial"
+        },
+        {
+          "id": "as-zh-06-p",
+          "prompt": "哪個詞和「花」的第一個音相同？",
+          "options": [
+            "他",
+            "湖",
+            "家"
+          ],
+          "answer": 2,
+          "skill": "initial"
+        },
+        {
+          "id": "as-zh-07-p",
+          "prompt": "「水」和「誰」的第一個音一樣嗎？",
+          "options": [
+            "不一樣",
+            "一樣"
+          ],
+          "answer": 0,
+          "skill": "initial"
+        },
+        {
+          "id": "as-zh-08-p",
+          "prompt": "哪個是「ㄍㄨㄚ」？",
+          "options": [
+            "掛",
+            "刷",
+            "瓜"
+          ],
+          "answer": 2,
+          "skill": "initial"
+        },
+        {
+          "id": "as-zh-09-p",
+          "prompt": "哪個詞和「四」的第一個音相同？",
+          "options": [
+            "思",
+            "西",
+            "死"
+          ],
+          "answer": 0,
+          "skill": "initial"
+        },
+        {
+          "id": "as-zh-10-p",
+          "prompt": "「新」和「心」的第一個音一樣嗎？",
+          "options": [
+            "不一樣",
+            "一樣"
+          ],
+          "answer": 1,
+          "skill": "initial"
+        },
+        {
+          "id": "as-zh-11-p",
+          "prompt": "哪個詞和「狗」的第一個音相同？",
+          "options": [
+            "咕",
+            "故",
+            "購"
+          ],
+          "answer": 0,
+          "skill": "initial"
+        },
+        {
+          "id": "as-zh-12-p",
+          "prompt": "哪個字有「ㄕ」這個音？",
+          "options": [
+            "飛",
+            "魚",
+            "師"
+          ],
+          "answer": 2,
+          "skill": "initial"
+        }
+      ],
+      "en-US": [
+        {
+          "id": "as-en-01-p",
+          "prompt": "Which word starts with the same sound: ship, sheep?",
+          "options": [
+            "sheep",
+            "slip",
+            "ship"
+          ],
+          "answer": 0,
+          "skill": "vowel"
+        },
+        {
+          "id": "as-en-02-p",
+          "prompt": "Which word starts with the same sound: fish, fist?",
+          "options": [
+            "fist",
+            "miss",
+            "fish"
+          ],
+          "answer": 0,
+          "skill": "onset"
+        },
+        {
+          "id": "as-en-03-p",
+          "prompt": "Which word starts with the same sound: bed, pet?",
+          "options": [
+            "pet",
+            "red",
+            "bed"
+          ],
+          "answer": 0,
+          "skill": "onset"
+        },
+        {
+          "id": "as-en-04-p",
+          "prompt": "Which word starts with the same sound: boat, goat?",
+          "options": [
+            "goat",
+            "both",
+            "boat"
+          ],
+          "answer": 0,
+          "skill": "onset"
+        },
+        {
+          "id": "as-en-05-p",
+          "prompt": "Which word starts with the same sound: cat, cap?",
+          "options": [
+            "cap",
+            "can",
+            "cat"
+          ],
+          "answer": 0,
+          "skill": "onset"
+        },
+        {
+          "id": "as-en-06-p",
+          "prompt": "Which word starts with the same sound: sun, son?",
+          "options": [
+            "son",
+            "sin",
+            "sun"
+          ],
+          "answer": 0,
+          "skill": "vowel"
+        },
+        {
+          "id": "as-en-07-p",
+          "prompt": "Which word starts with the same sound: pin, bin?",
+          "options": [
+            "bin",
+            "pen",
+            "pin"
+          ],
+          "answer": 0,
+          "skill": "onset"
+        },
+        {
+          "id": "as-en-08-p",
+          "prompt": "Which word starts with the same sound: rice, lice?",
+          "options": [
+            "lice",
+            "ride",
+            "rice"
+          ],
+          "answer": 0,
+          "skill": "onset"
+        },
+        {
+          "id": "as-en-09-p",
+          "prompt": "Which word starts with the same sound: four, for?",
+          "options": [
+            "for",
+            "fur",
+            "four"
+          ],
+          "answer": 0,
+          "skill": "vowel"
+        },
+        {
+          "id": "as-en-10-p",
+          "prompt": "Which word starts with the same sound: hat, hut?",
+          "options": [
+            "hut",
+            "hit",
+            "hat"
+          ],
+          "answer": 0,
+          "skill": "onset"
+        },
+        {
+          "id": "as-en-11-p",
+          "prompt": "Which word starts with the same sound: park, puck?",
+          "options": [
+            "puck",
+            "pack",
+            "park"
+          ],
+          "answer": 0,
+          "skill": "onset"
+        },
+        {
+          "id": "as-en-12-p",
+          "prompt": "Which word starts with the same sound: wet, vet?",
+          "options": [
+            "vet",
+            "net",
+            "wet"
+          ],
+          "answer": 0,
+          "skill": "vowel"
+        }
+      ]
+    },
+    "auditory-sequence": {
+      "zh-TW": [
+        {
+          "id": "as-seq-01-p",
+          "prompt": "依序複誦：紅、藍、綠",
+          "items": [
+            "紅",
+            "藍",
+            "綠"
+          ],
+          "skill": "sequence"
+        },
+        {
+          "id": "as-seq-02-p",
+          "prompt": "依序複誦：狗、貓、鳥、魚",
+          "items": [
+            "狗",
+            "貓",
+            "鳥",
+            "魚"
+          ],
+          "skill": "sequence"
+        },
+        {
+          "id": "as-seq-03-p",
+          "prompt": "依序複誦：一、二、三、四",
+          "items": [
+            "一",
+            "二",
+            "三",
+            "四"
+          ],
+          "skill": "sequence"
+        },
+        {
+          "id": "as-seq-04-p",
+          "prompt": "依序複誦：跳、跑、走、停",
+          "items": [
+            "跳",
+            "跑",
+            "走",
+            "停"
+          ],
+          "skill": "sequence"
+        },
+        {
+          "id": "as-seq-05-p",
+          "prompt": "依序複誦：蘋果、香蕉、葡萄",
+          "items": [
+            "蘋果",
+            "香蕉",
+            "葡萄"
+          ],
+          "skill": "sequence"
+        },
+        {
+          "id": "as-seq-06-p",
+          "prompt": "依序複誦：開、關、開、關",
+          "items": [
+            "開",
+            "關",
+            "開",
+            "關"
+          ],
+          "skill": "sequence"
+        },
+        {
+          "id": "as-seq-07-p",
+          "prompt": "依序複誦：爸爸、媽媽、哥哥、弟弟",
+          "items": [
+            "爸爸",
+            "媽媽",
+            "哥哥",
+            "弟弟"
+          ],
+          "skill": "sequence"
+        },
+        {
+          "id": "as-seq-08-p",
+          "prompt": "依序複誦：白、黑、白、黑",
+          "items": [
+            "白",
+            "黑",
+            "白",
+            "黑"
+          ],
+          "skill": "sequence"
+        }
+      ],
+      "en-US": [
+        {
+          "id": "as-seq-en-01-p",
+          "prompt": "Repeat in order: apple, banana, cherry",
+          "items": [
+            "apple",
+            "banana",
+            "cherry"
+          ],
+          "skill": "sequence"
+        },
+        {
+          "id": "as-seq-en-02-p",
+          "prompt": "Repeat in order: one, two, three, four",
+          "items": [
+            "one",
+            "two",
+            "three",
+            "four"
+          ],
+          "skill": "sequence"
+        },
+        {
+          "id": "as-seq-en-03-p",
+          "prompt": "Repeat in order: red, green, blue",
+          "items": [
+            "red",
+            "green",
+            "blue"
+          ],
+          "skill": "sequence"
+        },
+        {
+          "id": "as-seq-en-04-p",
+          "prompt": "Repeat in order: cat, dog, bird, fish",
+          "items": [
+            "cat",
+            "dog",
+            "bird",
+            "fish"
+          ],
+          "skill": "sequence"
+        },
+        {
+          "id": "as-seq-en-05-p",
+          "prompt": "Repeat in order: jump, hop, run, stop",
+          "items": [
+            "jump",
+            "hop",
+            "run",
+            "stop"
+          ],
+          "skill": "sequence"
+        },
+        {
+          "id": "as-seq-en-06-p",
+          "prompt": "Repeat in order: up, down, left, right",
+          "items": [
+            "up",
+            "down",
+            "left",
+            "right"
+          ],
+          "skill": "sequence"
+        },
+        {
+          "id": "as-seq-en-07-p",
+          "prompt": "Repeat in order: open, shut, open, shut",
+          "items": [
+            "open",
+            "shut",
+            "open",
+            "shut"
+          ],
+          "skill": "sequence"
+        },
+        {
+          "id": "as-seq-en-08-p",
+          "prompt": "Repeat in order: mother, father, sister, brother",
+          "items": [
+            "mother",
+            "father",
+            "sister",
+            "brother"
+          ],
+          "skill": "sequence"
+        }
+      ]
+    },
+    "spatial-memory": {
+      "zh-TW": [
+        {
+          "id": "as-mem-01-p",
+          "prompt": "哪一格剛才出現過恐龍足跡？",
+          "grid": 9,
+          "answerIndex": 5,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-02-p",
+          "prompt": "哪一格剛才出現過恐龍足跡？",
+          "grid": 9,
+          "answerIndex": 1,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-03-p",
+          "prompt": "哪一格剛才出現過恐龍足跡？",
+          "grid": 9,
+          "answerIndex": 0,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-04-p",
+          "prompt": "哪一格剛才出現過恐龍足跡？",
+          "grid": 9,
+          "answerIndex": 3,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-05-p",
+          "prompt": "哪一格剛才出現過恐龍足跡？",
+          "grid": 9,
+          "answerIndex": 7,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-06-p",
+          "prompt": "哪一格剛才出現過計數器？",
+          "grid": 9,
+          "answerIndex": 4,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-07-p",
+          "prompt": "哪一格剛才出現過恐龍足跡？",
+          "grid": 9,
+          "answerIndex": 8,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-08-p",
+          "prompt": "哪一格剛才出現過星星？",
+          "grid": 9,
+          "answerIndex": 2,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-09-p",
+          "prompt": "哪一格剛才出現過恐龍足跡？",
+          "grid": 9,
+          "answerIndex": 6,
+          "skill": "spatial"
+        }
+      ],
+      "en-US": [
+        {
+          "id": "as-mem-en-01-p",
+          "prompt": "Which grid cell had the dinosaur footprint?",
+          "grid": 9,
+          "answerIndex": 5,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-en-02-p",
+          "prompt": "Which grid cell had the dinosaur footprint?",
+          "grid": 9,
+          "answerIndex": 1,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-en-03-p",
+          "prompt": "Which grid cell had the dinosaur footprint?",
+          "grid": 9,
+          "answerIndex": 0,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-en-04-p",
+          "prompt": "Which grid cell had the counter?",
+          "grid": 9,
+          "answerIndex": 3,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-en-05-p",
+          "prompt": "Which grid cell had the dinosaur footprint?",
+          "grid": 9,
+          "answerIndex": 7,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-en-06-p",
+          "prompt": "Which grid cell had the star?",
+          "grid": 9,
+          "answerIndex": 2,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-en-07-p",
+          "prompt": "Which grid cell had the dinosaur footprint?",
+          "grid": 9,
+          "answerIndex": 8,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-en-08-p",
+          "prompt": "Which grid cell had the dinosaur footprint?",
+          "grid": 9,
+          "answerIndex": 4,
+          "skill": "spatial"
+        },
+        {
+          "id": "as-mem-en-09-p",
+          "prompt": "Which grid cell had the counter?",
+          "grid": 9,
+          "answerIndex": 6,
+          "skill": "spatial"
+        }
+      ]
+    },
+    "pattern-reasoning": {
+      "zh-TW": [
+        {
+          "id": "as-pat-01-p",
+          "prompt": "接下來是哪一個？",
+          "sequence": [
+            "blue",
+            "red",
+            "blue",
+            "red"
+          ],
+          "options": [
+            "blue",
+            "green",
+            "red"
+          ],
+          "answer": 2,
+          "skill": "abab"
+        },
+        {
+          "id": "as-pat-02-p",
+          "prompt": "接下來是哪一個？",
+          "sequence": [
+            "square",
+            "circle",
+            "square",
+            "circle"
+          ],
+          "options": [
+            "square",
+            "star",
+            "circle"
+          ],
+          "answer": 2,
+          "skill": "abab"
+        },
+        {
+          "id": "as-pat-03-p",
+          "prompt": "接下來是哪一個？",
+          "sequence": [
+            "a",
+            "b",
+            "b",
+            "a"
+          ],
+          "options": [
+            "b",
+            "c",
+            "a"
+          ],
+          "answer": 2,
+          "skill": "aabb"
+        },
+        {
+          "id": "as-pat-04-p",
+          "prompt": "接下來是哪一個？",
+          "sequence": [
+            "bird",
+            "fish",
+            "bird",
+            "fish"
+          ],
+          "options": [
+            "bird",
+            "crab",
+            "fish"
+          ],
+          "answer": 2,
+          "skill": "abab"
+        },
+        {
+          "id": "as-pat-05-p",
+          "prompt": "接下來是哪一個？",
+          "sequence": [
+            "small",
+            "big",
+            "small",
+            "big"
+          ],
+          "options": [
+            "small",
+            "medium",
+            "big"
+          ],
+          "answer": 2,
+          "skill": "abab"
+        },
+        {
+          "id": "as-pat-06-p",
+          "prompt": "接下來是哪一個？",
+          "sequence": [
+            "b",
+            "c",
+            "a",
+            "a"
+          ],
+          "options": [
+            "c",
+            "d",
+            "b"
+          ],
+          "answer": 2,
+          "skill": "abc"
+        },
+        {
+          "id": "as-pat-07-p",
+          "prompt": "接下來是哪一個？",
+          "sequence": [
+            "two",
+            "one",
+            "two",
+            "one"
+          ],
+          "options": [
+            "two",
+            "three",
+            "one"
+          ],
+          "answer": 2,
+          "skill": "abab"
+        },
+        {
+          "id": "as-pat-08-p",
+          "prompt": "接下來是哪一個？",
+          "sequence": [
+            "dog",
+            "cat",
+            "dog",
+            "cat"
+          ],
+          "options": [
+            "dog",
+            "bird",
+            "cat"
+          ],
+          "answer": 2,
+          "skill": "abab"
+        },
+        {
+          "id": "as-pat-09-p",
+          "prompt": "接下來是哪一個？",
+          "sequence": [
+            "a",
+            "b",
+            "a",
+            "a"
+          ],
+          "options": [
+            "b",
+            "c",
+            "a"
+          ],
+          "answer": 2,
+          "skill": "aab"
+        }
+      ],
+      "en-US": [
+        {
+          "id": "as-pat-en-01-p",
+          "prompt": "What comes next?",
+          "sequence": [
+            "blue",
+            "red",
+            "blue",
+            "red"
+          ],
+          "options": [
+            "blue",
+            "green",
+            "red"
+          ],
+          "answer": 2,
+          "skill": "abab"
+        },
+        {
+          "id": "as-pat-en-02-p",
+          "prompt": "What comes next?",
+          "sequence": [
+            "circle",
+            "triangle",
+            "circle",
+            "triangle"
+          ],
+          "options": [
+            "circle",
+            "square",
+            "triangle"
+          ],
+          "answer": 2,
+          "skill": "abab"
+        },
+        {
+          "id": "as-pat-en-03-p",
+          "prompt": "What comes next?",
+          "sequence": [
+            "x",
+            "y",
+            "y",
+            "x"
+          ],
+          "options": [
+            "y",
+            "z",
+            "x"
+          ],
+          "answer": 2,
+          "skill": "aabb"
+        },
+        {
+          "id": "as-pat-en-04-p",
+          "prompt": "What comes next?",
+          "sequence": [
+            "dog",
+            "cat",
+            "dog",
+            "cat"
+          ],
+          "options": [
+            "dog",
+            "bird",
+            "cat"
+          ],
+          "answer": 2,
+          "skill": "abab"
+        },
+        {
+          "id": "as-pat-en-05-p",
+          "prompt": "What comes next?",
+          "sequence": [
+            "two",
+            "one",
+            "two",
+            "one"
+          ],
+          "options": [
+            "two",
+            "three",
+            "one"
+          ],
+          "answer": 2,
+          "skill": "abab"
+        },
+        {
+          "id": "as-pat-en-06-p",
+          "prompt": "What comes next?",
+          "sequence": [
+            "b",
+            "c",
+            "a",
+            "a"
+          ],
+          "options": [
+            "c",
+            "d",
+            "b"
+          ],
+          "answer": 2,
+          "skill": "abc"
+        },
+        {
+          "id": "as-pat-en-07-p",
+          "prompt": "What comes next?",
+          "sequence": [
+            "small",
+            "big",
+            "small",
+            "big"
+          ],
+          "options": [
+            "small",
+            "medium",
+            "big"
+          ],
+          "answer": 2,
+          "skill": "abab"
+        },
+        {
+          "id": "as-pat-en-08-p",
+          "prompt": "What comes next?",
+          "sequence": [
+            "bird",
+            "fish",
+            "bird",
+            "fish"
+          ],
+          "options": [
+            "bird",
+            "crab",
+            "fish"
+          ],
+          "answer": 2,
+          "skill": "abab"
+        }
+      ]
+    }
+  },
+  "protocol": {
+    "pretest": "第 0 天，由家長在旁以固定話術執行，每題限時 10 秒",
+    "posttest": "第 28 天，同一組題目但不同題面（id 後綴 -p），順序打散",
+    "scoring": {
+      "metric": "correctRate",
+      "secondary": "reactionTimeMs",
+      "target": "correctRate 提升 ≥ 15 個百分點且 p < 0.05"
+    },
+    "n": 30
+  }
+}

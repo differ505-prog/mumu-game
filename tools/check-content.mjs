@@ -163,19 +163,58 @@ if (assessment) {
     }
 
     const assessmentIds = new Set();
-    for (const scale of Object.values(assessment.scales || {})) {
-        for (const list of Object.values(scale || {})) {
-            if (!Array.isArray(list)) continue;
-            for (const item of list) {
-                if (item?.id) {
-                    assessmentIds.add(String(item.id));
-                    if (gameIds.has(String(item.id))) {
-                        problems.push(`assessment 題目 id 與遊戲題庫重疊: ${item.id}`);
+    // 支援 scales（單一測驗組）與 pretest/posttest（前測／後測分離）兩種結構
+    const groups = assessment.scales
+        ? { single: assessment.scales }
+        : { pretest: assessment.pretest, posttest: assessment.posttest };
+
+    for (const [groupName, scales] of Object.entries(groups)) {
+        for (const [scaleName, scale] of Object.entries(scales || {})) {
+            for (const [locale, list] of Object.entries(scale || {})) {
+                if (!Array.isArray(list)) continue;
+                for (const item of list) {
+                    if (item?.id) {
+                        const fullId = `${groupName}:${scaleName}:${locale}:${item.id}`;
+                        assessmentIds.add(fullId);
+                        if (gameIds.has(String(item.id))) {
+                            problems.push(`assessment 題目 id 與遊戲題庫重疊: ${item.id}`);
+                        }
                     }
                 }
             }
         }
     }
+
+    // 前測與後測題面不得完全相同（否則構成練習效應）
+    if (assessment.pretest && assessment.posttest) {
+        for (const [scaleName, scale] of Object.entries(assessment.pretest)) {
+            const post = assessment.posttest[scaleName];
+            if (!post) continue;
+            for (const locale of ["zh-TW", "en-US"]) {
+                const preList = scale?.[locale] || [];
+                const postList = post?.[locale] || [];
+                if (preList.length !== postList.length) {
+                    problems.push(`assessment ${scaleName}/${locale} 前後測題數不一致`);
+                }
+                for (const pre of preList) {
+                    const match = postList.find((/** @type {any} */ p) => p.id === `${pre.id}-p`);
+                    if (!match) {
+                        problems.push(`assessment ${scaleName}/${locale} 後測缺少對應題目: ${pre.id}-p`);
+                        continue;
+                    }
+                    if (Array.isArray(pre.options) && Array.isArray(match.options)
+                        && JSON.stringify(pre.options) === JSON.stringify(match.options)) {
+                        problems.push(`assessment ${scaleName}/${locale} 前後測選項順序相同: ${pre.id}`);
+                    }
+                    if (Array.isArray(pre.sequence) && Array.isArray(match.sequence)
+                        && JSON.stringify(pre.sequence) === JSON.stringify(match.sequence)) {
+                        problems.push(`assessment ${scaleName}/${locale} 前後測序列內容相同: ${pre.id}`);
+                    }
+                }
+            }
+        }
+    }
+
     const total = assessmentIds.size;
     if (total < 60) problems.push(`assessment 題目數 ${total} < 60`);
 }
