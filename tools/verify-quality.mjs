@@ -470,6 +470,84 @@ function checkChildHudLevel() {
 }
 
 /**
+ * 9. 最終構件檢查 — 孩子路徑不得有任何評量構件。
+ */
+function checkChildNoEvalWidgetFinal() {
+    const problems = [];
+
+    // 分享卡孩子版分支不得產出雷達圖
+    const share = readSrc("src/js/ui/share-card.js");
+    if (share) {
+        const cleaned = stripComments(share);
+        const idx = cleaned.search(/view\s*===\s*["']parent["']/);
+        // 找出所有 "child" 分支區塊
+        const childBlocks = [];
+        let m;
+        const re = /view\s*===\s*["']child["']/g;
+        while ((m = re.exec(cleaned))) {
+            childBlocks.push(cleaned.slice(m.index, m.index + 700));
+        }
+        for (const b of childBlocks) {
+            if (/drawParentLearningCard|radar|Radar|AXES/.test(b)) {
+                problems.push("分享卡孩子版分支引用雷達圖／多軸圖");
+            }
+        }
+        void idx;
+    }
+
+    // 圖鑑介面不得顯示達成率類指標
+    const dexUi = readSrc("src/js/ui/dex.js");
+    if (dexUi) {
+        for (const lit of extractStringLiterals(stripComments(dexUi))) {
+            if (/正確率|達成率|掌握度|百分/.test(lit)) {
+                problems.push(`圖鑑介面含評量指標：「${lit.trim()}」`);
+            }
+        }
+    }
+
+    // HUD 不得顯示統計指標
+    const hud = readSrc("src/js/ui/hud.js");
+    if (hud) {
+        for (const lit of extractStringLiterals(stripComments(hud))) {
+            if (/正確率|本週分鐘|連續天數|掌握度|百分/.test(lit)) {
+                problems.push(`HUD 含評量指標：「${lit.trim()}」`);
+            }
+        }
+    }
+
+    // 家長端介面不得出現在孩子路徑的 HTML 容器中
+    const index = readSrc("index.html");
+    if (index && /mode-options[^>]*>\s*<[^>]*>\s*(學習報告|成效|學習成果)/.test(index)) {
+        problems.push("index.html 的孩子選單含家長端文案");
+    }
+
+    if (problems.length) {
+        return { ok: false, msg: `${problems.length} 處評量構件：${problems.slice(0, 5).join("；")}` };
+    }
+    return { ok: true, msg: "孩子路徑無評量構件（雷達圖／指標／家長文案）" };
+}
+
+/**
+ * 10. 家長端完整性 — 正式技能名與數據必須仍在。
+ */
+function checkParentViewIntact() {
+    const parent = readSrc("src/js/ui/parent-report.js");
+    const assess = readSrc("src/js/ui/assessment-ui.js");
+
+    if (!parent || !/掌握度|Skill Mastery/.test(parent)) {
+        return { ok: false, msg: "parent-report.js 缺少「掌握度／Skill Mastery」" };
+    }
+    if (!assess || !/成效|Assessment|前後測/.test(assess)) {
+        return { ok: false, msg: "assessment-ui.js 缺少「成效／Assessment／前後測」" };
+    }
+    // 家長報告應仍含數據類型圖表
+    if (!/正確率|percent|rate/.test(parent)) {
+        return { ok: false, msg: "parent-report.js 缺少數據指標" };
+    }
+    return { ok: true, msg: "家長端正式技能名與數據完整" };
+}
+
+/**
  * 8. 資訊分層：家長端只能由家長閘門觸發，孩子流程不會自動開啟。
  */
 function checkChildSingleLayer() {
@@ -531,7 +609,9 @@ const CHECKS = [
     { id: "child-share-uses-voice", phase: "child", fn: checkChildShareUsesVoice },
     { id: "child-hud-level", phase: "child", fn: checkChildHudLevel },
     { id: "child-single-layer", phase: "child", fn: checkChildSingleLayer },
-    { id: "parent-view-untouched", phase: "child", fn: checkParentViewUntouched }
+    { id: "parent-view-untouched", phase: "child", fn: checkParentViewUntouched },
+    { id: "child-no-eval-widget-final", phase: "child", fn: checkChildNoEvalWidgetFinal },
+    { id: "parent-view-intact", phase: "child", fn: checkParentViewIntact }
 ];
 
 const args = process.argv.slice(2);
