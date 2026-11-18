@@ -356,7 +356,126 @@ function checkVisualBodyTypes() {
     if (kinds.size < 12) {
         return { ok: false, msg: `體型種類僅 ${kinds.size} 種（需 ≥12）：${[...kinds].sort((a, b) => a - b).join(",")}` };
     }
-    return { ok: true, msg: `${files.length} 隻角色，${kinds.size} 種體型` };
+
+    // 強化：不得有任何兩隻角色的 path 數完全相同的比例超過 40%
+    /** @type {Map<number, number>} */
+    const freq = new Map();
+    for (const c of counts) freq.set(c.n, (freq.get(c.n) || 0) + 1);
+    let worst = 0;
+    let worstN = 0;
+    for (const [n, k] of freq) {
+        if (k > worst) {
+            worst = k;
+            worstN = n;
+        }
+    }
+    const ratio = worst / counts.length;
+    if (ratio > 0.4) {
+        return {
+            ok: false,
+            msg: `有 ${worst} 隻（${(ratio * 100).toFixed(1)}%）共用 path 數 ${worstN}，超過 40% 上限`
+        };
+    }
+    return { ok: true, msg: `${files.length} 隻角色，${kinds.size} 種體型，最大同型群組 ${worst}/${counts.length}` };
+}
+
+/**
+ * 14. 24 隻角色中至少 20 隻含漸層或多層色階。
+ */
+function checkVisualGradient() {
+    const dir = join(root, "assets/characters");
+    if (!existsSync(dir)) return { ok: false, msg: "assets/characters 不存在" };
+
+    const files = readdirSync(dir).filter((f) => /^dino-.*\.svg$/.test(f) && !/walk/.test(f));
+    if (!files.length) return { ok: false, msg: "找不到角色 SVG" };
+
+    const plain = [];
+    let withGradient = 0;
+    for (const f of files) {
+        const svg = readFileSync(join(dir, f), "utf8");
+        const hasGradient = /linearGradient|radialGradient/.test(svg);
+        // 多層色階：同一色彩出現於 ≥3 個不同 stop／色值
+        const stops = [...svg.matchAll(/stop-color="(#[0-9a-fA-F]{3,8})"/g)].map((m) => m[1]);
+        const hasTone = new Set(stops).size >= 3;
+        if (hasGradient || hasTone) withGradient++;
+        else plain.push(f);
+    }
+    if (withGradient < 20) {
+        return {
+            ok: false,
+            msg: `僅 ${withGradient} 隻含漸層／多層色階（需 ≥20）：${plain.slice(0, 4).join(", ")}`
+        };
+    }
+    return { ok: true, msg: `${withGradient}/${files.length} 隻角色含漸層或多層色階` };
+}
+
+/**
+ * 15. 每隻角色的 walk-1..4 四幀內容必須不相同。
+ */
+function checkVisualWalkDiff() {
+    const dir = join(root, "assets/characters");
+    if (!existsSync(dir)) return { ok: false, msg: "assets/characters 不存在" };
+
+    const files = readdirSync(dir).filter((f) => /^dino-.*\.svg$/.test(f) && !/walk/.test(f));
+    if (!files.length) return { ok: false, msg: "找不到角色 SVG" };
+
+    const same = [];
+    for (const f of files) {
+        const id = f.replace(/\.svg$/, "");
+        const frames = [];
+        for (let i = 1; i <= 4; i++) {
+            const p = join(dir, `${id}-walk-${i}.svg`);
+            if (!existsSync(p)) {
+                return { ok: false, msg: `${id} 缺少 walk-${i}.svg` };
+            }
+            // 去掉檔名差異後比對內容
+            frames.push(readFileSync(p, "utf8").split("\n").slice(1).join("\n"));
+        }
+        if (new Set(frames).size < 4) same.push(id);
+    }
+    if (same.length) {
+        return { ok: false, msg: `${same.length} 隻的四幀內容有重複：${same.slice(0, 4).join(", ")}` };
+    }
+    return { ok: true, msg: `${files.length} 隻的四幀步行內容皆不相同` };
+}
+
+/**
+ * 16. assets/characters/manifest.json 的每筆 file 與 walkFrames 都必須實際存在。
+ */
+function checkVisualManifestSync() {
+    const path = join(root, "assets/characters/manifest.json");
+    if (!existsSync(path)) return { ok: false, msg: "assets/characters/manifest.json 不存在" };
+
+    let manifest;
+    try {
+        manifest = JSON.parse(readFileSync(path, "utf8"));
+    } catch {
+        return { ok: false, msg: "manifest.json 無法解析" };
+    }
+    if (!Array.isArray(manifest) || !manifest.length) {
+        return { ok: false, msg: "manifest.json 不是有效陣列" };
+    }
+
+    const missing = [];
+    for (const entry of manifest) {
+        if (!entry.file || !existsSync(join(root, "assets/characters", entry.file))) {
+            missing.push(entry.id || entry.file || "(無 id)");
+        }
+        const frames = entry.walkFrames;
+        if (!Array.isArray(frames) || frames.length !== 4) {
+            missing.push(`${entry.id}(walkFrames)`);
+            continue;
+        }
+        for (const fr of frames) {
+            if (!existsSync(join(root, "assets/characters", fr))) {
+                missing.push(`${entry.id}(${fr})`);
+            }
+        }
+    }
+    if (missing.length) {
+        return { ok: false, msg: `${missing.length} 筆素材不存在：${missing.slice(0, 5).join(", ")}` };
+    }
+    return { ok: true, msg: `${manifest.length} 筆 manifest 素材全部存在` };
 }
 
 /**
@@ -816,6 +935,9 @@ const CHECKS = [
     { id: "story-letter-arc", phase: "story", fn: checkStoryLetterArc },
     { id: "story-scene-unique", phase: "story", fn: checkStorySceneUnique },
     { id: "visual-body-types", phase: "visual", fn: checkVisualBodyTypes },
+    { id: "visual-gradient", phase: "visual", fn: checkVisualGradient },
+    { id: "visual-walk-diff", phase: "visual", fn: checkVisualWalkDiff },
+    { id: "visual-manifest-sync", phase: "visual", fn: checkVisualManifestSync },
     { id: "visual-parallax", phase: "visual", fn: checkVisualParallax },
     { id: "visual-scene-diff", phase: "visual", fn: checkVisualSceneDiff },
     { id: "child-no-jargon", phase: "child", fn: checkChildNoJargon },
