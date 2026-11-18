@@ -11,6 +11,7 @@
 
 import { emit } from "./events.js";
 import { state, setState } from "./state.js";
+import { axisForVerb } from "./dex.js";
 
 /**
  * @typedef {"hint-item"|"demonstrate"|"replay"} HintStage
@@ -22,6 +23,7 @@ import { state, setState } from "./state.js";
  * @param {string} [_locale]
  */
 export function createSession(_bundle, _locale) {
+    const locale = _locale || "zh-TW";
     /** @type {any} */
     let verbEngine = null;
     /** @type {any} */
@@ -30,6 +32,11 @@ export function createSession(_bundle, _locale) {
     let hintStage = "hint-item";
     /** @type {number[]} */
     let attempts = [];
+    /**
+     * 學習樣本（供掌握度與圖鑑解鎖判定）。
+     * @type {any[]}
+     */
+    let samples = [];
     /** @type {number} */
     let hintCount = 0;
     /** @type {number} */
@@ -42,6 +49,8 @@ export function createSession(_bundle, _locale) {
     let finishCb = null;
     /** @type {number} */
     let startedAt = 0;
+    /** @type {number} */
+    let roundStartedAt = 0;
 
     return {
         /**
@@ -54,9 +63,11 @@ export function createSession(_bundle, _locale) {
             totalRounds = currentLevel.spec?.rounds ?? 3;
             roundIndex = 0;
             attempts = [];
+            samples = [];
             hintCount = 0;
             hintStage = "hint-item";
             startedAt = Date.now();
+            roundStartedAt = Date.now();
 
             setState({
                 level: levelId,
@@ -81,6 +92,7 @@ export function createSession(_bundle, _locale) {
                 return;
             }
             hintStage = "hint-item";
+            roundStartedAt = Date.now();
             verbEngine = currentLevel.engineFactory();
             verbEngine.build();
 
@@ -114,6 +126,16 @@ export function createSession(_bundle, _locale) {
                 ? { correct: true }
                 : verbEngine.check(itemId);
             attempts.push(result.correct);
+
+            // 學習樣本：供掌握度模型與圖鑑解鎖條件（locale／noHint）判定使用
+            samples.push({
+                axis: axisForVerb(currentLevel.verb),
+                verb: currentLevel.verb,
+                correct: result.correct ? 1 : 0,
+                locale,
+                hinted: hintCount > 0 ? 1 : 0,
+                ms: Date.now() - roundStartedAt
+            });
 
             if (result.correct) {
                 setState({ score: state.score + 1, combo: state.combo + 1 });
@@ -178,7 +200,8 @@ export function createSession(_bundle, _locale) {
                 correct,
                 total,
                 hintsUsed: hintCount,
-                ms: Date.now() - startedAt
+                ms: Date.now() - startedAt,
+                samples: samples
             };
             setState({ phase: "levelup", locked: true });
             emit({ type: "level:complete", payload: { levelId: state.level, ...result } });

@@ -8,6 +8,14 @@
 >
 > **素材策略：混合** — 能程序化生成的就生成（沿用既有 Web Audio 手法，全自動、無授權風險）；需要真實錄音／樂器的部分由素材方提供，本清單先把介面與接線做對。
 >
+> **狀態（2026-11-19）：v8 三支柱 Step 81–108 全部完成。** 靜態可驗證項目全部通過
+> （`npm run check` exit 0、`node tools/verify-quality.mjs` 29/29、`node tools/verify-phaseO.mjs --phase 1` 7/7）。
+> **但以下實測項目仍未達成，必須在公測期補齊，不得宣稱已達成：**
+> D7 留存 ≥ 12%、下載轉付費 ≥ 2.5%、≥ 55 FPS、−16 LUFS ±1、分享率 8–12%、K-factor ≥ 0.5、
+> 最小對辨識成效顯著改善（n ≥ 30）、盲測 5/5、音樂真人聆聽評分、兒童理解度（4–8 歲）、
+> 兒童試玩滿意度、家長評價、聆聽疲勞度、美術主觀水準評分。
+> 詳細對照見 `docs/acceptance-9.md`「三支柱製作水準驗收」與 `docs/beta-launch.md`。
+>
 > **執行對象**：低階模型。本清單每一步都必須可獨立執行、可獨立驗證、不可跳步。
 > **前置條件**：必須先讀完「執行守則」與「全域約束」。
 
@@ -1239,62 +1247,106 @@
 
 ## v8 完成紀錄
 
-> Step 81–98：待執行。
+> Step 81–108：全部完成（2026-11-19）。
+> 三支柱（音樂／劇本／畫面）與兒童語言層的**靜態可驗證**項目全部達成；
+> 主觀與實測項目仍為「待實測」，詳見 `docs/acceptance-9.md`「三支柱製作水準驗收」。
 
 ### Phase P — 守門與準備
 
 | Step | 內容 | 驗證指令 | Commit | 狀態 |
 | --- | --- | --- | --- | --- |
-| 81 | 三支柱品質守門工具 | `node tools/verify-quality.mjs` | — | ⬜ |
-| 82 | 場景設定資料檔 | `node tools/verify-quality.mjs --phase scenes` | — | ⬜ |
+| 81 | 三支柱品質守門工具 | `node tools/verify-quality.mjs` | `0cbfe00` | ✅ |
+| 82 | 場景設定資料檔 | `node tools/verify-quality.mjs --phase scenes` | `198d4a8` | ✅ |
 
 ### Phase Q — 音樂支柱
 
 | Step | 內容 | 驗證指令 | Commit | 狀態 |
 | --- | --- | --- | --- | --- |
-| 83 | 程序化場景音樂生成器 | `node --check src/js/audio/scene-music.js` | — | ⬜ |
-| 84 | 音樂引擎支援程序化播放 | `npm run typecheck` | — | ⬜ |
-| 85 | 接通背景音自動播放與換曲 | `node tools/verify-quality.mjs --phase music` | — | ⬜ |
-| 86 | 視差五層視覺定義 | `node tools/verify-quality.mjs --phase visual` | — | ⬜ |
-| 87 | 清理重複音檔 | `node tools/verify-quality.mjs --phase music` | — | ⬜ |
-| 88 | 音樂支柱回歸驗證 | `node tools/verify-quality.mjs --phase music` | — | ⬜ |
+| 83 | 程序化場景音樂生成器 | `node --check src/js/audio/scene-music.js` | `568eb81` | ✅ |
+| 84 | 音樂引擎支援程序化播放 | `npm run typecheck` | `f4e0205` | ✅ |
+| 85 | 接通背景音自動播放與換曲 | `node tools/verify-quality.mjs --phase music` | `ef17ccd` | ✅ |
+| 86 | 視差五層視覺定義 | `node tools/verify-quality.mjs --phase visual` | `fb6f2ff` | ✅ |
+| 87 | 清理重複音檔 | `node tools/verify-quality.mjs --phase music` | `4871882` | ✅ |
+| 88 | 音樂支柱回歸驗證 | `node tools/verify-quality.mjs --phase music` | `9ab532a` | ✅ |
 
 ### Phase R — 劇本支柱
 
 | Step | 內容 | 驗證指令 | Commit | 狀態 |
 | --- | --- | --- | --- | --- |
-| 89 | 24 隻恐龍專屬對白 | `node tools/verify-quality.mjs --phase story` | — | ⬜ |
-| 90 | 擴寫六章章節信件 | `node tools/verify-quality.mjs --phase story` | — | ⬜ |
-| 91 | 補足情境台詞至 120 句 | `node -e "…"` | — | ⬜ |
-| 92 | 劇本支柱回歸驗證 | `node tools/verify-quality.mjs --phase story` | — | ⬜ |
+| 89 | 24 隻恐龍專屬對白 | `node tools/verify-quality.mjs --phase story` | `09787a9` | ✅ |
+| 90 | 擴寫六章章節信件 | `node tools/verify-quality.mjs --phase story` | `a97644d` | ✅ |
+| 91 | 補足情境台詞至 120 句 | `node -e "…"` | `f04d0a5` | ✅ |
+| 92 | 劇本支柱回歸驗證 | `node tools/verify-quality.mjs --phase story` | `be5c773` | ✅ |
 
 ### Phase S — 畫面支柱
 
 | Step | 內容 | 驗證指令 | Commit | 狀態 |
 | --- | --- | --- | --- | --- |
-| 93 | 角色體型多樣化至 12+ 種 | `node tools/verify-quality.mjs --phase visual` | — | ⬜ |
-| 94 | 角色接地感與情緒回饋 | `npm run typecheck` | — | ⬜ |
-| 95 | 畫面支柱回歸驗證 | `node tools/verify-quality.mjs --phase visual` | — | ⬜ |
+| 93 | 角色體型多樣化至 12+ 種 | `node tools/verify-quality.mjs --phase visual` | `32ed845` | ✅ |
+| 94 | 角色接地感與情緒回饋 | `npm run typecheck` | `fe6b22b` | ✅ |
+| 95 | 畫面支柱回歸驗證 | `node tools/verify-quality.mjs --phase visual` | `54192a8` | ✅ |
 
 ### Phase U — 兒童語言層
 
 | Step | 內容 | 驗證指令 | Commit | 狀態 |
 | --- | --- | --- | --- | --- |
-| 96 | 建立雙層文案資料檔 | `node -e "…"` | — | ⬜ |
-| 97 | 建立兒童語言守門檢查（6 條） | `node tools/verify-quality.mjs --phase child` | — | ⬜ |
-| 98 | 圖鑑解鎖條件改為兒童語言 | `node tools/verify-quality.mjs --phase child` | — | ⬜ |
-| 99 | 圖鑑介面改為收集語言 | `node tools/verify-quality.mjs --phase child` | — | ⬜ |
-| 100 | 分享卡改為兒童語言（無雷達圖） | `node tools/verify-quality.mjs --phase child` | — | ⬜ |
-| 101 | HUD 與介面語言統一 | `node tools/verify-quality.mjs --phase child` | — | ⬜ |
-| 102 | 兒童語言層回歸驗證 | `node tools/verify-quality.mjs --phase child` | — | ⬜ |
+| 96 | 建立雙層文案資料檔 | `node -e "…"` | `64ec7b4` | ✅ |
+| 97 | 建立兒童語言守門檢查（6 條） | `node tools/verify-quality.mjs --phase child` | `555b05a` | ✅ |
+| 98 | 圖鑑解鎖條件改為兒童語言 | `node tools/verify-quality.mjs --phase child` | `d199665` | ✅ |
+| 99 | 圖鑑介面改為收集語言 | `node tools/verify-quality.mjs --phase child` | `5cd4e19` | ✅ |
+| 100 | 分享卡改為兒童語言（無雷達圖） | `node tools/verify-quality.mjs --phase child` | `50c46d6` | ✅ |
+| 101 | HUD 與介面語言統一 | `node tools/verify-quality.mjs --phase child` | `b6e7929` | ✅ |
+| 102 | 兒童語言層回歸驗證 | `node tools/verify-quality.mjs --phase child` | `e4bef8c` | ✅ |
 
 ### Phase T — 整合與交付
 
 | Step | 內容 | 驗證指令 | Commit | 狀態 |
 | --- | --- | --- | --- | --- |
-| 106 | 三支柱與兒童語言整合 | `node tools/verify-quality.mjs` | — | ⬜ |
-| 107 | 更新驗收與公測文件 | `npm run check` | — | ⬜ |
-| 108 | 終局守門與交付 | `npm run check` | — | ⬜ |
+| 106 | 三支柱與兒童語言整合 | `node tools/verify-quality.mjs` | `e8d5532` | ✅ |
+| 107 | 更新驗收與公測文件 | `npm run check` | `b133e1b` | ✅ |
+| 108 | 終局守門與交付 | `npm run check` | （本 Step） | ✅ |
+
+### 終局守門結果（2026-11-19）
+
+| 指令 | 結果 |
+| --- | --- |
+| `npm run check` | exit 0（lint／check-content／check-assets／sweep 全通過） |
+| `node tools/verify-quality.mjs` | exit 0（29/29 通過） |
+| `node tools/verify-phaseO.mjs --phase 1` | exit 0（7/7 通過） |
+
+> 註：`verify-phaseO.mjs` 的 phase 2（Service Worker 預快取、telemetry 外送、IAP 金流）
+> 屬商業管道範圍，v8 不涵蓋，維持未通過狀態（見 `docs/beta-launch.md` 產品／商業面）。
+
+### 現況診斷修復狀態
+
+| 診斷 | 問題 | 修復狀態 | 修復 Step | 修復 Commit |
+| --- | --- | --- | --- | --- |
+| **A1** | 背景音未接線（`playMusic()` 從未被呼叫，音樂按鈕硬編碼音檔） | ✅ 已修復 | Step 85 | `ef17ccd` |
+| **A2** | 場景切換不換歌不換景（`startLevel()` 無 `playMusic`／`applyTheme`） | ✅ 已修復 | Step 85、Step 106 | `ef17ccd`、`e8d5532` |
+| **A3** | 五個章節主題只有 2 個音檔 | ✅ 已修復（程序化獨立主題曲，9 個場景定義涵蓋 6 個遊戲場景） | Step 83、Step 92 | `568eb81`、`be5c773` |
+| **A4** | 4 份大小寫重複音檔，白佔 1.1 MB | ✅ 已修復 | Step 87 | `4871882` |
+| **B1** | 24 隻恐龍共用 7 句對白 | ✅ 已修復（24 隻各 ≥3 句、共 72 句，無 3 隻共用） | Step 89 | `09787a9` |
+| **B2** | 章節信件過短（55–65 字） | ✅ 已修復（六章各 263–330 字） | Step 90 | `a97644d` |
+| **B3** | 第 3、4 章共用場景 `ice-age` | ✅ 已修復（新增 `ice-age-christmas` 場景／音樂／關卡） | Step 92 | `be5c773` |
+| **B4** | 情境台詞僅 88 句 | ✅ 已修復（雙語各 120 句且對稱） | Step 91 | `f04d0a5` |
+| **C1** | 24 隻恐龍只有 5 種體型 | ✅ 已修復（20 種體型定義、19 種 path 數、最大同型群組 2/24） | Step 93 | `32ed845` |
+| **C2** | 角色無接地感（無漸層、無陰影） | ✅ 已修復（漸層 + 接地陰影 + 情緒動效） | Step 94 | `fe6b22b` |
+| **C3** | 視差三層空白 | ✅ 已修復（五層視差皆有 CSS 定義與場景色票注入） | Step 86 | `fb6f2ff` |
+| **D1–D4** | 兒童介面外露認知心理學術語與評量構件 | ✅ 已修復（孩子層零禁用術語、分享卡無雷達圖、HUD 統一） | Step 96–102 | `64ec7b4`～`e4bef8c` |
+| 附帶修正 | 序章信以 `[locale]` 取字串值導致 undefined；`session` 未產出學習樣本；圖鑑解鎖未評估 `locale`／`noHint` | ✅ 已修復（`verify-phaseO --phase 1` 由 4/7 提升為 7/7） | Step 108 | （本 Step） |
+
+### 三支柱完成後評分現況（僅靜態可驗證部分）
+
+| 支柱 | v8 目標 | 靜態驗證現況 | 仍待實測 |
+| --- | --- | --- | --- |
+| **音樂** | 每場景獨立主題曲、程序化生成、交叉淡入淡出 | ✅ 9 個場景音樂定義涵蓋 6 個遊戲場景、(root, tempo) 互不相同、9 個皆渲染出非靜音緩衝區、淡入 1.2s／淡出 700ms | 真人聆聽評分（悅耳度）、聆聽疲勞度 |
+| **劇本** | 24 隻專屬對白、信件 150+ 字、台詞 120 句 | ✅ 24 隻各 ≥3 句共 72 句、六章信件 263–330 字且長度互異、雙語台詞各 120 句對稱、6 類個性組別內對白互異 | 兒童理解度（4–8 歲） |
+| **畫面** | 12+ 體型、漸層與接地陰影、五層視差、場景色差 | ✅ 19 種體型（最大同型群組 2/24）、24/24 含漸層、24 隻四幀步行皆相異、五層視差齊備、6 場景 sky 色互不相同 | 美術主觀水準評分 |
+| **兒童語言層** | 孩子介面零評量術語與評量構件 | ✅ 12 條 child 守門全通過（含反向檢查：家長端術語仍在） | 兒童試玩滿意度、家長評價 |
+| **整合** | 三支柱於同一場景同時生效 | ✅ `startLevel()` 內同時呼叫 `playSceneMusic()` 與 `applyTheme()`（`integration-scene-switch`） | 場景轉場觀感（主觀） |
+
+> **上述評分只涵蓋靜態可驗證部分。** 留存率、轉付費、FPS、LUFS、盲測、兒童滿意度等
+> 實測指標**仍未達成**，一律標示「待實測」，詳見 `docs/acceptance-9.md` 與 `docs/beta-launch.md`。
 
 ---
 

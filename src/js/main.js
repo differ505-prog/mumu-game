@@ -217,7 +217,10 @@ async function startGame() {
     setParallax($("scene"), 0);
     $("start-overlay").classList.add("hidden");
 
-    const letter = bundle.narrative.letters.prologue?.[locale] || "";
+    const prologueRaw = bundle.narrative?.letters?.prologue;
+    const letter = typeof prologueRaw === "string"
+        ? prologueRaw
+        : (prologueRaw?.[locale] || "");
     const char = getCharacter(bundle, selectedCharacter);
     setVoiceProfile(locale, char.voice);
     renderCharacter($("santa-container"), char, "idle");
@@ -433,7 +436,8 @@ function onLevelFinish(r) {
         recordLearningSample(progress, {
             verb: sample.verb || "minimal-pair",
             correct: Boolean(sample.correct),
-            locale
+            locale: sample.locale || locale,
+            hinted: Boolean(sample.hinted)
         });
     }
 

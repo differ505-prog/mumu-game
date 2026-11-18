@@ -45,7 +45,7 @@ const AXIS_FIELD = {
 /**
  * 從學習樣本累積各技能軸統計。
  * @param {any} progress
- * @param {{ verb:string, correct:boolean, locale:string }} sample
+ * @param {{ verb:string, correct:boolean, locale:string, hinted?:boolean }} sample
  */
 export function recordLearningSample(progress, sample) {
     if (!progress.learningSamples) progress.learningSamples = [];
@@ -55,7 +55,8 @@ export function recordLearningSample(progress, sample) {
         axis,
         verb: sample.verb,
         correct: sample.correct ? 1 : 0,
-        locale: sample.locale
+        locale: sample.locale,
+        hinted: sample.hinted ? 1 : 0
     });
 
     // 限制樣本長度，避免存檔無限膨脹（保留最近 500 筆）
@@ -69,16 +70,31 @@ export function recordLearningSample(progress, sample) {
  * 取得某技能軸的統計。
  * @param {any} progress
  * @param {string} axis
+ * @param {{ locale?:string, noHint?:boolean }} [filter] 解鎖條件額外篩選
  * @returns {{ correct:number, total:number, rate:number }}
  */
-export function axisStats(progress, axis) {
-    const samples = (progress.learningSamples || []).filter((/** @type {any} */ s) => s.axis === axis);
+export function axisStats(progress, axis, filter) {
+    const samples = (progress.learningSamples || []).filter((/** @type {any} */ s) => {
+        if (s.axis !== axis) return false;
+        if (filter?.locale && s.locale && s.locale !== filter.locale) return false;
+        if (filter?.noHint === true && s.hinted) return false;
+        return true;
+    });
     const correct = samples.filter((/** @type {any} */ s) => s.correct).length;
     return {
         correct,
         total: samples.length,
         rate: samples.length ? correct / samples.length : 0
     };
+}
+
+/**
+ * 依玩法取得技能軸名稱。
+ * @param {string} verb
+ * @returns {string}
+ */
+export function axisForVerb(verb) {
+    return AXIS_FIELD[verb] || "otherCorrect";
 }
 
 /**
@@ -123,6 +139,10 @@ export function dexUnlockProgress(bundle, progress, dinoId) {
 function evaluateCondition(cond, progress) {
     if (!cond || !cond.type) return 1;
 
+    // 解鎖條件可帶語系限定（cond.locale）與「不得使用提示」（cond.noHint），
+    // 兩者都必須在判定時真正被評估，否則條件形同虛設。
+    const filter = { locale: cond.locale, noHint: cond.noHint === true };
+
     switch (cond.type) {
         case "always":
             return 1;
@@ -131,28 +151,28 @@ function evaluateCondition(cond, progress) {
             return clamp01((progress.unlockedLevels?.length || 0) / Math.max(1, cond.chapter || 1));
 
         case "minimal-pair":
-            return ratio(axisStats(progress, "minimalPairCorrect").correct, cond.count || 1);
+            return ratio(axisStats(progress, "minimalPairCorrect", filter).correct, cond.count || 1);
 
         case "sequence":
-            return ratio(axisStats(progress, "sequenceCorrect").correct, cond.count || 1);
+            return ratio(axisStats(progress, "sequenceCorrect", filter).correct, cond.count || 1);
 
         case "rhythm":
-            return ratio(axisStats(progress, "rhythmCorrect").correct, cond.count || 1);
+            return ratio(axisStats(progress, "rhythmCorrect", filter).correct, cond.count || 1);
 
         case "interference":
-            return ratio(axisStats(progress, "interferenceCorrect").correct, cond.count || 1);
+            return ratio(axisStats(progress, "interferenceCorrect", filter).correct, cond.count || 1);
 
         case "pitch":
-            return ratio(axisStats(progress, "pitchCorrect").correct, cond.count || 1);
+            return ratio(axisStats(progress, "pitchCorrect", filter).correct, cond.count || 1);
 
         case "puzzle":
-            return ratio(axisStats(progress, "puzzleCorrect").correct, cond.count || 1);
+            return ratio(axisStats(progress, "puzzleCorrect", filter).correct, cond.count || 1);
 
         case "memory":
-            return ratio(axisStats(progress, "memoryCorrect").correct, cond.count || 1);
+            return ratio(axisStats(progress, "memoryCorrect", filter).correct, cond.count || 1);
 
         case "accuracy": {
-            const stats = axisStats(progress, cond.axis || "minimalPairCorrect");
+            const stats = axisStats(progress, cond.axis || "minimalPairCorrect", filter);
             if (!stats.total) return 0;
             return clamp01(stats.rate / (cond.rate || 0.8));
         }
