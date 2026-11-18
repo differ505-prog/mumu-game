@@ -24,6 +24,7 @@ const THEMES = {
     valley: { sky: "#0f2d3f", glow: "#7fd4c1", fog: "#16414f" },
     forest: { sky: "#12301f", glow: "#8fd694", fog: "#1c4430" },
     "ice-age": { sky: "#16243d", glow: "#bfe8ff", fog: "#243c5e" },
+    "ice-age-christmas": { sky: "#2c1f45", glow: "#ffd98a", fog: "#4a3767" },
     north: { sky: "#0b1830", glow: "#9fd0ff", fog: "#172a4d" }
 };
 

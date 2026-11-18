@@ -53,7 +53,7 @@
       "chapter": 4,
       "title": { "zh-TW": "第四章：冰河紀的聖誕", "en-US": "Chapter 4: A Christmas in the Ice Age" },
       "mood": "home",
-      "scene": "ice-age",
+      "scene": "ice-age-christmas",
       "verbs": ["puzzle", "memory"],
       "unlockDex": [28, 29, 30, 31, 32, 33, 34, 35],
       "letter": {

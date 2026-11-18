@@ -174,7 +174,72 @@ function checkStoryDinoLines() {
     if (shared.length) {
         return { ok: false, msg: `${shared.length} 句被 3 隻以上共用：${shared[0][0]}` };
     }
+    if (all.length < 72) {
+        return { ok: false, msg: `對白總數僅 ${all.length} 句（需 ≥72）` };
+    }
     return { ok: true, msg: `${ids.length} 隻各 ≥3 句、共 ${all.length} 句，無 3 隻共用` };
+}
+
+/**
+ * 5b. 不同「個性類型」的恐龍，其對白不得相同。
+ *
+ * 個性感取自 content/characters.json 的 personality 描述所屬的語意類別：
+ * 守護型／衝勁型／溫柔型／天空型／水域型／節奏型／好奇型。
+ * 同類別的恐龍可以風格相近，但**對白集合不得完全相同**。
+ */
+const PERSONALITY_GROUPS = {
+    guard: ["dino-triceratops", "dino-ankylosaurus", "dino-stegosaurus", "dino-maiasaura", "dino-oviraptor"],
+    rush: ["dino-trex", "dino-velociraptor", "dino-allosaurus", "dino-tyrannosaurus", "dino-giganotosaurus", "dino-ceratosaurus"],
+    gentle: ["dino-brachiosaurus", "dino-diplodocus", "dino-trachodon", "dino-eoraptor"],
+    sky: ["dino-pteranodon", "dino-dilophosaurus", "dino-compysognathus"],
+    water: ["dino-spinosaurus", "dino-mosasaurus"],
+    rhythm: ["dino-iguanodon", "dino-parasaurolophus", "dino-carnotaurus", "dino-tyrannosaurus-scout"]
+};
+
+/**
+ * 11. 不同個性類型的恐龍對白不得相同。
+ */
+function checkStoryDinoPersonality() {
+    const narrative = readJson("content/narrative.zh-TW.json");
+    if (!narrative) return { ok: false, msg: "無法讀取 narrative.zh-TW.json" };
+
+    const lines = narrative.dinoLines || {};
+
+    // 收集每隻恐龍的對白集合
+    /** @type {Map<string, string[]>} */
+    const sets = new Map();
+    for (const [id, v] of Object.entries(lines)) {
+        const arr = Array.isArray(v) ? v : [v];
+        sets.set(
+            id,
+            arr.map((line) => (typeof line === "string" ? line : line?.["zh-TW"] || "")).filter(Boolean)
+        );
+    }
+
+    // 同類別內：任兩隻的對白集合不得完全相同
+    const clashes = [];
+    for (const [group, members] of Object.entries(PERSONALITY_GROUPS)) {
+        for (let i = 0; i < members.length; i++) {
+            for (let j = i + 1; j < members.length; j++) {
+                const a = sets.get(members[i]);
+                const b = sets.get(members[j]);
+                if (!a || !b) continue;
+                const ka = [...a].sort().join("|");
+                const kb = [...b].sort().join("|");
+                if (ka === kb) clashes.push(`${group}: ${members[i]} ≡ ${members[j]}`);
+            }
+        }
+    }
+    if (clashes.length) {
+        return { ok: false, msg: `${clashes.length} 組同類型恐龍對白完全相同：${clashes[0]}` };
+    }
+
+    // 跨類別：所有對白不得完全落入同一組（防止整份檔案被複製貼上）
+    const allSets = [...sets.values()].map((s) => [...s].sort().join("|"));
+    if (new Set(allSets).size !== allSets.length) {
+        return { ok: false, msg: "有恐龍對白集合與其他恐龍完全相同" };
+    }
+    return { ok: true, msg: `${Object.keys(PERSONALITY_GROUPS).length} 類個性組別內對白皆互異` };
 }
 
 /**
@@ -214,6 +279,63 @@ function checkStoryLinesCount() {
     if (cz < 120) return { ok: false, msg: `台詞僅 ${cz} 句（需 ≥120）` };
     if (cz !== ce) return { ok: false, msg: `雙語句數不對稱：zh ${cz} / en ${ce}` };
     return { ok: true, msg: `雙語台詞各 ${cz} 句且對稱` };
+}
+
+/**
+ * 12. 六章信件長度必須互不相同（避免內容複製貼上）。
+ */
+function checkStoryLetterArc() {
+    const arcs = readJson("content/story-arcs.json");
+    if (!arcs) return { ok: false, msg: "無法讀取 story-arcs.json" };
+
+    const chapters = arcs.chapters || [];
+    const lengths = chapters.map((c) => (c.letter?.["zh-TW"] || "").length);
+    const uniq = new Set(lengths);
+    if (uniq.size !== lengths.length) {
+        const dupLen = [...uniq].find((n) => lengths.filter((x) => x === n).length > 1);
+        return { ok: false, msg: `信件長度有重複（${dupLen} 字），內容疑似複製貼上` };
+    }
+    return { ok: true, msg: `${lengths.length} 章信件長度互不相同（${lengths.join("/")}）` };
+}
+
+/**
+ * 13. 任兩章不得共用同一個 scene（診斷 B3）。
+ *
+ * 若確實共用，必須為該章新增獨立場景，並在 scenes.json 與 music.json 補上設定。
+ */
+function checkStorySceneUnique() {
+    const arcs = readJson("content/story-arcs.json");
+    if (!arcs) return { ok: false, msg: "無法讀取 story-arcs.json" };
+
+    const chapters = arcs.chapters || [];
+    /** @type {Map<string, number[]>} */
+    const byScene = new Map();
+    for (const c of chapters) {
+        const s = c.scene;
+        if (!s) continue;
+        if (!byScene.has(s)) byScene.set(s, []);
+        byScene.get(s)?.push(c.chapter);
+    }
+    const shared = [...byScene.entries()].filter(([, list]) => list.length > 1);
+    if (shared.length) {
+        const [scene, list] = shared[0];
+        return { ok: false, msg: `第 ${list.join("、")} 章共用場景「${scene}」，須拆為獨立場景` };
+    }
+
+    // 拆分後：每個章節場景都必須在 scenes.json 與 music.json 有對應設定
+    const scenes = readJson("content/scenes.json");
+    const music = readJson("content/music.json");
+    if (!scenes || !music) return { ok: false, msg: "無法讀取 scenes.json 或 music.json" };
+
+    const missing = [];
+    for (const c of chapters) {
+        if (!scenes[c.scene]) missing.push(`scenes.json 缺 ${c.scene}`);
+        if (!music.chapters?.[c.scene]) missing.push(`music.json 缺 ${c.scene}`);
+    }
+    if (missing.length) {
+        return { ok: false, msg: missing.slice(0, 4).join("；") };
+    }
+    return { ok: true, msg: `${chapters.length} 章各有獨立場景且設定齊備` };
 }
 
 /**
@@ -329,7 +451,7 @@ function checkMusicRenderable() {
             for (let i = 0; i < L.length; i++) { const a = Math.abs(L[i]); if (a > peak) peak = a; }
             results.push([k, peak]);
         }
-        console.log(JSON.stringify(results));
+        process.stdout.write(JSON.stringify(results));
     `;
     // 同步執行：改用 child_process
     const { execFileSync } = require("node:child_process");
@@ -690,6 +812,9 @@ const CHECKS = [
     { id: "story-dino-lines", phase: "story", fn: checkStoryDinoLines },
     { id: "story-letter-length", phase: "story", fn: checkStoryLetterLength },
     { id: "story-lines-count", phase: "story", fn: checkStoryLinesCount },
+    { id: "story-dino-personality", phase: "story", fn: checkStoryDinoPersonality },
+    { id: "story-letter-arc", phase: "story", fn: checkStoryLetterArc },
+    { id: "story-scene-unique", phase: "story", fn: checkStorySceneUnique },
     { id: "visual-body-types", phase: "visual", fn: checkVisualBodyTypes },
     { id: "visual-parallax", phase: "visual", fn: checkVisualParallax },
     { id: "visual-scene-diff", phase: "visual", fn: checkVisualSceneDiff },

@@ -59,6 +59,21 @@
     },
     "weather": "snow"
   },
+  "ice-age-christmas": {
+    "id": "ice-age-christmas",
+    "title": { "zh-TW": "冰原聖誕夜", "en-US": "Christmas on the Ice" },
+    "music": { "scene": "ice-age-christmas", "gainDb": -16, "tempo": 72 },
+    "ambience": { "kind": "snow", "gainDb": -25 },
+    "palette": {
+      "sky": "#2c1f45",
+      "glow": "#ffd98a",
+      "fog": "#e7d9f2",
+      "ridge": "#4a3767",
+      "midground": "#6a5089",
+      "foreground": "#180f2b"
+    },
+    "weather": "snow"
+  },
   "north": {
     "id": "north",
     "title": { "zh-TW": "北方之夜", "en-US": "Northern Night" },

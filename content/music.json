@@ -73,6 +73,16 @@
       "gainDb": -18,
       "theme": "ice-age"
     },
+    "ice-age-christmas": {
+      "id": "chapter.theme.ice-age-christmas",
+      "scene": "ice-age-christmas",
+      "file": "./assets/audio/外部資源__jingle-bells.m4a",
+      "loopStart": 0,
+      "loopEnd": 30,
+      "durationSec": 30,
+      "gainDb": -16,
+      "theme": "ice-age-christmas"
+    },
     "north": {
       "id": "chapter.theme.north",
       "scene": "north",
