@@ -9,7 +9,7 @@
 > **素材策略：混合** — 能程序化生成的就生成（沿用既有 Web Audio 手法，全自動、無授權風險）；需要真實錄音／樂器的部分由素材方提供，本清單先把介面與接線做對。
 >
 > **狀態（2026-11-19）：v8 三支柱 Step 81–108 全部完成。** 靜態可驗證項目全部通過
-> （`npm run check` exit 0、`node tools/verify-quality.mjs` 29/29、`node tools/verify-phaseO.mjs --phase 1` 7/7）。
+> （`npm run check` exit 0、`node tools/verify-quality.mjs` 34/34、`node tools/verify-phaseO.mjs --phase 1` 7/7）。
 > **但以下實測項目仍未達成，必須在公測期補齊，不得宣稱已達成：**
 > D7 留存 ≥ 12%、下載轉付費 ≥ 2.5%、≥ 55 FPS、−16 LUFS ±1、分享率 8–12%、K-factor ≥ 0.5、
 > 最小對辨識成效顯著改善（n ≥ 30）、盲測 5/5、音樂真人聆聽評分、兒童理解度（4–8 歲）、
@@ -1311,11 +1311,25 @@
 | 指令 | 結果 |
 | --- | --- |
 | `npm run check` | exit 0（lint／check-content／check-assets／sweep 全通過） |
-| `node tools/verify-quality.mjs` | exit 0（29/29 通過） |
+| `node tools/verify-quality.mjs` | exit 0（**34/34** 通過） |
 | `node tools/verify-phaseO.mjs --phase 1` | exit 0（7/7 通過） |
 
 > 註：`verify-phaseO.mjs` 的 phase 2（Service Worker 預快取、telemetry 外送、IAP 金流）
 > 屬商業管道範圍，v8 不涵蓋，維持未通過狀態（見 `docs/beta-launch.md` 產品／商業面）。
+
+### 終局補齊項目（2026-11-19 第二輪）
+
+以下項目在 Step 81–108 實作後複查時發現「規格已寫、程式未落地」，已於終局前補齊：
+
+| 項目 | 規格來源 | 補齊內容 | 驗證 |
+| --- | --- | --- | --- |
+| `music-scenes-defined` 守門 | Step 88 預期變更 3、附錄 C | 新增 `checkMusicScenesDefined`：斷言 `content/scenes.json` 每個場景的 `music.scene` 都在 `SCENE_MUSIC` 中有對應鍵 | `node tools/verify-quality.mjs --phase music`（7/7） |
+| `--phase scenes` 空跑 | Step 82 驗證指令 | 原先 `--phase scenes` 為 0/0 空跑；新增 4 條場景專屬檢查（涵蓋 levels、palette 合法 hex、無 emoji、章節場景連續性） | `node tools/verify-quality.mjs --phase scenes`（4/4） |
+| `applySceneAudio` / `applySceneVisual` | Step 85 預期變更 4、Step 106 預期變更 1 | `src/js/main.js` 落地兩個具名函式；`startLevel()` 改為呼叫兩者 | `integration-scene-switch` |
+| `themeForChapter` 場景錯位 | Step 92（B3 修復）、Step 106 場景連續性 | 原對應表為 `christmas/christmas/valley/forest/ice-age/north`，與六章實際場景不符；改為 `christmas/valley/forest/ice-age/ice-age-christmas/north` | `scenes-chapter-continuity` |
+
+> 守門總數由 29 條提升為 **34 條**，全部 PASS。
+
 
 ### 現況診斷修復狀態
 
@@ -1343,7 +1357,7 @@
 | **劇本** | 24 隻專屬對白、信件 150+ 字、台詞 120 句 | ✅ 24 隻各 ≥3 句共 72 句、六章信件 263–330 字且長度互異、雙語台詞各 120 句對稱、6 類個性組別內對白互異 | 兒童理解度（4–8 歲） |
 | **畫面** | 12+ 體型、漸層與接地陰影、五層視差、場景色差 | ✅ 19 種體型（最大同型群組 2/24）、24/24 含漸層、24 隻四幀步行皆相異、五層視差齊備、6 場景 sky 色互不相同 | 美術主觀水準評分 |
 | **兒童語言層** | 孩子介面零評量術語與評量構件 | ✅ 12 條 child 守門全通過（含反向檢查：家長端術語仍在） | 兒童試玩滿意度、家長評價 |
-| **整合** | 三支柱於同一場景同時生效 | ✅ `startLevel()` 內同時呼叫 `playSceneMusic()` 與 `applyTheme()`（`integration-scene-switch`） | 場景轉場觀感（主觀） |
+| **整合** | 三支柱於同一場景同時生效 | ✅ `startLevel()` → `applySceneAudio()` / `applySceneVisual()` → `playSceneMusic()` / `applyTheme()` 完整串接（`integration-scene-switch`） | 場景轉場觀感（主觀） |
 
 > **上述評分只涵蓋靜態可驗證部分。** 留存率、轉付費、FPS、LUFS、盲測、兒童滿意度等
 > 實測指標**仍未達成**，一律標示「待實測」，詳見 `docs/acceptance-9.md` 與 `docs/beta-launch.md`。
@@ -1421,6 +1435,11 @@ cp docs/refs/child-voice.reference.json content/child-voice.json
 | 音樂 | `music-scenes-match` | `music.json` 涵蓋 `levels.json` 全部 scene |
 | 音樂 | `music-scenes-defined` | 每個場景在 `SCENE_MUSIC` 有對應 |
 | 音樂 | `audio-dupes` | 無正規化後重複音檔 |
+| 場景 | `scenes-cover-levels` | `scenes.json` 涵蓋 `levels.json` 全部 scene |
+| 場景 | `scenes-palette-valid` | 每個場景 palette 完整且為合法 6 位 hex |
+| 場景 | `scenes-no-emoji` | 場景設定不含 emoji |
+| 場景 | `scenes-chapter-continuity` | 每章 arcs 場景與該章關卡場景一致 |
+| 整合 | `integration-scene-switch` | `startLevel` → `applySceneAudio`/`applySceneVisual` → `playSceneMusic`/`applyTheme` 完整串接 |
 | 劇本 | `story-dino-lines` | 每隻 ≥3 句、無 3 隻共用同句 |
 | 劇本 | `story-letter-length` | 每章信件 ≥150 字 |
 | 劇本 | `story-lines-count` | 台詞 ≥120 句、雙語對稱 |

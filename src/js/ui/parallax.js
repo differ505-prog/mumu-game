@@ -128,10 +128,14 @@ export function themeColors(theme) {
 
 /**
  * 章節到主題的對應。
+ *
+ * 索引對應 story-arcs.json 的 chapter 0–5：
+ * christmas / valley / forest / ice-age / ice-age-christmas / north。
+ *
  * @param {number} chapter
  * @returns {string}
  */
 export function themeForChapter(chapter) {
-    const map = ["christmas", "christmas", "valley", "forest", "ice-age", "north"];
+    const map = ["christmas", "valley", "forest", "ice-age", "ice-age-christmas", "north"];
     return map[chapter] || "christmas";
 }

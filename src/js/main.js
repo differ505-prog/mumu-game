@@ -146,6 +146,37 @@ async function loadChildVoice() {
 let currentSceneId = "";
 
 /**
+ * 套用場景音樂。
+ *
+ * 規範：若場景與目前相同則直接返回（避免重複切換）；程序化音樂不可用時
+ * 回退到檔案音樂軌道；任一環節失敗都不得拋錯中斷遊戲流程。
+ *
+ * @param {string} scene
+ * @returns {boolean} 是否成功切換
+ */
+function applySceneAudio(scene) {
+    if (!scene || scene === currentSceneId) return false;
+    currentSceneId = scene;
+    // 優先走程序化場景音樂；無對應場景時回退到檔案音樂軌道
+    if (!playSceneMusic(scene)) playMusic(scene);
+    return true;
+}
+
+/**
+ * 套用場景視覺（色票 + 視差層）。
+ *
+ * 色票來自 content/scenes.json（由 applyTheme 透過 setScenePalettes 注入），
+ * 載入失敗時沿用 parallax.js 內建預設色票，不得中斷遊戲。
+ *
+ * @param {string} scene
+ */
+function applySceneVisual(scene) {
+    if (!scene) return;
+    applyTheme($("scene"), scene);
+    setParallax($("scene"), 0);
+}
+
+/**
  * 兒童化玩法名稱。
  *
  * 優先使用 content/child-voice.json 的 verbChildLabel（動作或角色名）；
@@ -334,10 +365,8 @@ function startLevel(levelId) {
     $("game-container").classList.remove("hidden");
     $("mode-indicator").textContent = childVerbLabel(level.verb, locale);
     // 三支柱整合：切換場景時，音樂（playSceneMusic）與場景色票（applyTheme）必須同步
-    currentSceneId = level.scene;
-    if (!playSceneMusic(level.scene)) playMusic(level.scene);
-    applyTheme($("scene"), level.scene);
-    setParallax($("scene"), 0);
+    applySceneAudio(level.scene);
+    applySceneVisual(level.scene);
     setState({ level: levelId, chapter: level.chapter, verb: level.verb });
 
     hud.update({

@@ -22,7 +22,7 @@
 | P8 | 六種認知玩法可玩 | `node tools/check-content.mjs` | items.json 九軸、levels 40／chapters 6 | 已驗證（靜態）／**玩法互動待實測** |
 | P9 | 無障礙選項生效 | 鍵盤走完首關、開啟色覺輔助與減少動畫 | `src/js/ui/a11y.js`、`src/styles/a11y.css` | **尚未驗證**（實機待測） |
 | P10 | 五個場景各能聽到不同主題曲 | 依序進入不同章節，逐一確認背景曲互異 | `src/js/audio/scene-music.js`（9 個場景定義涵蓋 6 個遊戲場景，root／tempo 互異） | 已驗證（靜態）／**聆聽待實測** |
-| P11 | 場景切換有視覺與聽覺同步轉場 | 跨章節切換，觀察色票轉換與音樂淡出淡入是否同步 | `src/js/main.js` `startLevel()` 同時呼叫 `playSceneMusic()` 與 `applyTheme()`；`src/js/audio/music.js` 淡入 1.2s／淡出 700ms | 已驗證（靜態）／**轉場觀感待實測** |
+| P11 | 場景切換有視覺與聽覺同步轉場 | 跨章節切換，觀察色票轉換與音樂淡出淡入是否同步 | `src/js/main.js` `startLevel()` → `applySceneAudio()` / `applySceneVisual()` → `playSceneMusic()` / `applyTheme()`；`src/js/audio/music.js` 淡入 1.2s／淡出 700ms | 已驗證（靜態）／**轉場觀感待實測** |
 | P12 | 24 隻角色外觀可區分 | 開啟圖鑑，確認每隻體型／配色／接地陰影可辨識 | `assets/characters/manifest.json`（24 筆）、19 種體型、最大同型群組 2/24 | 已驗證（靜態）／**辨識度待實測** |
 | P13 | 角色有接地感與情緒回饋動效 | 解鎖一隻恐龍、完成一關，觀察陰影縮放與動效回饋 | `src/js/ui/character-render.js` `playUnlock()`／`playComplete()`／`playEmotion()`；`src/styles/components.css` `.char__shadow` | 已驗證（靜態）／**動效觀感待實測** |
 
@@ -87,13 +87,14 @@
 ## 六、公測前最終動作（依序）
 
 1. `npm run check` 全數通過（exit code 0）
-2. 飛航模式冷啟動測試 × 10（確認離線可開局）
-3. 以 LINE 實機測試分享連結開啟
-4. 完成家長閘門繞過測試（錯誤答案、長按不足 3 秒）
-5. 確認第 13 關導向付費牆而非直接進入
-6. 招募 30 戶，執行前測（第 0 天）
-7. 第 28 天執行後測，計算正確率差與 p 值
-8. 每週更新本表「尚未驗證」項目狀態
+2. `node tools/verify-quality.mjs` 全數通過（exit code 0，目前 34/34）
+3. 飛航模式冷啟動測試 × 10（確認離線可開局）
+4. 以 LINE 實機測試分享連結開啟
+5. 完成家長閘門繞過測試（錯誤答案、長按不足 3 秒）
+6. 確認第 13 關導向付費牆而非直接進入
+7. 招募 30 戶，執行前測（第 0 天）
+8. 第 28 天執行後測，計算正確率差與 p 值
+9. 每週更新本表「尚未驗證」項目狀態
 
 ---
 

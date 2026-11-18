@@ -161,7 +161,9 @@
 | 每個場景有獨立主題曲（不共用音檔） | 靜態可驗證 | `src/js/audio/scene-music.js` `SCENE_MUSIC`（9 個場景定義，涵蓋 6 個遊戲場景） | `node tools/verify-quality.mjs --phase music`（`music-per-scene`／`music-scene-distinct`） | 已實作 |
 | 程序化生成（Web Audio 離線合成） | 靜態可驗證 | `src/js/audio/scene-music.js` `renderSceneMusic()`；`src/js/audio/music.js` `playSceneMusic()` | `node tools/verify-quality.mjs --phase music`（`music-renderable`：9 個場景皆渲染出非靜音緩衝區） | 已實作 |
 | 場景切換有交叉淡入淡出 | 靜態可驗證 | `src/js/audio/music.js` `playSceneMusic()`（淡入 1.2s）／`stopSceneMusic()`（淡出 700ms） | `node tools/verify-quality.mjs --phase integration`（`integration-scene-switch`） | 已實作 |
-| 場景切換時音樂與色票同步生效 | 靜態可驗證 | `src/js/main.js` `startLevel()` 同時呼叫 `playSceneMusic()` 與 `applyTheme()` | 同上 | 已實作 |
+| 場景切換時音樂與色票同步生效 | 靜態可驗證 | `src/js/main.js` `startLevel()` → `applySceneAudio()` / `applySceneVisual()` → `playSceneMusic()` / `applyTheme()` | 同上 | 已實作 |
+| 每個場景在程序化音樂庫有對應 | 靜態可驗證 | `content/scenes.json` `music.scene` ↔ `src/js/audio/scene-music.js` `SCENE_MUSIC` | `node tools/verify-quality.mjs --phase music`（`music-scenes-defined`） | 已實作 |
+| 場景設定完整且六章場景連續 | 靜態可驗證 | `content/scenes.json`、`content/story-arcs.json`、`content/levels.json` | `node tools/verify-quality.mjs --phase scenes`（`scenes-cover-levels`／`scenes-palette-valid`／`scenes-no-emoji`／`scenes-chapter-continuity`） | 已實作 |
 | **真人聆聽評分（悅耳度、疲勞度）** | **需實測** | — | 須真人聆聽評分表回收 | **待實測** |
 
 ### 劇本支柱
@@ -199,6 +201,9 @@
 ## 彙總
 
 **靜態可驗證項目：全部已實作**，可由 `npm run check` 重現。
+
+> 守門現況：`node tools/verify-quality.mjs` → **34/34 通過**（音樂 7／劇本 6／畫面 6／場景 4／整合 1／兒童語言 10）；
+> `node tools/verify-phaseO.mjs --phase 1` → 7/7 通過。
 
 **需實測項目（14 項，全部標示為「待實機驗收」或「待實測」，不代表已達成）：**
 

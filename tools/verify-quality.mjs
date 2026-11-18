@@ -515,6 +515,12 @@ function checkVisualSceneDiff() {
 
 /**
  * 三支柱整合：切換場景時，音樂與場景色票必須在 startLevel 內同時套用。
+ *
+ * startLevel 透過 applySceneAudio() / applySceneVisual() 兩個具名函式委派，
+ * 因此本檢查會**解析一層呼叫鏈**：確認 startLevel 本體呼叫了這兩個函式，
+ * 且這兩個函式內確實分別呼叫了 playSceneMusic() 與 applyTheme()。
+ *
+ * 註：若只在 startLevel 內貼上字串而未真正呼叫，檢查同樣會 FAIL。
  */
 function checkIntegrationSceneSwitch() {
     const main = readSrc("src/js/main.js");
@@ -524,13 +530,35 @@ function checkIntegrationSceneSwitch() {
     if (!fn) return { ok: false, msg: "main.js 找不到 startLevel 函式" };
 
     const body = fn[0];
-    if (!/playSceneMusic\s*\(/.test(body)) {
-        return { ok: false, msg: "startLevel 未呼叫 playSceneMusic（場景切換時音樂不會同步）" };
+
+    /** 取得指定具名函式的本體（以行首 function 宣告為界）。 */
+    const funcBody = (name) => {
+        const m = main.match(new RegExp(`function ${name}\\([^)]*\\)\\s*\\{[\\s\\S]*?\\n\\}`));
+        return m ? m[0] : "";
+    };
+
+    // startLevel 必須呼叫兩個具名切換函式
+    if (!/applySceneAudio\s*\(/.test(body)) {
+        return { ok: false, msg: "startLevel 未呼叫 applySceneAudio（場景切換時音樂不會同步）" };
     }
-    if (!/applyTheme\s*\(/.test(body)) {
-        return { ok: false, msg: "startLevel 未呼叫 applyTheme（場景切換時色票不會同步）" };
+    if (!/applySceneVisual\s*\(/.test(body)) {
+        return { ok: false, msg: "startLevel 未呼叫 applySceneVisual（場景切換時色票不會同步）" };
     }
-    return { ok: true, msg: "startLevel 內同時切換音樂與場景色票" };
+
+    // 解析一層呼叫鏈：兩個函式內必須真的接上音樂與色票
+    const audioBody = funcBody("applySceneAudio");
+    const visualBody = funcBody("applySceneVisual");
+    if (!audioBody) return { ok: false, msg: "main.js 找不到 applySceneAudio 函式" };
+    if (!visualBody) return { ok: false, msg: "main.js 找不到 applySceneVisual 函式" };
+
+    if (!/playSceneMusic\s*\(/.test(audioBody)) {
+        return { ok: false, msg: "applySceneAudio 內未呼叫 playSceneMusic（場景切換時音樂不會同步）" };
+    }
+    if (!/applyTheme\s*\(/.test(visualBody)) {
+        return { ok: false, msg: "applySceneVisual 內未呼叫 applyTheme（場景切換時色票不會同步）" };
+    }
+
+    return { ok: true, msg: "startLevel → applySceneAudio/applySceneVisual → playSceneMusic/applyTheme 完整串接" };
 }
 
 /**
@@ -617,6 +645,150 @@ function checkMusicRenderable() {
         return { ok: false, msg: `${silent.length} 個場景渲染為靜音：${silent.map(([k]) => k).join(", ")}` };
     }
     return { ok: true, msg: `${results.length} 個場景皆渲染出非靜音緩衝區` };
+}
+
+/**
+ * 7. content/scenes.json 的每個場景都必須在 SCENE_MUSIC 中有對應的音樂場景鍵。
+ */
+function checkMusicScenesDefined() {
+    const scenes = readJson("content/scenes.json");
+    if (!scenes) return { ok: false, msg: "content/scenes.json 不存在" };
+
+    const src = readSrc("src/js/audio/scene-music.js");
+    if (!src) return { ok: false, msg: "無法讀取 scene-music.js" };
+
+    const start = src.indexOf("export const SCENE_MUSIC");
+    if (start < 0) return { ok: false, msg: "SCENE_MUSIC 未匯出" };
+    const end = src.indexOf("\n};", start);
+    const block = src.slice(start, end);
+    const defined = new Set(
+        [...block.matchAll(/^\s{4}"?([a-z0-9-]+)"?:\s*\{/gm)].map((m) => m[1])
+    );
+
+    const missing = [];
+    const sceneKeys = Object.keys(scenes).filter((k) => !k.startsWith("_"));
+    for (const key of sceneKeys) {
+        const v = scenes[key];
+        // 場景宣告的音樂場景鍵必須存在於 SCENE_MUSIC
+        const musicScene = v?.music?.scene;
+        if (!musicScene) {
+            missing.push(`${key}(未宣告 music.scene)`);
+            continue;
+        }
+        if (!defined.has(musicScene)) missing.push(`${key}→${musicScene}`);
+    }
+    if (missing.length) {
+        return { ok: false, msg: `${missing.length} 個場景無對應音樂：${missing.join(", ")}` };
+    }
+    return { ok: true, msg: `${sceneKeys.length} 個場景皆有對應的 SCENE_MUSIC 音樂鍵` };
+}
+
+/* ------------------------------------------------------------------ *
+ * 場景設定（Step 82）
+ * ------------------------------------------------------------------ */
+
+/**
+ * 12. scenes.json 必須涵蓋 levels.json 用到的全部 scene，且每個場景的 palette 完整。
+ */
+function checkScenesCoverLevels() {
+    const scenes = readJson("content/scenes.json");
+    const levels = readJson("content/levels.json");
+    if (!scenes || !levels) return { ok: false, msg: "無法讀取 scenes.json 或 levels.json" };
+
+    const used = [...new Set((levels.levels || levels || []).map((l) => l.scene).filter(Boolean))];
+    const missing = used.filter((s) => !scenes[s]);
+    if (missing.length) {
+        return { ok: false, msg: `scenes.json 未涵蓋場景：${missing.join(", ")}` };
+    }
+    return { ok: true, msg: `涵蓋 levels.json 全部 ${used.length} 個場景` };
+}
+
+/**
+ * 13. 每個場景的 palette 必須完整，且每個色值都是合法 6 位 hex。
+ */
+function checkScenesPaletteValid() {
+    const scenes = readJson("content/scenes.json");
+    if (!scenes) return { ok: false, msg: "content/scenes.json 不存在" };
+
+    const required = ["sky", "glow", "fog", "ridge", "midground", "foreground"];
+    const hex = /^#[0-9a-fA-F]{6}$/;
+    const bad = [];
+    const sceneKeys = Object.keys(scenes).filter((k) => !k.startsWith("_"));
+
+    for (const key of sceneKeys) {
+        const v = scenes[key];
+        const p = v?.palette;
+        if (!p) {
+            bad.push(`${key}(缺 palette)`);
+            continue;
+        }
+        for (const c of required) {
+            if (!p[c]) bad.push(`${key}.${c}(缺色)`);
+            else if (!hex.test(p[c])) bad.push(`${key}.${c}=${p[c]}(非法 hex)`);
+        }
+        if (!v?.title?.["zh-TW"] || !v?.title?.["en-US"]) bad.push(`${key}(標題缺雙語)`);
+        if (!v?.music?.scene) bad.push(`${key}(缺 music.scene)`);
+        if (!v?.weather) bad.push(`${key}(缺 weather)`);
+    }
+    if (bad.length) {
+        return { ok: false, msg: `${bad.length} 項場景設定不完整：${bad.slice(0, 6).join(", ")}` };
+    }
+    return { ok: true, msg: `${sceneKeys.length} 個場景 palette 皆完整且為合法 hex` };
+}
+
+/**
+ * 14. 場景設定不得使用 emoji 作為符號。
+ */
+function checkScenesNoEmoji() {
+    const scenes = readJson("content/scenes.json");
+    if (!scenes) return { ok: false, msg: "content/scenes.json 不存在" };
+
+    const emoji = /\p{Extended_Pictographic}|[\u{1F300}-\u{1FAFF}]|[\u{2600}-\u{27BF}]/u;
+    for (const [key, v] of Object.entries(scenes)) {
+        if (key.startsWith("_")) continue;
+        if (emoji.test(JSON.stringify(v))) {
+            return { ok: false, msg: `場景 ${key} 含 emoji` };
+        }
+    }
+    return { ok: true, msg: "場景設定無 emoji" };
+}
+
+/**
+ * 15. 場景連續性：每章的 story-arcs.json scene 必須與該章關卡的 scene 完全一致。
+ */
+function checkScenesChapterContinuity() {
+    const arcs = readJson("content/story-arcs.json");
+    const levels = readJson("content/levels.json");
+    const scenes = readJson("content/scenes.json");
+    if (!arcs || !levels || !scenes) {
+        return { ok: false, msg: "無法讀取 story-arcs.json / levels.json / scenes.json" };
+    }
+
+    const list = levels.levels || levels || [];
+    /** @type {Map<number, Set<string>>} */
+    const byChapter = new Map();
+    for (const l of list) {
+        if (!l?.scene) continue;
+        if (!byChapter.has(l.chapter)) byChapter.set(l.chapter, new Set());
+        byChapter.get(l.chapter).add(l.scene);
+    }
+
+    const bad = [];
+    for (const c of arcs.chapters || []) {
+        const used = byChapter.get(c.chapter);
+        if (!used || !used.size) {
+            bad.push(`第${c.chapter}章無關卡`);
+            continue;
+        }
+        if (!used.has(c.scene)) {
+            bad.push(`第${c.chapter}章 arcs=${c.scene} vs levels=${[...used].join("/")}`);
+        }
+        if (!scenes[c.scene]) bad.push(`第${c.chapter}章場景 ${c.scene} 未定義於 scenes.json`);
+    }
+    if (bad.length) {
+        return { ok: false, msg: `${bad.length} 項場景連續性不一致：${bad.slice(0, 5).join("；")}` };
+    }
+    return { ok: true, msg: `${(arcs.chapters || []).length} 章的章節場景與關卡場景完全一致` };
 }
 
 /* ------------------------------------------------------------------ *
@@ -948,6 +1120,7 @@ const CHECKS = [
     { id: "audio-dupes", phase: "music", fn: checkAudioDupes },
     { id: "music-scene-distinct", phase: "music", fn: checkMusicSceneDistinct },
     { id: "music-renderable", phase: "music", fn: checkMusicRenderable },
+    { id: "music-scenes-defined", phase: "music", fn: checkMusicScenesDefined },
     { id: "story-dino-lines", phase: "story", fn: checkStoryDinoLines },
     { id: "story-letter-length", phase: "story", fn: checkStoryLetterLength },
     { id: "story-lines-count", phase: "story", fn: checkStoryLinesCount },
@@ -960,6 +1133,10 @@ const CHECKS = [
     { id: "visual-manifest-sync", phase: "visual", fn: checkVisualManifestSync },
     { id: "visual-parallax", phase: "visual", fn: checkVisualParallax },
     { id: "visual-scene-diff", phase: "visual", fn: checkVisualSceneDiff },
+    { id: "scenes-cover-levels", phase: "scenes", fn: checkScenesCoverLevels },
+    { id: "scenes-palette-valid", phase: "scenes", fn: checkScenesPaletteValid },
+    { id: "scenes-no-emoji", phase: "scenes", fn: checkScenesNoEmoji },
+    { id: "scenes-chapter-continuity", phase: "scenes", fn: checkScenesChapterContinuity },
     { id: "integration-scene-switch", phase: "integration", fn: checkIntegrationSceneSwitch },
     { id: "child-no-jargon", phase: "child", fn: checkChildNoJargon },
     { id: "child-no-eval-widget", phase: "child", fn: checkChildNoEvalWidget },
