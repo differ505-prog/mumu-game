@@ -21,6 +21,10 @@
 | P7 | 48 個 SVG icon 齊備 | `ls assets/icons/*.svg \| wc -l` = 48 | 48 個 | 已驗證 |
 | P8 | 六種認知玩法可玩 | `node tools/check-content.mjs` | items.json 九軸、levels 40／chapters 6 | 已驗證（靜態）／**玩法互動待實測** |
 | P9 | 無障礙選項生效 | 鍵盤走完首關、開啟色覺輔助與減少動畫 | `src/js/ui/a11y.js`、`src/styles/a11y.css` | **尚未驗證**（實機待測） |
+| P10 | 五個場景各能聽到不同主題曲 | 依序進入不同章節，逐一確認背景曲互異 | `src/js/audio/scene-music.js`（9 個場景定義涵蓋 6 個遊戲場景，root／tempo 互異） | 已驗證（靜態）／**聆聽待實測** |
+| P11 | 場景切換有視覺與聽覺同步轉場 | 跨章節切換，觀察色票轉換與音樂淡出淡入是否同步 | `src/js/main.js` `startLevel()` 同時呼叫 `playSceneMusic()` 與 `applyTheme()`；`src/js/audio/music.js` 淡入 1.2s／淡出 700ms | 已驗證（靜態）／**轉場觀感待實測** |
+| P12 | 24 隻角色外觀可區分 | 開啟圖鑑，確認每隻體型／配色／接地陰影可辨識 | `assets/characters/manifest.json`（24 筆）、19 種體型、最大同型群組 2/24 | 已驗證（靜態）／**辨識度待實測** |
+| P13 | 角色有接地感與情緒回饋動效 | 解鎖一隻恐龍、完成一關，觀察陰影縮放與動效回饋 | `src/js/ui/character-render.js` `playUnlock()`／`playComplete()`／`playEmotion()`；`src/styles/components.css` `.char__shadow` | 已驗證（靜態）／**動效觀感待實測** |
 
 ---
 
@@ -108,5 +112,7 @@
 - 付費邊界互動（C3）
 - 成效研究 30 戶招募與執行（E4–E6）
 - 上述數據之外的所有成效指標（D7 留存 ≥ 12%、轉付費 ≥ 2.5%、≥55 FPS、−16 LUFS ±1、盲測 5/5）
+- 三支柱主觀水準待實測：音樂聆聽評分（P10）、場景轉場觀感（P11）、角色外觀辨識度（P12）、接地感與情緒動效觀感（P13）
+- 兒童試玩滿意度、家長評價、聆聽疲勞度、兒童理解度（詳見 `docs/acceptance-9.md`「三支柱製作水準驗收」）
 
 完整對照見 `docs/acceptance-9.md`。

@@ -150,11 +150,57 @@
 
 ---
 
+## 三支柱製作水準驗收（v8 三支柱：劇本／畫面／音樂）
+
+本節逐項列出三支柱的**靜態可驗證**水準與**仍待實測**的部分。標示「待實測」者**不代表已達成**。
+
+### 音樂支柱
+
+| 驗收項 | 類別 | 實作位置 | 驗證指令 | 狀態 |
+| --- | --- | --- | --- | --- |
+| 每個場景有獨立主題曲（不共用音檔） | 靜態可驗證 | `src/js/audio/scene-music.js` `SCENE_MUSIC`（9 個場景定義，涵蓋 6 個遊戲場景） | `node tools/verify-quality.mjs --phase music`（`music-per-scene`／`music-scene-distinct`） | 已實作 |
+| 程序化生成（Web Audio 離線合成） | 靜態可驗證 | `src/js/audio/scene-music.js` `renderSceneMusic()`；`src/js/audio/music.js` `playSceneMusic()` | `node tools/verify-quality.mjs --phase music`（`music-renderable`：9 個場景皆渲染出非靜音緩衝區） | 已實作 |
+| 場景切換有交叉淡入淡出 | 靜態可驗證 | `src/js/audio/music.js` `playSceneMusic()`（淡入 1.2s）／`stopSceneMusic()`（淡出 700ms） | `node tools/verify-quality.mjs --phase integration`（`integration-scene-switch`） | 已實作 |
+| 場景切換時音樂與色票同步生效 | 靜態可驗證 | `src/js/main.js` `startLevel()` 同時呼叫 `playSceneMusic()` 與 `applyTheme()` | 同上 | 已實作 |
+| **真人聆聽評分（悅耳度、疲勞度）** | **需實測** | — | 須真人聆聽評分表回收 | **待實測** |
+
+### 劇本支柱
+
+| 驗收項 | 類別 | 實作位置 | 驗證指令 | 狀態 |
+| --- | --- | --- | --- | --- |
+| 24 隻恐龍各有專屬對白 | 靜態可驗證 | `content/narrative.zh-TW.json`／`content/narrative.en-US.json` | `node tools/verify-quality.mjs --phase story`（`story-dino-lines`：24 隻各 ≥3 句、共 72 句，無 3 隻共用） | 已實作 |
+| 章節信件 ≥ 150 字 | 靜態可驗證 | `content/story-arcs.json`（6 章，實際 263–330 字） | `node tools/verify-quality.mjs --phase story`（`story-letter-length`／`story-letter-arc`） | 已實作 |
+| 情境台詞 120 句（雙語對稱） | 靜態可驗證 | `content/narrative.zh-TW.json`／`content/narrative.en-US.json`（5 情境 × 21 句 + 5 句解鎖讚美 = 120 句） | `node tools/verify-quality.mjs --phase story`（`story-lines-count`） | 已實作 |
+| 個性感分組差異化 | 靜態可驗證 | `content/narrative.*.json` | `node tools/verify-quality.mjs --phase story`（`story-dino-personality`） | 已實作 |
+| **兒童理解度（4–8 歲能聽懂）** | **需實測** | — | 須兒童試玩觀察或理解度測驗 | **待實測** |
+
+### 畫面支柱
+
+| 驗收項 | 類別 | 實作位置 | 驗證指令 | 狀態 |
+| --- | --- | --- | --- | --- |
+| 角色體型 ≥ 12 種 | 靜態可驗證 | `tools/dino-bodies.mjs`（20 種體型定義） | `node tools/verify-quality.mjs --phase visual`（`visual-body-types`：24 隻、19 種體型、最大同型群組 2/24） | 已實作 |
+| 五層視差 | 靜態可驗證 | `src/js/ui/parallax.js`（sky .05／ridge .12／midground .22／character .35／foreground .55） | `node tools/verify-quality.mjs --phase visual`（`visual-parallax`） | 已實作 |
+| 角色接地感（地面陰影） | 靜態可驗證 | `assets/characters/*.svg`（`<ellipse>` 接地陰影 + `<linearGradient>` 漸層）、`src/js/ui/character-render.js` `syncShadowScale()`、`src/styles/components.css` `.char__shadow` | `node tools/verify-quality.mjs --phase visual`（`visual-gradient`） | 已實作 |
+| 24 隻外觀可區分 | 靜態可驗證 | `assets/characters/manifest.json`（24 筆）、`tools/gen-characters.mjs` | `node tools/verify-quality.mjs --phase visual`（`visual-body-types`／`visual-walk-diff`／`visual-manifest-sync`） | 已實作 |
+| **美術主觀水準（是否專業級）** | **需實測** | — | 須設計師或目標使用者評審 | **待實測** |
+
+### 本節「待實測」彙總（不得視為已達成）
+
+1. 音樂：真人聆聽評分（悅耳度、疲勞度）
+2. 劇本：兒童理解度（4–8 歲）
+3. 畫面：美術主觀水準評分
+4. 兒童試玩滿意度
+5. 家長評價
+6. 聆聽疲勞度
+7. 美術主觀水準（與第 3 點同項，於公測期統一回收）
+
+---
+
 ## 彙總
 
 **靜態可驗證項目：全部已實作**，可由 `npm run check` 重現。
 
-**需實測項目（9 項，全部標示為「待實機驗收」，不代表已達成）：**
+**需實測項目（14 項，全部標示為「待實機驗收」或「待實測」，不代表已達成）：**
 
 1. D7 留存 ≥ 12%
 2. 最小對辨識成效顯著改善（n ≥ 30）
@@ -165,5 +211,10 @@
 7. K-factor ≥ 0.5
 8. 盲測 5/5（未列於上方各表，屬公測證據面，詳見 `docs/beta-launch.md`）
 9. 視覺完成度主觀評分
+10. 音樂真人聆聽評分（悅耳度）
+11. 兒童理解度（4–8 歲）
+12. 兒童試玩滿意度
+13. 家長評價
+14. 聆聽疲勞度
 
 **下一階段：** 依 `docs/beta-launch.md` 招募 30 戶完成成效研究，並依公測檢查表收集實測數據。
