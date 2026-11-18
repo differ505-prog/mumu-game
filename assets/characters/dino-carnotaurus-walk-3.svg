@@ -1,19 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none" role="img" aria-label="dino-carnotaurus">
-  <g transform="translate(0 -5) rotate(0 256 280)">
-    <path d="M300 340 C 370 340 430 360 470 390 C 420 396 360 380 305 362 Z" fill="#1abc9c" />
-    <path d="M150 245 C 150 195 195 165 250 168 C 305 170 328 205 322 258 C 316 312 285 340 232 340 C 178 340 150 308 150 245 Z" fill="#16a085" />
-    <path d="M196 215 C 186 180 206 152 244 146 C 280 140 302 156 302 184 C 302 208 280 222 248 226 Z" fill="#16a085" />
-    <ellipse cx="252" cy="168" rx="56" ry="34" fill="#16a085" transform="rotate(-8 252 168)" />
-    <path d="M206 190 C 190 200 186 220 196 236 C 216 232 230 214 232 194 Z" fill="#1abc9c" />
-    <path d="M212 142 L 204 96 L 224 138 Z" fill="#f39c12" />
-    <path d="M244 134 L 244 84 L 262 134 Z" fill="#f39c12" />
-    <path d="M276 140 L 288 96 L 296 146 Z" fill="#f39c12" />
-    <circle cx="272" cy="162" r="6" fill="#ffffff" />
-    <circle cx="272" cy="162" r="3" fill="#1b1b1b" />
-    <path d="M184 320 L 176 380 L 204 380 L 212 320 Z" fill="#1abc9c" transform="translate(0 0)" />
-    <path d="M266 320 L 258 380 L 286 380 L 294 320 Z" fill="#1abc9c" transform="translate(0 0)" />
-    <path d="M214 306 L 210 340 L 226 340 L 230 306 Z" fill="#1abc9c" />
-    <path d="M244 306 L 240 340 L 256 340 L 260 306 Z" fill="#1abc9c" />
+  <defs>
+    <linearGradient id="gb-dino-carnotaurus" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#53b9a5" />
+      <stop offset="0.62" stop-color="#16a085" />
+      <stop offset="1" stop-color="#1ccdaa" />
+    </linearGradient>
+    <linearGradient id="gh-dino-carnotaurus" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#65c0ae" />
+      <stop offset="1" stop-color="#1aba9a" />
+    </linearGradient>
+  </defs>
+  <g transform="translate(0 -7) rotate(0 250 248)">
+    <ellipse cx="264" cy="404" rx="77.28" ry="13" fill="#0b1b2a" fill-opacity="0.18" />
+    <path d="M 322 250 C 388 254, 450 272, 502 292 C 442 292, 382 282, 328 272 Z" fill="#1abc9c" />
+    <path d="M 166 248 C 166 188, 216.4 180.8, 271 186.8 C 321.4 192.8, 334 230, 328.96 262.4 C 322.24 303.2, 275.2 312.8, 224.8 308 C 182.8 303.2, 166 272, 166 248 Z" fill="url(#gb-dino-carnotaurus)" />
+    <path d="M 178 234 C 156 214, 202 210, 190 182 C 204 204, 208 224, 200 256 Z" fill="url(#gh-dino-carnotaurus)" />
+    <path d="M 146 170 C 146 140, 206 143, 209 173 C 212 194, 182 200, 161 191 C 147.5 186.5, 146 182, 146 170 Z" fill="url(#gh-dino-carnotaurus)" />
+    <path d="M 146.6 182 C 137 180.8, 137.6 191.6, 148.4 191 Z" fill="#f39c12" fill-opacity="0.9" />
+    <path d="M 175.7 165.2 a 7.5 7.5 0 1 0 15 0 a 7.5 7.5 0 1 0 -15 0 Z" fill="#ffffff" />
+    <path d="M 180.8 165.8 a 3.6 3.6 0 1 0 7.2 0 a 3.6 3.6 0 1 0 -7.2 0 Z" fill="#1b1b1b" />
+    <path d="M 191 296 C 189 330, 192 374, 194 398 L 214 398 C 216 374, 219 330, 217 296 Z" fill="#1abc9c" />
+    <path d="M 225 296 C 223 330, 226 374, 228 398 L 248 398 C 250 374, 253 330, 251 296 Z" fill="#1abc9c" />
+    <path d="M 261 296 C 259 330, 262 374, 264 398 L 284 398 C 286 374, 289 330, 287 296 Z" fill="#1abc9c" />
+    <path d="M 293 296 C 291 330, 294 374, 296 398 L 316 398 C 318 374, 321 330, 319 296 Z" fill="#1abc9c" />
+    <path d="M 197 138 C 225 142, 231 190, 199 202 C 207 180, 207 160, 197 138 Z" fill="#1abc9c" />
+    <path d="M 164 155.5 L 172 121.5 L 179 155.5 Z" fill="#f39c12" />
+    <path d="M 174 155.5 L 182 119.5 L 189 155.5 Z" fill="#f39c12" />
+    <path d="M 178 157 C 170 135, 192 127, 204 141 C 194 145, 186 153, 190 159 Z" fill="#f39c12" fill-opacity="0.85" />
+    <path d="M 203.8 281 C 220 293, 280 293, 296.2 278 L 292 264.8 C 274 278, 224 278, 208 264.8 Z" fill="#1abc9c" fill-opacity="0.55" />
   </g>
 </svg>

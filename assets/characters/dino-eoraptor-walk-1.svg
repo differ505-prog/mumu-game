@@ -1,14 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none" role="img" aria-label="dino-eoraptor">
-  <g transform="translate(0 0) rotate(0 256 280)">
-    <path d="M300 340 C 370 340 430 360 470 390 C 420 396 360 380 305 362 Z" fill="#2f8f8a" />
-    <path d="M160 250 C 160 212 190 192 232 194 C 275 196 292 218 288 258 C 284 300 262 322 222 322 C 182 322 160 296 160 250 Z" fill="#2980b9" />
-    <path d="M198 216 C 190 182 214 154 250 150 C 286 146 306 164 304 190 C 302 214 278 226 248 230 Z" fill="#2980b9" />
-    <ellipse cx="254" cy="176" rx="44" ry="28" fill="#2980b9" transform="rotate(-8 254 176)" />
-    <circle cx="278" cy="168" r="6" fill="#ffffff" />
-    <circle cx="278" cy="168" r="3" fill="#1b1b1b" />
-    <path d="M288 182 L 306 190 L 288 190 Z" fill="#2f8f8a" />
-    <path d="M186 306 L 178 352 L 200 352 L 206 306 Z" fill="#2f8f8a" transform="translate(0 0)" />
-    <path d="M248 306 L 240 352 L 262 352 L 268 306 Z" fill="#2f8f8a" transform="translate(0 0)" />
+  <defs>
+    <linearGradient id="gb-dino-eoraptor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#61a1cb" />
+      <stop offset="0.62" stop-color="#2980b9" />
+      <stop offset="1" stop-color="#34a4ed" />
+    </linearGradient>
+    <linearGradient id="gh-dino-eoraptor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#72abd1" />
+      <stop offset="1" stop-color="#3094d7" />
+    </linearGradient>
+  </defs>
+  <g transform="translate(0 0) rotate(0 252 258)">
+    <ellipse cx="266" cy="404" rx="57.04" ry="13" fill="#0b1b2a" fill-opacity="0.18" />
+    <path d="M 302 254 C 368 232, 430 198, 478 176 C 442 224, 376 262, 310 274 Z" fill="#2f8f8a" />
+    <path d="M 190 258 C 190 214, 227.2 208.72, 267.5 213.12 C 304.7 217.51999999999998, 314 244.8, 310.28 268.56 C 305.32 298.48, 270.6 305.52, 233.4 302 C 202.4 298.48, 190 275.6, 190 258 Z" fill="url(#gb-dino-eoraptor)" />
+    <path d="M 208 238 C 176 212, 214 244, 200 214 C 216 238, 236 228, 228 262 Z" fill="url(#gh-dino-eoraptor)" />
+    <path d="M 160 200 C 160 176, 208 178.4, 210.4 202.4 C 212.8 219.2, 188.8 224, 172 216.8 C 161.2 213.2, 160 209.6, 160 200 Z" fill="url(#gh-dino-eoraptor)" />
+    <path d="M 158.8 207.2 C 148 204.8, 149.2 214.4, 161.2 214.88 Z" fill="#f39c12" />
+    <path d="M 182.26 196.16 a 7.5 7.5 0 1 0 15 0 a 7.5 7.5 0 1 0 -15 0 Z" fill="#ffffff" />
+    <path d="M 187.12 196.64 a 3.6 3.6 0 1 0 7.2 0 a 3.6 3.6 0 1 0 -7.2 0 Z" fill="#1b1b1b" />
+    <path d="M 223 288 C 221 322, 224 374, 226 398 L 246 398 C 248 374, 251 322, 249 288 Z" fill="#2f8f8a" />
+    <path d="M 253 288 C 251 322, 254 374, 256 398 L 276 398 C 278 374, 281 322, 279 288 Z" fill="#2f8f8a" />
+    <path d="M 217.9 282.2 C 222 291, 282 291, 286.1 280 L 283 270.32 C 276 280, 226 280, 221 270.32 Z" fill="#2f8f8a" fill-opacity="0.55" />
+    <path d="M 324 258 L 346 232 L 348 264 Z" fill="#f39c12" fill-opacity="0.85" />
+    <path d="M 216.1 239.8 L 228.1 211.8 L 236.1 237.8 Z" fill="#f39c12" />
+    <path d="M 183.6 191.2 C 175.6 169.2, 197.6 161.2, 209.6 175.2 C 199.6 179.2, 191.6 187.2, 195.6 193.2 Z" fill="#f39c12" fill-opacity="0.85" />
+    <path d="M 194 234 L 218 230 L 218 240 L 194 244 Z" fill="#f39c12" fill-opacity="0.7" />
+    <path d="M 225.3 287.68 L 232.3 305.68 L 237.3 285.68 Z" fill="#f4f1e8" fill-opacity="0.95" />
+    <path d="M 239.3 287.68 L 246.3 305.68 L 251.3 285.68 Z" fill="#f4f1e8" fill-opacity="0.95" />
+    <path d="M 181 184.4 C 176 162.4, 196 154.4, 205 168.4 C 194 172.4, 186 180.4, 189 186.4 Z" fill="#f39c12" fill-opacity="0.9" />
+    <path d="M 185 181.4 C 180 159.4, 200 151.4, 209 165.4 C 198 169.4, 190 177.4, 193 183.4 Z" fill="#f39c12" fill-opacity="0.9" />
+    <path d="M 189 178.4 C 184 156.4, 204 148.4, 213 162.4 C 202 166.4, 194 174.4, 197 180.4 Z" fill="#f39c12" fill-opacity="0.9" />
+    <path d="M 193 175.4 C 188 153.4, 208 145.4, 217 159.4 C 206 163.4, 198 171.4, 201 177.4 Z" fill="#f39c12" fill-opacity="0.9" />
+    <path d="M 204 246 L 228 242 L 228 252 L 204 256 Z" fill="#f39c12" fill-opacity="0.7" />
+    <path d="M 183.6 191.2 C 175.6 169.2, 197.6 161.2, 209.6 175.2 C 199.6 179.2, 191.6 187.2, 195.6 193.2 Z" fill="#f39c12" fill-opacity="0.85" />
   </g>
 </svg>

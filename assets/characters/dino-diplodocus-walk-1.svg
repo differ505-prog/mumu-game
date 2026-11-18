@@ -1,13 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none" role="img" aria-label="dino-diplodocus">
-  <g transform="translate(0 0) rotate(0 256 280)">
-    <path d="M300 340 C 370 340 430 360 470 390 C 420 396 360 380 305 362 Z" fill="#e91e63" />
-    <path d="M150 250 C 150 200 190 175 245 178 C 300 180 320 210 315 265 C 310 320 280 345 230 345 C 180 345 150 315 150 250 Z" fill="#2c3e50" />
-    <path d="M175 240 C 140 210 132 160 148 120 C 158 96 186 92 198 114 C 210 138 200 180 205 226 Z" fill="#2c3e50" />
-    <ellipse cx="170" cy="108" rx="42" ry="30" fill="#2c3e50" transform="rotate(-14 170 108)" />
-    <circle cx="152" cy="98" r="6" fill="#f39c12" />
-    <circle cx="152" cy="98" r="2.5" fill="#1b1b1b" />
-    <path d="M182 330 L 172 396 L 198 396 L 206 330 Z" fill="#e91e63" transform="translate(0 0)" />
-    <path d="M268 330 L 258 396 L 284 396 L 292 330 Z" fill="#e91e63" transform="translate(0 0)" />
+  <defs>
+    <linearGradient id="gb-dino-diplodocus" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#63707e" />
+      <stop offset="0.62" stop-color="#2c3e50" />
+      <stop offset="1" stop-color="#384f66" />
+    </linearGradient>
+    <linearGradient id="gh-dino-diplodocus" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#74808c" />
+      <stop offset="1" stop-color="#33485d" />
+    </linearGradient>
+  </defs>
+  <g transform="translate(0 0) rotate(0 248 270)">
+    <ellipse cx="262" cy="404" rx="95.68" ry="13" fill="#0b1b2a" fill-opacity="0.18" />
+    <path d="M 340 266 C 414 256, 480 268, 536 286 C 472 292, 406 292, 348 290 Z" fill="#e91e63" />
+    <path d="M 144 270 C 144 210, 206.4 202.8, 274 208.8 C 336.4 214.8, 352 252, 345.76 284.4 C 337.44 325.2, 279.2 334.8, 216.8 330 C 164.8 325.2, 144 294, 144 270 Z" fill="url(#gb-dino-diplodocus)" />
+    <path d="M 150 250 C 122 200, 148 168, 134 130 C 148 162, 188 224, 178 276 Z" fill="url(#gh-dino-diplodocus)" />
+    <path d="M 94 108 C 94 80, 150 82.8, 152.8 110.8 C 155.6 130.4, 127.6 136, 108 127.6 C 95.4 123.4, 94 119.2, 94 108 Z" fill="url(#gh-dino-diplodocus)" />
+    <path d="M 94.56 119.2 C 85.6 118.08, 86.16 128.16, 96.24 127.6 Z" fill="#f39c12" fill-opacity="0.9" />
+    <path d="M 121.22 103.52 a 7.5 7.5 0 1 0 15 0 a 7.5 7.5 0 1 0 -15 0 Z" fill="#ffffff" />
+    <path d="M 126.24000000000001 104.08 a 3.6 3.6 0 1 0 7.2 0 a 3.6 3.6 0 1 0 -7.2 0 Z" fill="#1b1b1b" />
+    <path d="M 181 314 C 179 348, 182 374, 184 398 L 204 398 C 206 374, 209 348, 207 314 Z" fill="#e91e63" />
+    <path d="M 223 314 C 221 348, 224 374, 226 398 L 246 398 C 248 374, 251 348, 249 314 Z" fill="#e91e63" />
+    <path d="M 269 314 C 267 348, 270 374, 272 398 L 292 398 C 294 374, 297 348, 295 314 Z" fill="#e91e63" />
+    <path d="M 313 314 C 311 348, 314 374, 316 398 L 336 398 C 338 374, 341 348, 339 314 Z" fill="#e91e63" />
+    <path d="M 183.8 234.8 L 190.8 206.8 L 197.8 234.8 Z" fill="#f39c12" />
+    <path d="M 202.86666666666667 234.8 L 209.86666666666667 205.8 L 216.86666666666667 234.8 Z" fill="#f39c12" />
+    <path d="M 221.93333333333334 234.8 L 228.93333333333334 204.8 L 235.93333333333334 234.8 Z" fill="#f39c12" />
+    <path d="M 241 234.8 L 248 203.8 L 255 234.8 Z" fill="#f39c12" />
+    <path d="M 260.06666666666666 234.8 L 267.06666666666666 202.8 L 274.06666666666666 234.8 Z" fill="#f39c12" />
+    <path d="M 132 142 L 156 138 L 156 148 L 132 152 Z" fill="#f39c12" fill-opacity="0.7" />
+    <path d="M 142 154 L 166 150 L 166 160 L 142 164 Z" fill="#f39c12" fill-opacity="0.7" />
+    <path d="M 364 282 C 386 276, 392 304, 370 306 C 360 304, 360 284, 364 282 Z" fill="#e91e63" />
+    <path d="M 193.2 243 L 205.2 215 L 213.2 241 Z" fill="#f39c12" />
+    <path d="M 362 270 L 384 244 L 386 276 Z" fill="#f39c12" fill-opacity="0.85" />
   </g>
 </svg>

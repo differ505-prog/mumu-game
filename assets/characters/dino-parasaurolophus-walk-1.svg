@@ -1,16 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none" role="img" aria-label="dino-parasaurolophus">
-  <g transform="translate(0 0) rotate(0 256 280)">
-    <path d="M300 340 C 370 340 430 360 470 390 C 420 396 360 380 305 362 Z" fill="#d35400" />
-    <path d="M150 245 C 150 195 195 165 250 168 C 305 170 328 205 322 258 C 316 312 285 340 232 340 C 178 340 150 308 150 245 Z" fill="#27ae60" />
-    <path d="M198 216 C 190 182 214 154 250 150 C 286 146 306 164 304 190 C 302 214 278 226 248 230 Z" fill="#27ae60" />
-    <ellipse cx="254" cy="176" rx="44" ry="28" fill="#27ae60" transform="rotate(-8 254 176)" />
-    <circle cx="278" cy="168" r="6" fill="#ffffff" />
-    <circle cx="278" cy="168" r="3" fill="#1b1b1b" />
-    <path d="M288 182 L 306 190 L 288 190 Z" fill="#d35400" />
-    <path d="M184 320 L 176 380 L 204 380 L 212 320 Z" fill="#d35400" transform="translate(0 0)" />
-    <path d="M266 320 L 258 380 L 286 380 L 294 320 Z" fill="#d35400" transform="translate(0 0)" />
-    <path d="M214 306 L 210 340 L 226 340 L 230 306 Z" fill="#d35400" />
-    <path d="M244 306 L 240 340 L 256 340 L 260 306 Z" fill="#d35400" />
+  <defs>
+    <linearGradient id="gb-dino-parasaurolophus" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5fc389" />
+      <stop offset="0.62" stop-color="#27ae60" />
+      <stop offset="1" stop-color="#32df7b" />
+    </linearGradient>
+    <linearGradient id="gh-dino-parasaurolophus" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#70ca96" />
+      <stop offset="1" stop-color="#2dca6f" />
+    </linearGradient>
+  </defs>
+  <g transform="translate(0 0) rotate(0 252 250)">
+    <ellipse cx="266" cy="404" rx="79.12" ry="13" fill="#0b1b2a" fill-opacity="0.18" />
+    <path d="M 326 244 C 386 216, 446 180, 494 154 C 454 206, 396 246, 334 264 Z" fill="#d35400" />
+    <path d="M 166 250 C 166 190, 217.6 182.8, 273.5 188.8 C 325.1 194.8, 338 232, 332.84 264.4 C 325.96 305.2, 277.8 314.8, 226.2 310 C 183.2 305.2, 166 274, 166 250 Z" fill="url(#gb-dino-parasaurolophus)" />
+    <path d="M 178 236 C 156 216, 206 216, 194 188 C 208 210, 208 226, 200 258 Z" fill="url(#gh-dino-parasaurolophus)" />
+    <path d="M 152 176 C 152 148, 208 150.8, 210.8 178.8 C 213.6 198.4, 185.6 204, 166 195.6 C 153.4 191.4, 152 187.2, 152 176 Z" fill="url(#gh-dino-parasaurolophus)" />
+    <path d="M 152.56 187.2 C 143.6 186.08, 144.16 196.16, 154.24 195.6 Z" fill="#f39c12" fill-opacity="0.9" />
+    <path d="M 179.22 171.52 a 7.5 7.5 0 1 0 15 0 a 7.5 7.5 0 1 0 -15 0 Z" fill="#ffffff" />
+    <path d="M 184.24 172.08 a 3.6 3.6 0 1 0 7.2 0 a 3.6 3.6 0 1 0 -7.2 0 Z" fill="#1b1b1b" />
+    <path d="M 195 296 C 193 330, 196 374, 198 398 L 218 398 C 220 374, 223 330, 221 296 Z" fill="#d35400" />
+    <path d="M 227 296 C 225 330, 228 374, 230 398 L 250 398 C 252 374, 255 330, 253 296 Z" fill="#d35400" />
+    <path d="M 263 296 C 261 330, 264 374, 266 398 L 286 398 C 288 374, 291 330, 289 296 Z" fill="#d35400" />
+    <path d="M 295 296 C 293 330, 296 374, 298 398 L 318 398 C 320 374, 323 330, 321 296 Z" fill="#d35400" />
+    <path d="M 200 144 C 228 148, 234 196, 202 208 C 210 186, 210 166, 200 144 Z" fill="#d35400" />
+    <path d="M 168.4 163 L 176.4 129 L 183.4 163 Z" fill="#f39c12" />
+    <path d="M 178.4 163 L 186.4 127 L 193.4 163 Z" fill="#f39c12" />
+    <path d="M 181.2 164.4 C 173.2 142.4, 195.2 134.4, 207.2 148.4 C 197.2 152.4, 189.2 160.4, 193.2 166.4 Z" fill="#f39c12" fill-opacity="0.85" />
+    <path d="M 158.2 176.4 L 162.2 148.4 L 169.2 176.4 Z" fill="#f39c12" />
+    <path d="M 181.6 187.4 L 205.6 197.4 L 183.6 199.4 Z" fill="#f39c12" />
+    <path d="M 190 210 L 214 206 L 214 216 L 190 220 Z" fill="#f39c12" fill-opacity="0.7" />
+    <path d="M 200 222 L 224 218 L 224 228 L 200 232 Z" fill="#f39c12" fill-opacity="0.7" />
   </g>
 </svg>

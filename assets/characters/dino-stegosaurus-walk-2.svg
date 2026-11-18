@@ -1,19 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none" role="img" aria-label="dino-stegosaurus">
-  <g transform="translate(0 -3) rotate(-1.5 256 280)">
-    <path d="M300 340 C 370 340 430 360 470 390 C 420 396 360 380 305 362 Z" fill="#16a085" />
-    <path d="M150 245 C 150 195 195 165 250 168 C 305 170 328 205 322 258 C 316 312 285 340 232 340 C 178 340 150 308 150 245 Z" fill="#5a6b7a" />
-    <path d="M196 218 C 188 184 212 156 248 152 C 284 148 306 164 304 190 C 302 214 280 226 248 230 Z" fill="#5a6b7a" />
-    <ellipse cx="252" cy="176" rx="46" ry="26" fill="#5a6b7a" transform="rotate(-12 252 176)" />
-    <circle cx="276" cy="168" r="6" fill="#ffffff" />
-    <circle cx="276" cy="168" r="3" fill="#1b1b1b" />
-    <path d="M170 190 L 182 140 L 202 186 Z" fill="#16a085" />
-    <path d="M204 176 L 218 122 L 240 172 Z" fill="#16a085" />
-    <path d="M242 170 L 258 118 L 280 168 Z" fill="#16a085" />
-    <path d="M282 176 L 296 130 L 314 184 Z" fill="#16a085" />
-    <path d="M184 320 L 176 380 L 204 380 L 212 320 Z" fill="#16a085" transform="translate(0 4)" />
-    <path d="M266 320 L 258 380 L 286 380 L 294 320 Z" fill="#16a085" transform="translate(0 -4)" />
-    <path d="M214 306 L 210 340 L 226 340 L 230 306 Z" fill="#16a085" />
-    <path d="M244 306 L 240 340 L 256 340 L 260 306 Z" fill="#16a085" />
+  <defs>
+    <linearGradient id="gb-dino-stegosaurus" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#85919d" />
+      <stop offset="0.62" stop-color="#5a6b7a" />
+      <stop offset="1" stop-color="#73899c" />
+    </linearGradient>
+    <linearGradient id="gh-dino-stegosaurus" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#929da7" />
+      <stop offset="1" stop-color="#687c8e" />
+    </linearGradient>
+  </defs>
+  <g transform="translate(0 -4) rotate(-1.6 250 254)">
+    <ellipse cx="264" cy="404" rx="92" ry="13" fill="#0b1b2a" fill-opacity="0.18" />
+    <path d="M 338 256 C 404 260, 466 278, 518 298 C 458 298, 398 288, 344 278 Z" fill="#16a085" />
+    <path d="M 150 254 C 150 194, 210 186.8, 275 192.8 C 335 198.8, 350 236, 344 268.4 C 336 309.2, 280 318.8, 220 314 C 170 309.2, 150 278, 150 254 Z" fill="url(#gb-dino-stegosaurus)" />
+    <path d="M 166 250 C 146 232, 176 232, 166 210 C 178 230, 188 242, 182 266 Z" fill="url(#gh-dino-stegosaurus)" />
+    <path d="M 128 202 C 128 176, 180 178.6, 182.6 204.6 C 185.2 222.8, 159.2 228, 141 220.2 C 129.3 216.3, 128 212.4, 128 202 Z" fill="url(#gh-dino-stegosaurus)" />
+    <path d="M 128.52 212.4 C 120.19999999999999 211.36, 120.72 220.72, 130.07999999999998 220.2 Z" fill="#f39c12" fill-opacity="0.9" />
+    <path d="M 152.74 197.84 a 7.5 7.5 0 1 0 15 0 a 7.5 7.5 0 1 0 -15 0 Z" fill="#ffffff" />
+    <path d="M 157.68 198.36 a 3.6 3.6 0 1 0 7.2 0 a 3.6 3.6 0 1 0 -7.2 0 Z" fill="#1b1b1b" />
+    <path d="M 185 300.1 C 183 334.1, 186 371.2, 188 395.2 L 208 395.2 C 210 371.2, 213 334.1, 211 300.1 Z" fill="#16a085" />
+    <path d="M 221 295.9 C 219 329.9, 222 374, 224 398 L 244 398 C 246 374, 249 329.9, 247 295.9 Z" fill="#16a085" />
+    <path d="M 267 300.1 C 265 334.1, 268 371.2, 270 395.2 L 290 395.2 C 292 371.2, 295 334.1, 293 300.1 Z" fill="#16a085" />
+    <path d="M 305 295.9 C 303 329.9, 306 374, 308 398 L 328 398 C 330 374, 333 329.9, 331 295.9 Z" fill="#16a085" />
+    <path d="M 188 218.8 L 195 190.8 L 202 218.8 Z" fill="#f39c12" />
+    <path d="M 206.33333333333334 218.8 L 213.33333333333334 189.8 L 220.33333333333334 218.8 Z" fill="#f39c12" />
+    <path d="M 224.66666666666669 218.8 L 231.66666666666669 188.8 L 238.66666666666669 218.8 Z" fill="#f39c12" />
+    <path d="M 243 218.8 L 250 187.8 L 257 218.8 Z" fill="#f39c12" />
+    <path d="M 261.33333333333337 218.8 L 268.33333333333337 186.8 L 275.33333333333337 218.8 Z" fill="#f39c12" />
+    <path d="M 279.6666666666667 218.8 L 286.6666666666667 185.8 L 293.6666666666667 218.8 Z" fill="#f39c12" />
+    <path d="M 298 218.8 L 305 184.8 L 312 218.8 Z" fill="#f39c12" />
+    <path d="M 316.33333333333337 218.8 L 323.33333333333337 183.8 L 330.33333333333337 218.8 Z" fill="#f39c12" />
+    <path d="M 334.6666666666667 218.8 L 341.6666666666667 182.8 L 348.6666666666667 218.8 Z" fill="#f39c12" />
+    <path d="M 200 219.2 L 207 195.2 L 212 219.2 Z" fill="#f39c12" fill-opacity="0.9" />
+    <path d="M 210 219.2 L 217 195.2 L 222 219.2 Z" fill="#f39c12" fill-opacity="0.9" />
+    <path d="M 220 219.2 L 227 195.2 L 232 219.2 Z" fill="#f39c12" fill-opacity="0.9" />
+    <path d="M 230 219.2 L 237 195.2 L 242 219.2 Z" fill="#f39c12" fill-opacity="0.9" />
+    <path d="M 240 219.2 L 247 195.2 L 252 219.2 Z" fill="#f39c12" fill-opacity="0.9" />
+    <path d="M 250 219.2 L 257 195.2 L 262 219.2 Z" fill="#f39c12" fill-opacity="0.9" />
+    <path d="M 260 219.2 L 267 195.2 L 272 219.2 Z" fill="#f39c12" fill-opacity="0.9" />
+    <path d="M 270 219.2 L 277 195.2 L 282 219.2 Z" fill="#f39c12" fill-opacity="0.9" />
+    <path d="M 280 219.2 L 287 195.2 L 292 219.2 Z" fill="#f39c12" fill-opacity="0.9" />
+    <path d="M 356 260 L 376 270 L 356 276 Z" fill="#f39c12" />
+    <path d="M 370 263 L 390 273 L 370 279 Z" fill="#f39c12" />
+    <path d="M 384 266 L 404 276 L 384 282 Z" fill="#f39c12" />
+    <path d="M 398 269 L 418 279 L 398 285 Z" fill="#f39c12" />
   </g>
 </svg>

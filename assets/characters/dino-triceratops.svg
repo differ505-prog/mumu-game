@@ -1,19 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none" role="img" aria-label="dino-triceratops">
-  <g transform="translate(0 0) rotate(0 256 280)">
-    <path d="M300 340 C 370 340 430 360 470 390 C 420 396 360 380 305 362 Z" fill="#c0392b" />
-    <path d="M150 245 C 150 195 195 165 250 168 C 305 170 328 205 322 258 C 316 312 285 340 232 340 C 178 340 150 308 150 245 Z" fill="#4a9d5f" />
-    <path d="M196 215 C 186 180 206 152 244 146 C 280 140 302 156 302 184 C 302 208 280 222 248 226 Z" fill="#4a9d5f" />
-    <ellipse cx="252" cy="168" rx="56" ry="34" fill="#4a9d5f" transform="rotate(-8 252 168)" />
-    <path d="M206 190 C 190 200 186 220 196 236 C 216 232 230 214 232 194 Z" fill="#c0392b" />
-    <path d="M212 142 L 204 96 L 224 138 Z" fill="#f39c12" />
-    <path d="M244 134 L 244 84 L 262 134 Z" fill="#f39c12" />
-    <path d="M276 140 L 288 96 L 296 146 Z" fill="#f39c12" />
-    <circle cx="272" cy="162" r="6" fill="#ffffff" />
-    <circle cx="272" cy="162" r="3" fill="#1b1b1b" />
-    <path d="M184 320 L 176 380 L 204 380 L 212 320 Z" fill="#c0392b" transform="translate(0 0)" />
-    <path d="M266 320 L 258 380 L 286 380 L 294 320 Z" fill="#c0392b" transform="translate(0 0)" />
-    <path d="M214 306 L 210 340 L 226 340 L 230 306 Z" fill="#c0392b" />
-    <path d="M244 306 L 240 340 L 256 340 L 260 306 Z" fill="#c0392b" />
+  <defs>
+    <linearGradient id="gb-dino-triceratops" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#79b689" />
+      <stop offset="0.62" stop-color="#4a9d5f" />
+      <stop offset="1" stop-color="#5fc97a" />
+    </linearGradient>
+    <linearGradient id="gh-dino-triceratops" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#88be95" />
+      <stop offset="1" stop-color="#56b66e" />
+    </linearGradient>
+  </defs>
+  <g transform="translate(0 0) rotate(0 246 252)">
+    <ellipse cx="260" cy="404" rx="82.8" ry="13" fill="#0b1b2a" fill-opacity="0.18" />
+    <path d="M 324 254 C 390 258, 452 276, 504 296 C 444 296, 384 286, 330 276 Z" fill="#c0392b" />
+    <path d="M 156 252 C 156 188, 210 180.32, 268.5 186.72 C 322.5 193.12, 336 232.8, 330.6 267.36 C 323.4 310.88, 273 321.12, 219 316 C 174 310.88, 156 277.6, 156 252 Z" fill="url(#gb-dino-triceratops)" />
+    <path d="M 168 238 C 146 218, 194 218, 182 190 C 196 212, 198 228, 190 260 Z" fill="url(#gh-dino-triceratops)" />
+    <path d="M 136 178 C 136 146, 200 149.2, 203.2 181.2 C 206.4 203.6, 174.4 210, 152 200.4 C 137.6 195.6, 136 190.8, 136 178 Z" fill="url(#gh-dino-triceratops)" />
+    <path d="M 136.64 190.8 C 126.4 189.52, 127.03999999999999 201.04, 138.56 200.4 Z" fill="#f39c12" fill-opacity="0.9" />
+    <path d="M 168.18 172.88 a 7.5 7.5 0 1 0 15 0 a 7.5 7.5 0 1 0 -15 0 Z" fill="#ffffff" />
+    <path d="M 173.36 173.52 a 3.6 3.6 0 1 0 7.2 0 a 3.6 3.6 0 1 0 -7.2 0 Z" fill="#1b1b1b" />
+    <path d="M 187 300 C 185 334, 188 374, 190 398 L 210 398 C 212 374, 215 334, 213 300 Z" fill="#c0392b" />
+    <path d="M 223 300 C 221 334, 224 374, 226 398 L 246 398 C 248 374, 251 334, 249 300 Z" fill="#c0392b" />
+    <path d="M 261 300 C 259 334, 262 374, 264 398 L 284 398 C 286 374, 289 334, 287 300 Z" fill="#c0392b" />
+    <path d="M 295 300 C 293 334, 296 374, 298 398 L 318 398 C 320 374, 323 334, 321 300 Z" fill="#c0392b" />
+    <path d="M 190 146 C 218 150, 224 198, 192 210 C 200 188, 200 168, 190 146 Z" fill="#c0392b" />
+    <path d="M 155.6 162 L 163.6 128 L 170.6 162 Z" fill="#f39c12" />
   </g>
 </svg>

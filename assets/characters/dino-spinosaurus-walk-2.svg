@@ -1,13 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none" role="img" aria-label="dino-spinosaurus">
-  <g transform="translate(0 -3) rotate(-1.5 256 280)">
-    <path d="M300 340 C 370 340 430 360 470 390 C 420 396 360 380 305 362 Z" fill="#8e44ad" />
-    <path d="M150 250 C 150 200 190 175 245 178 C 300 180 320 210 315 265 C 310 320 280 345 230 345 C 180 345 150 315 150 250 Z" fill="#34495e" />
-    <path d="M175 240 C 140 210 132 160 148 120 C 158 96 186 92 198 114 C 210 138 200 180 205 226 Z" fill="#34495e" />
-    <ellipse cx="170" cy="108" rx="42" ry="30" fill="#34495e" transform="rotate(-14 170 108)" />
-    <circle cx="152" cy="98" r="6" fill="#f39c12" />
-    <circle cx="152" cy="98" r="2.5" fill="#1b1b1b" />
-    <path d="M182 330 L 172 396 L 198 396 L 206 330 Z" fill="#8e44ad" transform="translate(0 4)" />
-    <path d="M268 330 L 258 396 L 284 396 L 292 330 Z" fill="#8e44ad" transform="translate(0 -4)" />
+  <defs>
+    <linearGradient id="gb-dino-spinosaurus" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#697888" />
+      <stop offset="0.62" stop-color="#34495e" />
+      <stop offset="1" stop-color="#435d78" />
+    </linearGradient>
+    <linearGradient id="gh-dino-spinosaurus" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#798795" />
+      <stop offset="1" stop-color="#3c556d" />
+    </linearGradient>
+  </defs>
+  <g transform="translate(0 -4) rotate(-1.6 252 266)">
+    <ellipse cx="266" cy="404" rx="90.16000000000001" ry="13" fill="#0b1b2a" fill-opacity="0.18" />
+    <path d="M 338 262 C 412 252, 478 264, 534 282 C 470 288, 404 288, 346 286 Z" fill="#8e44ad" />
+    <path d="M 154 266 C 154 204, 212.8 196.56, 276.5 202.76 C 335.3 208.96, 350 247.4, 344.12 280.88 C 336.28 323.04, 281.4 332.96000000000004, 222.6 328 C 173.6 323.04, 154 290.8, 154 266 Z" fill="url(#gb-dino-spinosaurus)" />
+    <path d="M 160 246 C 132 196, 166 184, 152 146 C 166 178, 198 220, 188 272 Z" fill="url(#gh-dino-spinosaurus)" />
+    <path d="M 110 124 C 110 94, 170 97, 173 127 C 176 148, 146 154, 125 145 C 111.5 140.5, 110 136, 110 124 Z" fill="url(#gh-dino-spinosaurus)" />
+    <path d="M 110.6 136 C 101 134.8, 101.6 145.6, 112.4 145 Z" fill="#f39c12" fill-opacity="0.9" />
+    <path d="M 139.7 119.2 a 7.5 7.5 0 1 0 15 0 a 7.5 7.5 0 1 0 -15 0 Z" fill="#ffffff" />
+    <path d="M 144.8 119.8 a 3.6 3.6 0 1 0 7.2 0 a 3.6 3.6 0 1 0 -7.2 0 Z" fill="#1b1b1b" />
+    <path d="M 185 314.1 C 183 348.1, 186 371.2, 188 395.2 L 208 395.2 C 210 371.2, 213 348.1, 211 314.1 Z" fill="#8e44ad" />
+    <path d="M 225 309.9 C 223 343.9, 226 374, 228 398 L 248 398 C 250 374, 253 343.9, 251 309.9 Z" fill="#8e44ad" />
+    <path d="M 271 314.1 C 269 348.1, 272 371.2, 274 395.2 L 294 395.2 C 296 371.2, 299 348.1, 297 314.1 Z" fill="#8e44ad" />
+    <path d="M 311 309.9 C 309 343.9, 312 374, 314 398 L 334 398 C 336 374, 339 343.9, 337 309.9 Z" fill="#8e44ad" />
+    <path d="M 212.6 234.8 L 226.6 176.8 L 234.6 232.8 Z" fill="#f39c12" fill-opacity="0.85" />
+    <path d="M 242 234.8 L 256 173.8 L 264 232.8 Z" fill="#f39c12" fill-opacity="0.85" />
+    <path d="M 271.4 234.8 L 285.4 170.8 L 293.4 232.8 Z" fill="#f39c12" fill-opacity="0.85" />
+    <path d="M 300.79999999999995 234.8 L 314.79999999999995 167.8 L 322.79999999999995 232.8 Z" fill="#f39c12" fill-opacity="0.85" />
+    <path d="M 191.1 229.36 L 198.1 201.36 L 205.1 229.36 Z" fill="#f39c12" />
+    <path d="M 209.06666666666666 229.36 L 216.06666666666666 200.36 L 223.06666666666666 229.36 Z" fill="#f39c12" />
+    <path d="M 227.03333333333333 229.36 L 234.03333333333333 199.36 L 241.03333333333333 229.36 Z" fill="#f39c12" />
+    <path d="M 150 158 L 174 154 L 174 164 L 150 168 Z" fill="#f39c12" fill-opacity="0.7" />
+    <path d="M 160 170 L 184 166 L 184 176 L 160 180 Z" fill="#f39c12" fill-opacity="0.7" />
+    <path d="M 362 278 C 384 272, 390 300, 368 302 C 358 300, 358 280, 362 278 Z" fill="#8e44ad" />
+    <path d="M 199.9 237.9 L 211.9 209.9 L 219.9 235.9 Z" fill="#f39c12" />
+    <path d="M 360 266 L 382 240 L 384 272 Z" fill="#f39c12" fill-opacity="0.85" />
   </g>
 </svg>

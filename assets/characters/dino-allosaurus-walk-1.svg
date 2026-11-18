@@ -1,18 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none" role="img" aria-label="dino-allosaurus">
-  <g transform="translate(0 0) rotate(0 256 280)">
-    <path d="M300 330 C 380 320 440 280 470 240 C 455 300 400 350 320 372 Z" fill="#2c3e50" />
-    <path d="M150 245 C 150 195 195 165 250 168 C 305 170 328 205 322 258 C 316 312 285 340 232 340 C 178 340 150 308 150 245 Z" fill="#e67e22" />
-    <path d="M205 200 C 200 165 218 138 252 130 C 288 122 315 140 318 168 C 320 192 300 208 268 212 Z" fill="#e67e22" />
-    <path d="M250 128 C 288 106 330 112 348 134 C 332 140 300 144 276 142 Z" fill="#e67e22" />
-    <path d="M320 122 L 344 118 L 322 132 Z" fill="#f39c12" />
-    <circle cx="300" cy="132" r="6" fill="#f39c12" />
-    <circle cx="300" cy="132" r="2.5" fill="#1b1b1b" />
-    <path d="M292 142 L 298 156 L 304 141 Z" fill="#ffffff" />
-    <path d="M310 140 L 315 152 L 320 139 Z" fill="#ffffff" />
-    <path d="M184 320 L 176 380 L 204 380 L 212 320 Z" fill="#2c3e50" transform="translate(0 0)" />
-    <path d="M266 320 L 258 380 L 286 380 L 294 320 Z" fill="#2c3e50" transform="translate(0 0)" />
-    <path d="M214 306 L 210 340 L 226 340 L 230 306 Z" fill="#2c3e50" />
-    <path d="M244 306 L 240 340 L 256 340 L 260 306 Z" fill="#2c3e50" />
+  <defs>
+    <linearGradient id="gb-dino-allosaurus" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eda05b" />
+      <stop offset="0.62" stop-color="#e67e22" />
+      <stop offset="1" stop-color="#ffa12c" />
+    </linearGradient>
+    <linearGradient id="gh-dino-allosaurus" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#efaa6d" />
+      <stop offset="1" stop-color="#ff9227" />
+    </linearGradient>
+  </defs>
+  <g transform="translate(0 0) rotate(0 248 228)">
+    <ellipse cx="262" cy="404" rx="73.60000000000001" ry="13" fill="#0b1b2a" fill-opacity="0.18" />
+    <path d="M 316 230 C 382 234, 444 252, 496 272 C 436 272, 376 262, 322 252 Z" fill="#2c3e50" />
+    <path d="M 168 228 C 168 172, 216 165.28, 268 170.88 C 316 176.48, 328 211.2, 323.2 241.44 C 316.8 279.52, 272 288.48, 224 284 C 184 279.52, 168 250.4, 168 228 Z" fill="url(#gb-dino-allosaurus)" />
+    <path d="M 186 208 C 154 182, 192 192, 178 162 C 194 186, 214 198, 206 232 Z" fill="url(#gh-dino-allosaurus)" />
+    <path d="M 132 148 C 132 118, 192 121, 195 151 C 198 172, 168 178, 147 169 C 133.5 164.5, 132 160, 132 148 Z" fill="url(#gh-dino-allosaurus)" />
+    <path d="M 132 158.5 C 118.5 156.4, 120 169.6, 135 169 Z" fill="#f4f1e8" fill-opacity="0.95" />
+    <path d="M 161.7 143.2 a 7.5 7.5 0 1 0 15 0 a 7.5 7.5 0 1 0 -15 0 Z" fill="#ffffff" />
+    <path d="M 166.8 143.8 a 3.6 3.6 0 1 0 7.2 0 a 3.6 3.6 0 1 0 -7.2 0 Z" fill="#1b1b1b" />
+    <path d="M 205 278 C 203 312, 206 374, 208 398 L 228 398 C 230 374, 233 312, 231 278 Z" fill="#2c3e50" />
+    <path d="M 265 278 C 263 312, 266 374, 268 398 L 288 398 C 290 374, 293 312, 291 278 Z" fill="#2c3e50" />
+    <path d="M 204 258.8 C 218 270, 278 270, 292 256 L 288 243.68 C 272 256, 222 256, 208 243.68 Z" fill="#2c3e50" fill-opacity="0.55" />
+    <path d="M 338 228 L 360 202 L 362 234 Z" fill="#f39c12" fill-opacity="0.85" />
+    <path d="M 204 203.2 L 216 175.2 L 224 201.2 Z" fill="#f39c12" />
   </g>
 </svg>

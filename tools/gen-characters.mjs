@@ -5,6 +5,8 @@
  * - 全部使用去背向量（512×512 viewBox，透明背景，無底色矩形）。
  * - 每隻恐龍具可辨識特徵（角、頭冠、背板、尾錘、翼膜等）。
  * - 步行變體以腳位與身體高度微幅變化形成 4 幀循環。
+ * - 體型多樣化（Step 93）：骨架與特徵由 tools/dino-bodies.mjs 的
+ *   BODY_TYPES 原型庫定義，24 隻分屬 20 種體型。
  * - 這些是「佔位美術」：正式素材可由插畫外包替換，替換只換檔案不改程式碼。
  */
 
@@ -12,6 +14,7 @@ import { writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { readFileSync } from "node:fs";
+import { BODY_TYPES, DINO_BODY, DINO_VARIANTS, buildDinoSvg } from "./dino-bodies.mjs";
 
 /**
  * 輸出報告（避免 console.log 殘留）。
@@ -26,22 +29,23 @@ const outDir = join(root, "assets/characters");
 mkdirSync(outDir, { recursive: true });
 
 /**
- * 依 id 判斷造型類型。
+ * 取得角色對應的體型原型鍵。
  * @param {string} id
+ * @returns {string}
  */
-function silhouette(id) {
-    if (id.includes("triceratops") || id.includes("carnotaurus") || id.includes("ceratosaurus")) return "horned";
-    if (id.includes("trex") || id.includes("tyrannosaurus") || id.includes("allosaurus")) return "theropod";
-    if (id.includes("brachiosaurus") || id.includes("diplodocus") || id.includes("spinosaurus") || id.includes("mosasaurus")) return "sauropod";
-    if (id.includes("pteranodon") || id.includes("dilophosaurus") || id.includes("oviraptor")) return "crested";
-    if (id.includes("stegosaurus")) return "plated";
-    if (id.includes("ankylosaurus")) return "clubbed";
-    if (id.includes("velociraptor") || id.includes("eoraptor") || id.includes("compysognathus") || id.includes("iguanodon") || id.includes("trachodon") || id.includes("maiasaura")) return "light";
-    return "basic";
+function bodyTypeFor(id) {
+    const key = DINO_BODY[id];
+    if (!key) throw new Error(`未定義體型原型：${id}`);
+    if (!BODY_TYPES[key]) throw new Error(`體型原型不存在：${key}`);
+    return key;
 }
 
 /**
  * 產生單隻恐龍的 SVG 內容。
+ *
+ * 骨架與特徵由 tools/dino-bodies.mjs 的 BODY_TYPES 定義；
+ * 每隻角色保留既有配色，並附帶漸層與接地陰影。
+ *
  * @param {string} id
  * @param {string} primary
  * @param {string} secondary
@@ -49,114 +53,13 @@ function silhouette(id) {
  * @param {number} frame 步行幀（0–3）
  */
 function dinoSvg(id, primary, secondary, accent, frame) {
-    const kind = silhouette(id);
-    const lift = [0, -3, -5, -2][frame];
-    const rot = [0, -1.5, 0, 1.5][frame];
-    const legA = [0, 4, 0, -4][frame];
-    const legB = [0, -4, 0, 4][frame];
-
-    /** @type {string[]} */
-    const parts = [];
-
-    // 尾巴（所有類型共有，方向依類型微調）
-    const tailPath = kind === "theropod"
-        ? "M300 330 C 380 320 440 280 470 240 C 455 300 400 350 320 372 Z"
-        : "M300 340 C 370 340 430 360 470 390 C 420 396 360 380 305 362 Z";
-    parts.push(`<path d="${tailPath}" fill="${secondary}" />`);
-
-    // 身體
-    const bodyPath = kind === "sauropod"
-        ? "M150 250 C 150 200 190 175 245 178 C 300 180 320 210 315 265 C 310 320 280 345 230 345 C 180 345 150 315 150 250 Z"
-        : kind === "light"
-            ? "M160 250 C 160 212 190 192 232 194 C 275 196 292 218 288 258 C 284 300 262 322 222 322 C 182 322 160 296 160 250 Z"
-            : "M150 245 C 150 195 195 165 250 168 C 305 170 328 205 322 258 C 316 312 285 340 232 340 C 178 340 150 308 150 245 Z";
-    parts.push(`<path d="${bodyPath}" fill="${primary}" />`);
-
-    // 頸與頭
-    if (kind === "sauropod") {
-        parts.push(`<path d="M175 240 C 140 210 132 160 148 120 C 158 96 186 92 198 114 C 210 138 200 180 205 226 Z" fill="${primary}" />`);
-        parts.push(`<ellipse cx="170" cy="108" rx="42" ry="30" fill="${primary}" transform="rotate(-14 170 108)" />`);
-        parts.push(`<circle cx="152" cy="98" r="6" fill="${accent}" />`);
-        parts.push(`<circle cx="152" cy="98" r="2.5" fill="#1b1b1b" />`);
-    } else if (kind === "theropod") {
-        parts.push(`<path d="M205 200 C 200 165 218 138 252 130 C 288 122 315 140 318 168 C 320 192 300 208 268 212 Z" fill="${primary}" />`);
-        parts.push(`<path d="M250 128 C 288 106 330 112 348 134 C 332 140 300 144 276 142 Z" fill="${primary}" />`);
-        parts.push(`<path d="M320 122 L 344 118 L 322 132 Z" fill="${accent}" />`);
-        parts.push(`<circle cx="300" cy="132" r="6" fill="${accent}" />`);
-        parts.push(`<circle cx="300" cy="132" r="2.5" fill="#1b1b1b" />`);
-        // 牙齒
-        parts.push(`<path d="M292 142 L 298 156 L 304 141 Z" fill="#ffffff" />`);
-        parts.push(`<path d="M310 140 L 315 152 L 320 139 Z" fill="#ffffff" />`);
-    } else if (kind === "horned") {
-        parts.push(`<path d="M196 215 C 186 180 206 152 244 146 C 280 140 302 156 302 184 C 302 208 280 222 248 226 Z" fill="${primary}" />`);
-        parts.push(`<ellipse cx="252" cy="168" rx="56" ry="34" fill="${primary}" transform="rotate(-8 252 168)" />`);
-        // 頭盾
-        parts.push(`<path d="M206 190 C 190 200 186 220 196 236 C 216 232 230 214 232 194 Z" fill="${secondary}" />`);
-        // 三支角
-        parts.push(`<path d="M212 142 L 204 96 L 224 138 Z" fill="${accent}" />`);
-        parts.push(`<path d="M244 134 L 244 84 L 262 134 Z" fill="${accent}" />`);
-        parts.push(`<path d="M276 140 L 288 96 L 296 146 Z" fill="${accent}" />`);
-        parts.push(`<circle cx="272" cy="162" r="6" fill="#ffffff" />`);
-        parts.push(`<circle cx="272" cy="162" r="3" fill="#1b1b1b" />`);
-    } else if (kind === "crested") {
-        parts.push(`<path d="M198 214 C 190 178 214 148 254 142 C 292 136 314 154 312 182 C 310 208 286 222 252 226 Z" fill="${primary}" />`);
-        parts.push(`<ellipse cx="258" cy="166" rx="48" ry="28" fill="${primary}" transform="rotate(-10 258 166)" />`);
-        // 頭冠
-        parts.push(`<path d="M232 140 C 240 96 280 84 300 108 C 286 116 258 128 236 148 Z" fill="${accent}" />`);
-        parts.push(`<path d="M204 168 L 116 196 L 208 186 Z" fill="${secondary}" />`);
-        parts.push(`<circle cx="282" cy="160" r="6" fill="#ffffff" />`);
-        parts.push(`<circle cx="282" cy="160" r="3" fill="#1b1b1b" />`);
-    } else if (kind === "plated") {
-        parts.push(`<path d="M196 218 C 188 184 212 156 248 152 C 284 148 306 164 304 190 C 302 214 280 226 248 230 Z" fill="${primary}" />`);
-        parts.push(`<ellipse cx="252" cy="176" rx="46" ry="26" fill="${primary}" transform="rotate(-12 252 176)" />`);
-        parts.push(`<circle cx="276" cy="168" r="6" fill="#ffffff" />`);
-        parts.push(`<circle cx="276" cy="168" r="3" fill="#1b1b1b" />`);
-        // 背板
-        parts.push(`<path d="M170 190 L 182 140 L 202 186 Z" fill="${secondary}" />`);
-        parts.push(`<path d="M204 176 L 218 122 L 240 172 Z" fill="${secondary}" />`);
-        parts.push(`<path d="M242 170 L 258 118 L 280 168 Z" fill="${secondary}" />`);
-        parts.push(`<path d="M282 176 L 296 130 L 314 184 Z" fill="${secondary}" />`);
-    } else if (kind === "clubbed") {
-        parts.push(`<path d="M196 220 C 188 188 210 162 246 158 C 280 154 300 170 298 194 C 296 216 274 226 244 230 Z" fill="${primary}" />`);
-        parts.push(`<ellipse cx="250" cy="180" rx="44" ry="26" fill="${primary}" transform="rotate(-6 250 180)" />`);
-        parts.push(`<circle cx="272" cy="176" r="5" fill="#ffffff" />`);
-        parts.push(`<circle cx="272" cy="176" r="2.5" fill="#1b1b1b" />`);
-        // 尾錘
-        parts.push(`<ellipse cx="474" cy="396" rx="26" ry="22" fill="${secondary}" />`);
-        // 背刺
-        parts.push(`<path d="M186 186 L 176 150 L 200 180 Z" fill="${accent}" />`);
-        parts.push(`<path d="M214 176 L 208 138 L 232 172 Z" fill="${accent}" />`);
-    } else {
-        parts.push(`<path d="M198 216 C 190 182 214 154 250 150 C 286 146 306 164 304 190 C 302 214 278 226 248 230 Z" fill="${primary}" />`);
-        parts.push(`<ellipse cx="254" cy="176" rx="44" ry="28" fill="${primary}" transform="rotate(-8 254 176)" />`);
-        parts.push(`<circle cx="278" cy="168" r="6" fill="#ffffff" />`);
-        parts.push(`<circle cx="278" cy="168" r="3" fill="#1b1b1b" />`);
-        parts.push(`<path d="M288 182 L 306 190 L 288 190 Z" fill="${secondary}" />`);
-    }
-
-    // 腿
-    const legColor = secondary;
-    if (kind === "light") {
-        parts.push(`<path d="M186 306 L 178 352 L 200 352 L 206 306 Z" fill="${legColor}" transform="translate(0 ${legA})" />`);
-        parts.push(`<path d="M248 306 L 240 352 L 262 352 L 268 306 Z" fill="${legColor}" transform="translate(0 ${legB})" />`);
-    } else if (kind === "sauropod") {
-        parts.push(`<path d="M182 330 L 172 396 L 198 396 L 206 330 Z" fill="${legColor}" transform="translate(0 ${legA})" />`);
-        parts.push(`<path d="M268 330 L 258 396 L 284 396 L 292 330 Z" fill="${legColor}" transform="translate(0 ${legB})" />`);
-    } else {
-        parts.push(`<path d="M184 320 L 176 380 L 204 380 L 212 320 Z" fill="${legColor}" transform="translate(0 ${legA})" />`);
-        parts.push(`<path d="M266 320 L 258 380 L 286 380 L 294 320 Z" fill="${legColor}" transform="translate(0 ${legB})" />`);
-        // 前肢
-        parts.push(`<path d="M214 306 L 210 340 L 226 340 L 230 306 Z" fill="${legColor}" />`);
-        parts.push(`<path d="M244 306 L 240 340 L 256 340 L 260 306 Z" fill="${legColor}" />`);
-    }
-
-    return `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none" role="img" aria-label="${id}">
-  <g transform="translate(0 ${lift}) rotate(${rot} 256 280)">
-    ${parts.join("\n    ")}
-  </g>
-</svg>
-`;
+    return buildDinoSvg(
+        id,
+        { primary, secondary, accent },
+        bodyTypeFor(id),
+        frame,
+        DINO_VARIANTS[id] || []
+    );
 }
 
 /**
