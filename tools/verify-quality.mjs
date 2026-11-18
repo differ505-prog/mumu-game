@@ -514,6 +514,26 @@ function checkVisualSceneDiff() {
 }
 
 /**
+ * 三支柱整合：切換場景時，音樂與場景色票必須在 startLevel 內同時套用。
+ */
+function checkIntegrationSceneSwitch() {
+    const main = readSrc("src/js/main.js");
+    if (!main) return { ok: false, msg: "無法讀取 main.js" };
+
+    const fn = main.match(/function startLevel[\s\S]*?\n\}/);
+    if (!fn) return { ok: false, msg: "main.js 找不到 startLevel 函式" };
+
+    const body = fn[0];
+    if (!/playSceneMusic\s*\(/.test(body)) {
+        return { ok: false, msg: "startLevel 未呼叫 playSceneMusic（場景切換時音樂不會同步）" };
+    }
+    if (!/applyTheme\s*\(/.test(body)) {
+        return { ok: false, msg: "startLevel 未呼叫 applyTheme（場景切換時色票不會同步）" };
+    }
+    return { ok: true, msg: "startLevel 內同時切換音樂與場景色票" };
+}
+
+/**
  * 5. 程序化場景音樂：每個場景必須有獨立定義，且 (root, tempo) 互不相同。
  */
 function checkMusicSceneDistinct() {
@@ -940,6 +960,7 @@ const CHECKS = [
     { id: "visual-manifest-sync", phase: "visual", fn: checkVisualManifestSync },
     { id: "visual-parallax", phase: "visual", fn: checkVisualParallax },
     { id: "visual-scene-diff", phase: "visual", fn: checkVisualSceneDiff },
+    { id: "integration-scene-switch", phase: "integration", fn: checkIntegrationSceneSwitch },
     { id: "child-no-jargon", phase: "child", fn: checkChildNoJargon },
     { id: "child-no-eval-widget", phase: "child", fn: checkChildNoEvalWidget },
     { id: "child-voice-complete", phase: "child", fn: checkChildVoiceComplete },

@@ -146,29 +146,6 @@ async function loadChildVoice() {
 let currentSceneId = "";
 
 /**
- * 套用場景音樂。
- *
- * 規範：背景音必須自動播放並隨場景切換；不得硬編碼音檔路徑。
- * @param {string} scene
- */
-function applySceneAudio(scene) {
-    if (!scene || scene === currentSceneId) return;
-    currentSceneId = scene;
-    // 場景鍵由 playMusic 轉譯到程序化軌道
-    playMusic(scene);
-}
-
-/**
- * 套用場景視覺（色票）。
- * @param {string} scene
- */
-function applySceneVisual(scene) {
-    if (!scene) return;
-    applyTheme($("scene"), scene);
-    setParallax($("scene"), 0);
-}
-
-/**
  * 兒童化玩法名稱。
  *
  * 優先使用 content/child-voice.json 的 verbChildLabel（動作或角色名）；
@@ -233,8 +210,11 @@ function showStart() {
  */
 async function startGame() {
     ensureAudio(locale);
-    applySceneAudio("christmas");
-    applySceneVisual("christmas");
+    // 初始場景（聖誕）：音樂、色票、視差同步
+    currentSceneId = "christmas";
+    if (!playSceneMusic("christmas")) playMusic("christmas");
+    applyTheme($("scene"), "christmas");
+    setParallax($("scene"), 0);
     $("start-overlay").classList.add("hidden");
 
     const letter = bundle.narrative.letters.prologue?.[locale] || "";
@@ -350,8 +330,11 @@ function startLevel(levelId) {
 
     $("game-container").classList.remove("hidden");
     $("mode-indicator").textContent = childVerbLabel(level.verb, locale);
-    applySceneAudio(level.scene);
-    applySceneVisual(level.scene);
+    // 三支柱整合：切換場景時，音樂（playSceneMusic）與場景色票（applyTheme）必須同步
+    currentSceneId = level.scene;
+    if (!playSceneMusic(level.scene)) playMusic(level.scene);
+    applyTheme($("scene"), level.scene);
+    setParallax($("scene"), 0);
     setState({ level: levelId, chapter: level.chapter, verb: level.verb });
 
     hud.update({
