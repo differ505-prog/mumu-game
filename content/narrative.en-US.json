@@ -16,7 +16,13 @@
       "I'll stay right here with you.",
       "Take a slow breath, we go slowly.",
       "Your ears are especially sharp today.",
-      "Let's see the new way to play."
+      "Let's see the new way to play.",
+      "More stars fell down. Shall we go pick them up?",
+      "A new friend is waiting for you in this one.",
+      "Listen, a dinosaur is calling from far away.",
+      "Tune your ears. We are off.",
+      "Today's questions are hiding somewhere fun.",
+      "Want to walk this way with me?"
     ],
     "encourage": [
       "You did it!",
@@ -33,7 +39,13 @@
       "Very good indeed",
       "You're improving fast",
       "You heard it perfectly",
-      "That's the exact sound"
+      "That's the exact sound",
+      "Your ears are getting sharper.",
+      "Yes, that is the one!",
+      "You are brighter than a star.",
+      "This time you listened more carefully.",
+      "Tell me your answer!",
+      "You are almost there."
     ],
     "hint": [
       "Let's listen again together",
@@ -50,7 +62,13 @@
       "Follow my rhythm",
       "Look for a closer one",
       "The last sound is the lightest",
-      "Just focus on the middle one"
+      "Just focus on the middle one",
+      "Let me play that sound slower for you.",
+      "Listen and see whose tail is moving.",
+      "Count the sounds first.",
+      "The last sound needs careful listening.",
+      "Keep the first two sounds in your mind.",
+      "This hint is only a tiny one."
     ],
     "celebrate": [
       "You finished today's task!",
@@ -67,7 +85,13 @@
       "This is what effort looks like",
       "Let's see what you unlocked",
       "A new friend joined",
-      "That's enough for today"
+      "That's enough for today",
+      "Your team has one more!",
+      "All the stars are back!",
+      "Santa is smiling right now.",
+      "This is today's first star.",
+      "A new page of the collection opens.",
+      "Let us remember this moment."
     ],
     "comfort": [
       "It's okay, let's try again",
@@ -84,7 +108,13 @@
       "This time I'll hint you",
       "Mistakes are part of learning",
       "I never mind at all",
-      "Go on, I'm with you"
+      "Go on, I'm with you",
+      "It is okay. Mistakes are part of the adventure.",
+      "This one is too tricky. We can skip it.",
+      "Do you need a little more time?",
+      "Look at how interesting this sound is.",
+      "I will try it with you once more.",
+      "Take a deep breath. We start over."
     ]
   },
   "letters": {
@@ -456,6 +486,8 @@
   "dexPraise": [
     "You met {name}!",
     "{name} joined your dex!",
-    "A new friend: {name}!"
+    "A new friend: {name}!",
+    "{name} has been waiting for you!",
+    "Welcome {name} to the team!"
   ]
 }
