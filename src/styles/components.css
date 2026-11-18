@@ -479,14 +479,22 @@
     isolation: isolate;
 }
 
-/* 接地陰影：橢圓陰影層 + drop-shadow */
+/* 接地陰影：橢圓漸層（中心深、邊緣透），並依角色身高微調縮放 */
 .char__shadow {
-    width: 60%;
-    height: 10px;
+    --shadow-scale: 1;
+    --shadow-opacity: .28;
+    width: 62%;
+    height: 12px;
     margin-top: calc(-1 * var(--s-1));
-    background: rgba(0, 0, 0, .28);
+    background:
+        radial-gradient(ellipse 50% 50% at 50% 50%,
+            rgba(0, 0, 0, var(--shadow-opacity)) 0%,
+            rgba(0, 0, 0, calc(var(--shadow-opacity) * .62)) 42%,
+            rgba(0, 0, 0, 0) 78%);
     border-radius: 50%;
     filter: blur(3px);
+    transform: scaleX(var(--shadow-scale));
+    opacity: var(--shadow-opacity);
     transition: transform var(--t-settle) var(--e-spring),
                 opacity var(--t-settle) var(--e-standard);
 }
@@ -506,14 +514,59 @@
 
 /* 步行循環（4 幀由 JS 切換 src） */
 .char--walk .char__art { animation: char-step var(--t-base) var(--e-linear) infinite; }
-.char--walk .char__shadow { transform: scaleX(.86); opacity: .78; }
+.char--walk .char__shadow {
+    transform: scaleX(calc(var(--shadow-scale) * .86));
+    opacity: calc(var(--shadow-opacity) * .78);
+}
 
 /* 破殼演出 */
 .char--hatch .char__art { animation: char-hatch var(--t-epic) var(--e-spring); }
 
 .char--roar .char__shadow {
-    transform: scaleX(1.25);
-    opacity: .5;
+    transform: scaleX(calc(var(--shadow-scale) * 1.25));
+    opacity: calc(var(--shadow-opacity) * .5);
+}
+
+/* ---------- 情緒回饋（Step 94） ---------- */
+
+/* 圖鑑解鎖：短促跳躍（影子同步收縮再回彈） */
+.char--unlock .char__art { animation: char-unlock var(--t-scene) var(--e-spring); }
+.char--unlock .char__shadow {
+    animation: char-shadow-pulse var(--t-scene) var(--e-standard);
+}
+
+/* 關卡完成：上下彈跳 */
+.char--complete .char__art { animation: char-complete var(--t-scene) var(--e-spring); }
+.char--complete .char__shadow {
+    animation: char-shadow-pulse var(--t-scene) var(--e-standard);
+}
+
+/* reduced-motion：靜態狀態變化（高亮），不跳躍 */
+.char--unlock-static .char__art { filter: drop-shadow(0 0 12px rgba(241, 196, 15, .9)); }
+.char--complete-static .char__art { filter: drop-shadow(0 0 12px rgba(46, 204, 113, .8)); }
+
+@keyframes char-unlock {
+    0% { transform: translateY(0) scale(1); }
+    22% { transform: translateY(-26%) scale(1.06, .94); }
+    48% { transform: translateY(0) scale(.95, 1.06); }
+    70% { transform: translateY(-10%) scale(1.02, .98); }
+    100% { transform: translateY(0) scale(1); }
+}
+
+@keyframes char-complete {
+    0% { transform: translateY(0); }
+    20% { transform: translateY(-14%); }
+    40% { transform: translateY(0); }
+    58% { transform: translateY(-9%); }
+    76% { transform: translateY(0); }
+    90% { transform: translateY(-4%); }
+    100% { transform: translateY(0); }
+}
+
+@keyframes char-shadow-pulse {
+    0% { transform: scaleX(calc(var(--shadow-scale) * 1)); opacity: var(--shadow-opacity); }
+    40% { transform: scaleX(calc(var(--shadow-scale) * .7)); opacity: calc(var(--shadow-opacity) * .55); }
+    100% { transform: scaleX(calc(var(--shadow-scale) * 1)); opacity: var(--shadow-opacity); }
 }
 
 @keyframes char-breathe {

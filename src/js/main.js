@@ -15,7 +15,7 @@ import { ensureAudio } from "./audio/mixer.js";
 import { speak, setVoiceProfile } from "./audio/voice.js";
 import { playSfx, playDinoRoar, setSfxMap } from "./audio/sfx.js";
 import { createHud } from "./ui/hud.js";
-import { renderCharacter, playRoar, playHatch, lookAt } from "./ui/character-render.js";
+import { renderCharacter, playRoar, playHatch, playUnlock, playComplete, lookAt } from "./ui/character-render.js";
 import { haptic } from "./ui/haptics.js";
 import { burst, startAmbientSnow } from "./ui/particles.js";
 import { animate } from "./ui/motion.js";
@@ -381,7 +381,7 @@ function startLevel(levelId) {
         }
     });
 
-    playTimeline("level:start", runTimelineStep);
+    playEvent("level:start");
 }
 
 /**
@@ -395,7 +395,7 @@ function onLevelFinish(r) {
     hud.update({ score: r.correct, maxScore: r.total });
     burst($("snow-container"), { kind: "firework", count: 30 });
     haptic("celebrate");
-    playTimeline("level:complete", runTimelineStep);
+    playEvent("level:complete");
 
     const upText = $("level-up-text");
     if (upText) {
@@ -463,7 +463,7 @@ function onLevelFinish(r) {
                 locale === "en-US" ? `New dinosaur: ${dino.name?.[locale] || dino.id}` : `新夥伴解鎖：${dino.name?.["zh-TW"] || dino.id}`,
                 "good"
             );
-            playTimeline("dex:unlock", runTimelineStep);
+            playEvent("dex:unlock");
         }
     }
 
@@ -482,10 +482,11 @@ function onLevelFinish(r) {
 /* ---------- 時間軸執行 ---------- */
 /**
  * 執行時間軸步驟。
+ * @param {string} eventName 事件名稱（用於判斷角色情緒回饋）
  * @param {string} track
  * @param {any} step
  */
-function runTimelineStep(track, step) {
+function runTimelineStep(eventName, track, step) {
     switch (track) {
         case "motion":
             if (step.target) animate(step.target, step.anim || "pop");
@@ -510,6 +511,23 @@ function runTimelineStep(track, step) {
             }
             break;
     }
+
+    // 角色情緒回饋（Step 94）：與 content/timeline.json 的事件對應
+    if (track === "scene" && (step.at || 0) === 0) {
+        if (eventName === "dex:unlock") {
+            playUnlock($("santa-container"), $("snow-container"));
+        } else if (eventName === "level:complete") {
+            playComplete($("santa-container"));
+        }
+    }
+}
+
+/**
+ * 播放時間軸事件，並把事件名稱帶入步驟執行器。
+ * @param {string} eventName
+ */
+function playEvent(eventName) {
+    playTimeline(eventName, (track, step) => runTimelineStep(eventName, track, step));
 }
 
 /* ---------- 回合 UI ---------- */

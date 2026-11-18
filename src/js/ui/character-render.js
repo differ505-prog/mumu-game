@@ -1,10 +1,55 @@
 /**
  * 角色渲染 — 載入去背素材並套用情緒／動作狀態。
+ *
+ * 情緒回饋（Step 94）：
+ * - unlock  → 短促跳躍＋星星散落（圖鑑解鎖）
+ * - roar    → 放大再回彈（squash & stretch）
+ * - complete→ 上下彈跳（關卡完成）
+ * - hatch   → 破殼
+ *
+ * 所有回饋皆以 class 切換驅動（不使用 setInterval），
+ * 且在 prefers-reduced-motion 下退化成靜態狀態變化。
  */
+
+import { burst } from "./particles.js";
 
 /**
  * @typedef {"idle"|"listen"|"happy"|"sad"|"hint"|"roar"|"walk"|"hatch"} CharacterMood
  */
+
+/**
+ * @typedef {"unlock"|"roar"|"complete"|"hatch"} CharacterEmotion
+ */
+
+/**
+ * 判斷使用者是否要求減少動態效果。
+ * @returns {boolean}
+ */
+function prefersReducedMotion() {
+    if (typeof window === "undefined") return false;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches) return true;
+    return document.documentElement.dataset.reducedMotion === "on";
+}
+
+/**
+ * 角色繪製後依素材比例微調接地陰影（角色越高，影子越寬越淡）。
+ * @param {HTMLImageElement} img
+ * @param {HTMLElement} shadow
+ */
+function syncShadowScale(img, shadow) {
+    if (!img || !shadow) return;
+    const apply = () => {
+        const w = img.naturalWidth || 0;
+        const h = img.naturalHeight || 0;
+        if (!w || !h) return;
+        // 影子寬度依角色實際高度線性放大（200px 為基準）
+        const scale = Math.max(0.72, Math.min(1.35, 0.62 + (h / 512) * 0.95));
+        shadow.style.setProperty("--shadow-scale", scale.toFixed(3));
+        shadow.style.setProperty("--shadow-opacity", (0.34 - (h / 512) * 0.12).toFixed(3));
+    };
+    if (img.complete && img.naturalWidth) apply();
+    else img.addEventListener("load", apply, { once: true });
+}
 
 /**
  * 渲染角色。
@@ -21,6 +66,10 @@ export function renderCharacter(mount, character, mood = "idle") {
         <img class="char__art" src="${art}" alt="${character.name?.["zh-TW"] || character.id}" />
         <div class="char__shadow"></div>
     `;
+
+    const img = /** @type {HTMLImageElement} */ (mount.querySelector(".char__art"));
+    const shadow = /** @type {HTMLElement} */ (mount.querySelector(".char__shadow"));
+    syncShadowScale(img, shadow);
 }
 
 /**
@@ -53,15 +102,25 @@ export function blink(mount) {
 }
 
 /**
- * 播放吼叫演出。
+ * 以 class 切換播放一次性演出（不做 setInterval）。
+ * @param {HTMLElement} mount
+ * @param {string} className
+ * @param {number} durationMs 演出結束後移除 class 的時間
+ */
+function playOnce(mount, className, durationMs) {
+    if (!mount) return;
+    mount.classList.remove(className);
+    void mount.offsetWidth;
+    mount.classList.add(className);
+    window.setTimeout(() => mount.classList.remove(className), durationMs);
+}
+
+/**
+ * 播放吼叫演出（放大再回彈，squash & stretch）。
  * @param {HTMLElement} mount
  */
 export function playRoar(mount) {
-    if (!mount) return;
-    mount.classList.remove("char--roar");
-    void mount.offsetWidth;
-    mount.classList.add("char--roar");
-    setTimeout(() => mount.classList.remove("char--roar"), 1200);
+    playOnce(mount, "char--roar", 1200);
 }
 
 /**
@@ -87,9 +146,82 @@ export function stopWalk(mount) {
  * @param {HTMLElement} mount
  */
 export function playHatch(mount) {
+    playOnce(mount, "char--hatch", 900);
+}
+
+/**
+ * 圖鑑解鎖回饋：短促跳躍＋星星散落。
+ *
+ * reduced-motion 下只做靜態狀態變化（短暫高亮），不跳躍。
+ * @param {HTMLElement} mount
+ * @param {HTMLElement} [particleLayer] 粒子層（通常是 #snow-container）
+ */
+export function playUnlock(mount, particleLayer) {
     if (!mount) return;
-    mount.classList.remove("char--hatch");
-    void mount.offsetWidth;
-    mount.classList.add("char--hatch");
-    setTimeout(() => mount.classList.remove("char--hatch"), 900);
+
+    if (prefersReducedMotion()) {
+        playOnce(mount, "char--unlock-static", 700);
+        return;
+    }
+
+    playOnce(mount, "char--unlock", 900);
+
+    const layer = particleLayer || mount.closest("#snow-container") || mount.parentElement;
+    if (!layer) return;
+
+    // 星星從角色身上散開
+    const rect = mount.getBoundingClientRect();
+    const layerRect = layer.getBoundingClientRect();
+    burst(layer, {
+        kind: "sparkle",
+        count: 14,
+        origin: {
+            x: rect.left - layerRect.left + rect.width / 2,
+            y: rect.top - layerRect.top + rect.height * 0.4
+        }
+    });
+}
+
+/**
+ * 關卡完成回饋：上下彈跳。
+ * @param {HTMLElement} mount
+ */
+export function playComplete(mount) {
+    if (prefersReducedMotion()) {
+        playOnce(mount, "char--complete-static", 700);
+        return;
+    }
+    playOnce(mount, "char--complete", 1000);
+}
+
+/**
+ * 依事件類型播放對應的角色情緒回饋。
+ *
+ * 對應 content/timeline.json 的事件：
+ * - `dex:unlock`    → unlock
+ * - `dino:roar`     → roar
+ * - `level:complete`→ complete
+ * - `puzzle:complete`→ hatch
+ *
+ * @param {HTMLElement} mount
+ * @param {CharacterEmotion} emotion
+ * @param {HTMLElement} [particleLayer]
+ */
+export function playEmotion(mount, emotion, particleLayer) {
+    switch (emotion) {
+        case "unlock":
+            playUnlock(mount, particleLayer);
+            break;
+        case "roar":
+            playRoar(mount);
+            break;
+        case "complete":
+            playComplete(mount);
+            break;
+        case "hatch":
+            playHatch(mount);
+            break;
+        default:
+            break;
+    }
 }
