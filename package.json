@@ -9,6 +9,7 @@
     "lint:src": "eslint src tools",
     "check:content": "node tools/check-content.mjs",
     "check:assets": "node tools/check-assets.mjs",
+    "test:play": "node --experimental-vm-modules tools/verify-playable.mjs",
     "sweep": "node tools/sweep-logs.mjs"
   },
   "devDependencies": {
@@ -16,6 +17,7 @@
     "@types/node": "^26.6.6",
     "eslint": "^9.13.0",
     "globals": "^15.11.0",
+    "jsdom": "^26.1.0",
     "sharp": "^0.33.5",
     "typescript": "^5.6.0"
   }
