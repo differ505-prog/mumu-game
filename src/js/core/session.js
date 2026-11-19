@@ -117,7 +117,8 @@ export function createSession(_bundle, _locale) {
                 round: roundIndex + 1,
                 phase: "listening",
                 locked: true,
-                sequence: verbEngine.getSequence?.() || []
+                // 只有序列玩法才把題目序列放進公開狀態（choice／place／match 沒有「順序」）
+                sequence: verbEngine.kind === "sequence" ? (verbEngine.getSequence?.() || []) : []
             });
 
             emit({ type: "round:listen", payload: { levelId: state.level, round: roundIndex + 1 } });

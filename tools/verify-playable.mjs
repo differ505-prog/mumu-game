@@ -102,6 +102,97 @@ function click(env, el) {
 /* 檢查項                                                              */
 /* ------------------------------------------------------------------ */
 
+/**
+ * 以引擎的**真實正確作答路徑**走完一個回合。
+ *
+ * 全部以 DOM 操作完成（不得直接改 state 跳過流程）。
+ *
+ * @param {any} env
+ * @returns {Promise<{ ok: boolean, detail: string }>}
+ */
+async function playOneRound(env) {
+    const els = roundElements(env);
+    const verdict = watchVerdict(env);
+
+    if (els.pieces.length) {
+        // 拼合：逐片嘗試放置，放對的片段會吸附進目標區（DOM 可觀察）
+        let filled = 0;
+        for (const piece of els.pieces) {
+            const pieceIndex = Number(piece.dataset.pieceIndex);
+            let placed = false;
+            for (const target of els.targets) {
+                click(env, piece);
+                await flush(6);
+                const slot = env.document.querySelector(`#controls-view [data-target-index="${target.dataset.targetIndex}"]`);
+                if (!slot) break;
+                const before = slot.classList.contains("is-filled");
+                click(env, slot);
+                await env.clock.advance(220);
+                if (!before && slot.classList.contains("is-filled")) {
+                    placed = true;
+                    filled++;
+                    break;
+                }
+            }
+            if (!placed) {
+                return { ok: false, detail: `切片 ${pieceIndex} 找不到可放置的位置` };
+            }
+        }
+        return {
+            ok: verdict.correct > 0 && filled > 0,
+            detail: `拼合回合 已放置=${filled} correct=${verdict.correct}`
+        };
+    }
+
+    if (els.cards.length) {
+        // 配對：依卡面圖樣分組，兩兩翻牌
+        const groups = new Map();
+        for (const card of els.cards) {
+            const key = card.querySelector(".memory-face--front .control-btn__label")?.textContent || "";
+            const list = groups.get(key) || [];
+            list.push(card);
+            groups.set(key, list);
+        }
+        for (const group of groups.values()) {
+            for (let i = 0; i + 1 < group.length; i += 2) {
+                click(env, group[i]);
+                await env.clock.advance(900);
+                click(env, group[i + 1]);
+                await env.clock.advance(900);
+            }
+        }
+        return {
+            ok: verdict.correct > 0,
+            detail: `配對回合 correct=${verdict.correct} wrong=${verdict.wrong}`
+        };
+    }
+
+    if (els.options.length) {
+        // 單選／序列：依公開狀態的 sequence 逐項送出；無 sequence 則逐一嘗試
+        const seq = currentState(env).sequence || [];
+        if (seq.length) {
+            for (const id of seq) {
+                const btn = env.document.querySelector(`#controls-view [data-item="${id}"]`);
+                if (!btn) return { ok: false, detail: `找不到選項 ${id}` };
+                click(env, btn);
+                await env.clock.advance(500);
+            }
+        } else {
+            for (const btn of els.options) {
+                click(env, btn);
+                await env.clock.advance(400);
+                if (verdict.correct > 0) break;
+            }
+        }
+        return {
+            ok: verdict.correct > 0 || verdict.wrong > 0,
+            detail: `選項回合 correct=${verdict.correct} wrong=${verdict.wrong}`
+        };
+    }
+
+    return { ok: false, detail: "回合沒有任何可互動元素" };
+}
+
 const CHECKS = [
     {
         name: "play-boot",
@@ -195,6 +286,95 @@ const CHECKS = [
                 detail: problems.length
                     ? `問題 → ${problems.join(" | ")}`
                     : `已驗 ${checked.length} 種引擎：${checked.join(", ")}`
+            };
+        }
+    },
+
+    {
+        name: "play-verbs-coverage",
+        async run(env) {
+            void env;
+
+            /** @type {string[]} */
+            const failed = [];
+            /** @type {number} */
+            let done = 0;
+
+            for (let levelId = 1; levelId <= 40; levelId++) {
+                const levelEnv = await openLevel(levelId);
+                try {
+                    /** @type {any} */
+                    let completed = null;
+                    let roundListens = 0;
+                    levelEnv.onEvent("level:complete", (payload) => { completed = payload; });
+                    levelEnv.onEvent("round:listen", () => { roundListens++; });
+
+                    // 走完 3 回合
+                    for (let r = 0; r < 3; r++) {
+                        const st = currentState(levelEnv);
+                        if (st.phase !== "input") {
+                            await levelEnv.clock.advance(2600);
+                        }
+                        const res = await playOneRound(levelEnv);
+                        if (!res.ok) {
+                            failed.push(`L${levelId} 回合${r + 1}: ${res.detail}`);
+                            break;
+                        }
+                        // 下一回合的聆聽階段（900ms 排程 + 2400ms 聆聽）
+                        await levelEnv.clock.advance(3600);
+                    }
+
+                    if (failed.some((f) => f.startsWith(`L${levelId} `))) continue;
+
+                    await levelEnv.clock.advance(1500);
+                    const st = currentState(levelEnv);
+                    if (completed === null && st.phase !== "levelup") {
+                        failed.push(`L${levelId}: 未觸發 level:complete（phase=${st.phase} roundListens=${roundListens}）`);
+                        continue;
+                    }
+                    done++;
+                } catch (err) {
+                    failed.push(`L${levelId}: 例外 ${err?.message || String(err)}`);
+                } finally {
+                    disposeEnv(levelEnv);
+                }
+            }
+
+            return {
+                ok: failed.length === 0,
+                detail: failed.length
+                    ? `完成 ${done}/40，問題 → ${failed.slice(0, 12).join(" | ")}`
+                    : `40/40 關全部可完成（每關 3 回合並觸發 level:complete）`
+            };
+        }
+    },
+
+    {
+        name: "play-no-error-verbs",
+        async run(env) {
+            void env;
+
+            /** @type {string[]} */
+            const errors = [];
+            const levels = Object.values(VERB_LEVELS).concat([1, 2, 13, 21, 29, 33, 40]);
+
+            for (const levelId of [...new Set(levels)]) {
+                const levelEnv = await openLevel(levelId);
+                try {
+                    await playOneRound(levelEnv);
+                    await levelEnv.clock.advance(1200);
+                    for (const e of levelEnv.errors) errors.push(`L${levelId}: ${e.split("\n")[0]}`);
+                    for (const e of levelEnv.consoleErrors) errors.push(`L${levelId} console: ${e}`);
+                } catch (err) {
+                    errors.push(`L${levelId}: 例外 ${err?.message || String(err)}`);
+                } finally {
+                    disposeEnv(levelEnv);
+                }
+            }
+
+            return {
+                ok: errors.length === 0,
+                detail: errors.length ? `錯誤 → ${errors.slice(0, 8).join(" | ")}` : `${new Set(levels).size} 關流程無未捕捉錯誤、無 console.error`
             };
         }
     },
