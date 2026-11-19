@@ -61,7 +61,7 @@ export function renderLevelMap(root, bundle, progress, locale) {
                         </h3>
                         <div class="levelmap__path">
                             ${list.map((/** @type {any} */ l) => {
-                                const locked = isLevelLocked(bundle, l.id);
+                                const locked = isLevelLocked(bundle, l.id, progress);
                                 const stars = progress.stars?.[String(l.id)] || 0;
                                 return `
                                     <button class="levelmap__node ${locked ? "is-locked" : ""}"
@@ -92,7 +92,7 @@ export function renderLevelMap(root, bundle, progress, locale) {
                 const level = levels.find((/** @type {any} */ l) => l.id === id);
                 if (!level) return;
 
-                if (isLevelLocked(bundle, id)) {
+                if (isLevelLocked(bundle, id, progress)) {
                     // 付費章節 → 導向付費牆；序進未解鎖 → 提示
                     if (!isChapterFree(level.chapter)) {
                         root.dispatchEvent(new CustomEvent("paywall:request", {
@@ -127,11 +127,15 @@ export function renderLevelMap(root, bundle, progress, locale) {
  *
  * 規則：序進解鎖（前關已通關）＋ 付費章節需權益。
  *
+ * 序進解鎖以**進度存檔**（`progress.unlockedLevels`）為準 ——
+ * `core/progress.js` 的 `recordLevelResult()` 會在完成第 N 關時解鎖第 N+1 關。
+ *
  * @param {any} bundle
  * @param {number} levelId
+ * @param {any} [progress]
  * @returns {boolean}
  */
-export function isLevelLocked(bundle, levelId) {
+export function isLevelLocked(bundle, levelId, progress) {
     const level = bundle?.levels?.find((/** @type {any} */ l) => l.id === levelId);
     if (!level) return true;
 
@@ -141,6 +145,11 @@ export function isLevelLocked(bundle, levelId) {
         if (getEntitlement?.() !== "premium") return true;
     }
 
-    // 序進：第一關永遠解鎖
-    return levelId > 1 && levelId >= 8;
+    // 序進：第一關永遠解鎖；其餘以進度為準
+    if (levelId <= 1) return false;
+    const unlocked = progress?.unlockedLevels;
+    if (Array.isArray(unlocked)) {
+        return !unlocked.includes(levelId);
+    }
+    return false;
 }

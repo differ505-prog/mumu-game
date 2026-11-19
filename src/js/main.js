@@ -574,7 +574,7 @@ on("round:correct", () => {
 on("round:wrong", () => {
     haptic("wrong");
     playSfx("ui.soft-low");
-    animate("#character-img", "shake");
+    animate(".char__art", "shake");
     setStatus(locale === "en-US" ? "Try again!" : "再試一次！");
 });
 
@@ -583,12 +583,24 @@ on("round:hint", () => {
     playSfx("ui.hint");
 });
 
+on("round:progress", () => {
+    // 序列／拼合的進行中回饋（回合尚未結束）
+    haptic("tap");
+    updateSequenceProgress();
+});
+
 on("level:complete", () => {
     haptic("celebrate");
 });
 
 /**
  * 渲染回合選項。
+ *
+ * 依 `engine.kind` 分派（**不得**以玩法名稱分派）：
+ *   "choice"   → 按鈕網格
+ *   "sequence" → 按鈕網格 ＋ 序列進度指示（不得洩漏答案順序）
+ *   "place"    → 拼合盤（目標區 ＋ 素材區）
+ *   "match"    → 翻牌網格
  */
 function renderRound() {
     const engine = session?.engine;
@@ -606,18 +618,30 @@ function renderRound() {
         bubble.classList.add("show");
     }
 
+    const kind = engine.kind;
+
+    // 拼合玩法：拼合盤
+    if (kind === "place") {
+        renderPuzzleBoard(controls, engine);
+        return;
+    }
+
     // 記憶力玩法：翻牌網格
-    if (typeof engine.getCards === "function") {
+    if (kind === "match") {
         renderMemoryBoard(controls, engine);
         return;
     }
 
-    controls.innerHTML = `<div class="controls-grid grid-3">${options.map((/** @type {any} */ o) => `
+    // 單選與序列：按鈕網格（序列另加進度指示）
+    controls.innerHTML = `
+        ${kind === "sequence" ? renderSequenceProgress() : ""}
+        <div class="controls-grid grid-3">${options.map((/** @type {any} */ o) => `
         <button class="control-btn" data-item="${o.id}" type="button">
             ${o.image ? `<img src="${o.image}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:var(--r-sm);" />` : ""}
             ${o.label ? `<span class="control-btn__label">${o.label}</span>` : ""}
         </button>
-    `).join("")}</div>`;
+    `).join("")}</div>
+    `;
 
     controls.querySelectorAll("[data-item]").forEach((btn) => {
         btn.addEventListener("click", () => {
@@ -626,6 +650,141 @@ function renderRound() {
             playSfx("ui.tap");
             const id = /** @type {HTMLElement} */ (btn).dataset.item || "";
             session.answer(id);
+            if (kind === "sequence") updateSequenceProgress();
+        });
+    });
+}
+
+/**
+ * 序列玩法的進度指示。
+ *
+ * 只顯示「已答對幾項」，**不得**洩漏答案順序。
+ * @returns {string}
+ */
+function renderSequenceProgress() {
+    const engine = session?.engine;
+    const total = engine?.getSequence?.()?.length || 0;
+    const done = sequenceDoneCount();
+    const dots = Array.from({ length: total }, (_, i) => `
+        <span class="seq-dot${i < done ? " is-on" : ""}"></span>
+    `).join("");
+    return `<div class="seq-progress" data-seq-progress>${dots}</div>`;
+}
+
+/**
+ * 目前序列已答對的項數。
+ *
+ * 以公開狀態的 `sequence` 與引擎的 `getFeedback()` 推算。
+ * @returns {number}
+ */
+function sequenceDoneCount() {
+    const engine = session?.engine;
+    const seq = engine?.getSequence?.() || [];
+    if (!seq.length) return 0;
+    let done = 0;
+    for (const id of seq) {
+        if (engine.getFeedback?.() === id) break;
+        done++;
+    }
+    return done;
+}
+
+/**
+ * 更新序列進度指示。
+ */
+function updateSequenceProgress() {
+    const box = document.querySelector("[data-seq-progress]");
+    if (!box) return;
+    const engine = session?.engine;
+    const total = engine?.getSequence?.()?.length || 0;
+    const done = sequenceDoneCount();
+    box.querySelectorAll(".seq-dot").forEach((dot, i) => {
+        dot.classList.toggle("is-on", i < done);
+    });
+    void total;
+}
+
+/**
+ * 渲染拼合盤。
+ *
+ * 上方目標區（顯示已正確放置的切片）、下方素材區（待放置切片）。
+ * 點素材切片 → 選取；點目標格 → 放置。
+ *
+ * @param {HTMLElement} controls
+ * @param {any} engine
+ */
+function renderPuzzleBoard(controls, engine) {
+    const pieces = engine.getPieces?.() || [];
+    const grid = Math.max(1, Math.ceil(Math.sqrt(pieces.length || 1)));
+    const total = grid * grid;
+
+    controls.innerHTML = `
+        <div class="puzzle-board">
+            <div class="puzzle-target" data-puzzle-target>
+                ${Array.from({ length: total }, (_, i) => `
+                    <button class="puzzle-slot" data-target-index="${i}" type="button" aria-label=""></button>
+                `).join("")}
+            </div>
+            <div class="puzzle-tray" data-puzzle-tray>
+                ${pieces.map((/** @type {any} */ p) => `
+                    <button class="puzzle-piece" data-piece-index="${p.index}" type="button">
+                        <img src="${p.dataUrl}" alt="" />
+                    </button>
+                `).join("")}
+            </div>
+        </div>
+    `;
+
+    /** @type {number|null} */
+    let selected = null;
+
+    const tray = controls.querySelector("[data-puzzle-tray]");
+    const target = controls.querySelector("[data-puzzle-target]");
+
+    tray?.querySelectorAll("[data-piece-index]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            if (state.locked) return;
+            const idx = Number(/** @type {HTMLElement} */ (btn).dataset.pieceIndex);
+            if (!Number.isFinite(idx)) return;
+            selected = idx;
+            haptic("tap");
+            playSfx("ui.tap");
+            tray.querySelectorAll(".puzzle-piece").forEach((el) => {
+                el.classList.toggle("is-selected", el === btn);
+            });
+        });
+    });
+
+    target?.querySelectorAll("[data-target-index]").forEach((slot) => {
+        slot.addEventListener("click", () => {
+            if (state.locked) return;
+            if (selected === null) return;
+            const targetIndex = Number(/** @type {HTMLElement} */ (slot).dataset.targetIndex);
+            const pieceIndex = selected;
+            selected = null;
+            tray?.querySelectorAll(".puzzle-piece").forEach((el) => el.classList.remove("is-selected"));
+
+            const result = session.answer({ pieceIndex, targetIndex }) ?? { correct: false, done: false };
+
+            if (result.correct) {
+                // 正確：吸附進目標區 ＋ 粒子回饋
+                const piece = pieces.find((/** @type {any} */ p) => p.index === pieceIndex);
+                slot.innerHTML = piece?.dataUrl ? `<img src="${piece.dataUrl}" alt="" />` : "";
+                slot.classList.add("is-filled");
+                tray?.querySelector(`[data-piece-index="${pieceIndex}"]`)?.remove();
+                haptic("correct");
+                playSfx("chime.bell");
+                burst($("particle-layer"), { kind: "sparkle", count: 10 });
+            } else {
+                // 錯誤：素材彈回 ＋ 低音回饋
+                const btn = tray?.querySelector(`[data-piece-index="${pieceIndex}"]`);
+                if (btn) {
+                    btn.classList.add("is-wrong");
+                    setTimeout(() => btn.classList.remove("is-wrong"), 500);
+                }
+                haptic("wrong");
+                playSfx("ui.soft-low");
+            }
         });
     });
 }
@@ -659,27 +818,19 @@ function renderMemoryBoard(controls, engine) {
         const slot = Number(card.dataset.slot);
         haptic("tap");
         playSfx("paper.flip");
-        const result = engine.flip(slot);
+
+        // 翻牌的視覺回饋**立即**發生（不等 submit 回傳）
         card.classList.add("is-flipped");
 
-        if (result.matched) {
+        // 統一由 session 走引擎契約，回傳結果供 UI 決定回饋
+        const result = session.answer({ slot }) ?? { correct: false, done: false };
+
+        if (result.correct) {
             playSfx("chime.bell");
             haptic("correct");
             setTimeout(() => {
                 card.classList.add("is-matched");
             }, 400);
-        }
-
-        if (result.done) {
-            setTimeout(() => {
-                session.answer("__memory_done__");
-            }, 700);
-        } else if (result.mismatch) {
-            setTimeout(() => {
-                controls.querySelectorAll(".dex-card--memory.is-flipped").forEach((/** @type {any} */ el) => {
-                    if (!el.classList.contains("is-matched")) el.classList.remove("is-flipped");
-                });
-            }, 800);
         }
     };
 

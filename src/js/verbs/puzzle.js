@@ -6,6 +6,7 @@
  */
 
 import { pickItems } from "../data/levels.js";
+import { speak } from "../audio/voice.js";
 
 /**
  * @typedef {"assembly"|"pattern"} PuzzleKind
@@ -104,15 +105,29 @@ export function createPuzzleVerb(bundle, locale, spec, kind) {
     let pieces = [];
     /** @type {number} */
     let placed = 0;
+    /** 序列推理題的正解 id。 @type {string} */
+    let answerId = "";
+    /** 拼合玩法的作答進度（由 submit() 內部維護）。 @type {number} */
+    let progressIndex = 0;
 
     return {
+        /**
+         * 玩法制程契約類型。
+         *
+         * - "assembly"（拼合）→ "place"（需多次放置片段）
+         * - "pattern"（序列推理）→ "choice"（從選項選答案）
+         */
+        kind: kind === "pattern" ? "choice" : "place",
+
         /**
          * 產生題目。
          */
         async build() {
+            progressIndex = 0;
             if (kind === "pattern") {
                 task = patternTask(bundle, spec?.options ?? 2);
                 if (task) {
+                    answerId = task.answer || "";
                     options = task.options.map((/** @type {any} */ c) => ({
                         id: c.id,
                         label: locale === "en-US" ? c["en-US"] : c["zh-TW"],
@@ -142,6 +157,7 @@ export function createPuzzleVerb(bundle, locale, spec, kind) {
             }));
             task = { dinoId: dino?.id, grid: sliced.grid };
             placed = 0;
+            answerId = "";
         },
 
         /**
@@ -169,6 +185,17 @@ export function createPuzzleVerb(bundle, locale, spec, kind) {
         },
 
         /**
+         * 播放題目。
+         *
+         * assembly（拼合）沒有語音提示；pattern（序列推理）朗讀題目文字。
+         */
+        playPrompt() {
+            if (kind === "pattern") {
+                speak(this.getPrompt());
+            }
+        },
+
+        /**
          * 放置拼圖片段。
          * @param {number} pieceIndex
          * @param {number} targetIndex
@@ -187,7 +214,67 @@ export function createPuzzleVerb(bundle, locale, spec, kind) {
         },
 
         /**
-         * 判定完成。
+         * 統一作答入口（玩法制程契約）。
+         *
+         * - "choice"（pattern）：比對 answerId → { status:"correct"|"wrong", correct, done:true }
+         * - "place"（assembly）：接收 { pieceIndex, targetIndex }，呼叫既有 place() 邏輯 →
+         *   { status:"progress", correct: 全部已放置, done: placed === pieces.length }
+         *
+         * @param {string|{ pieceIndex?:number, targetIndex?:number }} input
+         * @param {any} [_meta]
+         * @returns {import("../core/verb-contract.js").SubmitResult}
+         */
+        submit(input, _meta) {
+            if (kind === "pattern") {
+                const correct = String(input) === String(answerId);
+                return {
+                    status: correct ? "correct" : "wrong",
+                    correct,
+                    done: true,
+                    feedback: answerId
+                };
+            }
+
+            const pieceIndex = Number(/** @type {any} */ (input)?.pieceIndex);
+            const targetIndex = Number(/** @type {any} */ (input)?.targetIndex);
+            if (!Number.isFinite(pieceIndex) || !Number.isFinite(targetIndex)) {
+                return { status: "wrong", correct: false, done: false };
+            }
+
+            const result = this.place(pieceIndex, targetIndex);
+            const done = pieces.length > 0 && placed === pieces.length;
+            return {
+                status: result.correct ? "progress" : "wrong",
+                correct: Boolean(result.correct),
+                done
+            };        },
+
+        /**
+         * 判定本回合是否已完成。
+         * @returns {boolean}
+         */
+        isComplete() {
+            if (kind === "pattern") {
+                return progressIndex > 0 || Boolean(answerId);
+            }
+            return pieces.length > 0 && placed === pieces.length;
+        },
+
+        /**
+         * 本回合的正確選項 id（供示範與測試用）。
+         * @returns {string|null}
+         */
+        getFeedback() {
+            if (kind === "pattern") return answerId || null;
+            if (!pieces.length) return null;
+            const next = pieces.find((/** @type {any} */ p) => !p.placed);
+            if (!next) return null;
+            const grid = task?.grid || 1;
+            return String(next.targetY * grid + next.targetX);
+        },
+
+        /**
+         * 相容層：舊的 check() 保留（拼合的整體完成狀態）。
          */
         check() {
             return {

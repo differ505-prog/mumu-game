@@ -746,6 +746,12 @@ export function createGameEnv(options = {}) {
     env.getModule = (relPath) => moduleNamespace(env, relPath);
 
     /**
+     * 載入額外模組（守門需要檢查非由 main.js 引入的模組時使用）。
+     * @param {string} relPath
+     */
+    env.loadModule = (relPath) => loadExtraModule(env, relPath);
+
+    /**
      * 取得目前回合的引擎（session 的公開 getter）。
      */
     env.getEngine = () => env.engine || null;
@@ -827,6 +833,64 @@ async function loadGameModules(env, entry = MAIN_MODULE) {
 export function moduleNamespace(env, relPath) {
     const abs = path.join(ROOT, relPath);
     return env.moduleCache.get(abs)?.namespace;
+}
+
+/**
+ * 載入一個額外的模組（守門需要檢查非由 main.js 引入的模組時使用）。
+ *
+ * @param {any} env
+ * @param {string} relPath 相對於專案根目錄的路徑
+ */
+export async function loadExtraModule(env, relPath) {
+    const abs = path.join(ROOT, relPath);
+    const cached = env.moduleCache.get(abs);
+    if (cached) {
+        if (cached.status === "evaluated") return cached.namespace;
+    }
+
+    const source = fs.readFileSync(abs, "utf8");
+    const mod = new vm.SourceTextModule(source, {
+        context: env.context,
+        identifier: abs,
+        initializeImportMeta(meta) {
+            meta.url = `file://${abs}`;
+        }
+    });
+    env.moduleCache.set(abs, mod);
+
+    await mod.link(async (specifier, referencing) => {
+        const resolved = path.resolve(path.dirname(referencing.identifier), specifier);
+        const dep = env.moduleCache.get(resolved);
+        if (dep) return dep;
+        return loadExtraModuleModule(env, resolved);
+    });
+    await mod.evaluate();
+    return mod.namespace;
+}
+
+/**
+ * 以絕對路徑載入模組（供 link 回调使用）。
+ * @param {any} env
+ * @param {string} abs
+ */
+async function loadExtraModuleModule(env, abs) {
+    const source = fs.readFileSync(abs, "utf8");
+    const mod = new vm.SourceTextModule(source, {
+        context: env.context,
+        identifier: abs,
+        initializeImportMeta(meta) {
+            meta.url = `file://${abs}`;
+        }
+    });
+    env.moduleCache.set(abs, mod);
+    await mod.link(async (specifier, referencing) => {
+        const resolved = path.resolve(path.dirname(referencing.identifier), specifier);
+        const dep = env.moduleCache.get(resolved);
+        if (dep) return dep;
+        return loadExtraModuleModule(env, resolved);
+    });
+    await mod.evaluate();
+    return mod;
 }
 
 /**
@@ -1103,6 +1167,27 @@ export async function resetEnv(env) {
         env[key] = fresh[key];
     }
     return bootGame(env);
+}
+
+/**
+ * 開一個全新環境並直接進入指定關卡。
+ *
+ * 每個關卡都用**獨立環境**——關卡地圖在進入遊戲後會隱藏，
+ * 沒有公開的「回到地圖」路徑，因此要測另一關必須重新導航。
+ *
+ * @param {number} levelId
+ * @returns {Promise<any>}
+ */
+export async function openLevel(levelId) {
+    const env = createGameEnv({ locale: "zh-TW" });
+    await bootGame(env);
+    await clickStart(env);
+    await env.clock.advance(3000);
+    await advanceTutorial(env);
+    await pickCharacter(env, "santa");
+    await startLevel(env, levelId);
+    await env.clock.advance(3000);
+    return env;
 }
 
 /**

@@ -61,15 +61,28 @@ export function createAuditoryVerb(bundle, locale, spec, kind) {
     let answerId = "";
     /** @type {any[]} */
     let sequence = [];
+    /** 序列玩法的作答進度（由 submit() 內部維護）。 @type {number} */
+    let progressIndex = 0;
+    /** 節奏題的輪替游標（引擎不得使用 Math.random() 決定答案）。 @type {number} */
+    let rhythmCursor = 0;
 
     const sameLabel = bundle?.minimalPairs?.answers?.[0]?.[locale] || "一樣";
     const diffLabel = bundle?.minimalPairs?.answers?.[1]?.[locale] || "不一樣";
 
     return {
         /**
+         * 玩法制程契約類型。
+         *
+         * - "minimal-pair"／"interference"／"rhythm" → "choice"（一次作答即判定）
+         * - "sequence" → "sequence"（需依序多次作答）
+         */
+        kind: kind === "sequence" ? "sequence" : "choice",
+
+        /**
          * 產生本回合題目。
          */
-        build() {
+        async build() {
+            progressIndex = 0;
             switch (kind) {
                 case "minimal-pair": {
                     task = minimalPairFor(bundle, locale, spec?.options ?? 2);
@@ -93,12 +106,21 @@ export function createAuditoryVerb(bundle, locale, spec, kind) {
                 }
                 case "rhythm": {
                     const rhythms = bundle?.items?.rhythms || [];
-                    const pattern = rhythms[Math.floor(Math.random() * rhythms.length)] || { beats: 4, pattern: [1, 0, 1, 0] };
+                    // 引擎不得使用 Math.random() 決定答案 —— 以回合序號輪替，答案必定在選項內
+                    const cursor = rhythmCursor++ % Math.max(1, rhythms.length);
+                    const pattern = rhythms[cursor] || { beats: 4, pattern: [1, 0, 1, 0] };
                     task = pattern;
                     answerId = String(pattern.beats);
-                    options = rhythms.slice(0, 4).map((/** @type {any} */ r) => ({
-                        id: String(r.beats),
-                        label: String(r.beats),
+                    // 選項必須包含正解：以正解為中心取 4 個不同拍數
+                    const beats = rhythms.map((/** @type {any} */ r) => Number(r.beats));
+                    const ordered = [Number(pattern.beats)];
+                    for (const b of beats) {
+                        if (ordered.length >= 4) break;
+                        if (!ordered.includes(b)) ordered.push(b);
+                    }
+                    options = ordered.map((b) => ({
+                        id: String(b),
+                        label: String(b),
                         tone: "neutral"
                     }));
                     sequence = pattern.pattern.map((/** @type {number} */ b) => b);
@@ -196,27 +218,83 @@ export function createAuditoryVerb(bundle, locale, spec, kind) {
         },
 
         /**
-         * 判定作答。
+         * 統一作答入口（玩法制程契約）。
+         *
+         * - "choice"：比對 answerId → { status:"correct"|"wrong", correct, done:true }
+         * - "sequence"：內部維護 progressIndex，每次比對 sequence[progressIndex]；
+         *   正確則 progressIndex++ → { status:"progress", correct:true, done: progressIndex >= sequence.length }
+         *
          * @param {string} input
+         * @param {any} [_meta]
+         * @returns {import("../core/verb-contract.js").SubmitResult}
          */
-        check(input) {
+        submit(input, _meta) {
             if (kind === "sequence") {
-                // 序列模式由 UI 逐項呼叫 advance，此處僅回傳中性結果
-                return { correct: false, hintStage: "hint-item" };
+                const expected = sequence[progressIndex];
+                if (expected === undefined) {
+                    return { status: "progress", correct: false, done: true, feedback: expected };
+                }
+                if (String(input) !== String(expected)) {
+                    return { status: "wrong", correct: false, done: false, feedback: expected };
+                }
+                progressIndex++;
+                const done = progressIndex >= sequence.length;
+                return { status: done ? "correct" : "progress", correct: true, done, feedback: expected };
             }
-            return { correct: input === answerId, hintStage: "hint-item" };
+
+            const correct = String(input) === String(answerId);
+            return {
+                status: correct ? "correct" : "wrong",
+                correct,
+                done: true,
+                feedback: answerId
+            };
         },
 
         /**
-         * 序列模式的逐項推進。
+         * 判定本回合是否已完成。
+         * @returns {boolean}
+         */
+        isComplete() {
+            if (kind === "sequence") {
+                return sequence.length > 0 && progressIndex >= sequence.length;
+            }
+            return Boolean(answerId);
+        },
+
+        /**
+         * 本回合的正確選項 id（供示範與測試用）。
+         * @returns {string|null}
+         */
+        getFeedback() {
+            if (kind === "sequence") {
+                return sequence[progressIndex] ?? null;
+            }
+            return answerId || null;
+        },
+
+        /**
+         * 相容層：舊的 check() 改為委派 submit()。
+         *
+         * @param {string} input
+         */
+        check(input) {
+            const result = this.submit(input);
+            return { correct: result.correct, hintStage: "hint-item", done: result.done };
+        },
+
+        /**
+         * 相容層：舊的 advance() 改由 submit() 內部處理進度。
+         *
          * @param {string} itemId
          * @param {number} index
          */
         advance(itemId, index) {
-            if (sequence[index] === itemId) {
-                return { correct: true, done: index + 1 >= sequence.length };
-            }
-            return { correct: false, done: false };
+            const expected = sequence[index];
+            return {
+                correct: expected !== undefined && String(itemId) === String(expected),
+                done: expected !== undefined && index + 1 >= sequence.length
+            };
         }
     };
 }

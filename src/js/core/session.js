@@ -30,9 +30,8 @@ export function createSession(_bundle, _locale) {
     let currentLevel = null;
     /** @type {HintStage} */
     let hintStage = "hint-item";
-    /** @type {number[]} */
-    let attempts = [];
-    /**
+    /** @type {boolean[]} */
+    let attempts = [];    /**
      * 學習樣本（供掌握度與圖鑑解鎖判定）。
      * @type {any[]}
      */
@@ -80,13 +79,31 @@ export function createSession(_bundle, _locale) {
             });
 
             emit({ type: "level:start", payload: { levelId, chapter: currentLevel.chapter } });
-            this.nextRound();
+            this.nextRound().catch((err) => this.handleFatal(err));
+        },
+
+        /**
+         * 回合流程發生致命錯誤時的處置。
+         *
+         * 絕不讓遊戲卡死在 loading —— 記錄錯誤並結束關卡。
+         * @param {any} err
+         */
+        handleFatal(err) {
+            console.error("[session] 回合流程失敗", err);
+            try {
+                this.finish();
+            } catch (finishErr) {
+                console.error("[session] finish() 亦失敗", finishErr);
+            }
         },
 
         /**
          * 進入下一回合。
+         *
+         * **必須** await 引擎的 build()（build() 是 async），
+         * 否則題目尚未備妥就會 emit round:listen，導致回合無法作答。
          */
-        nextRound() {
+        async nextRound() {
             if (roundIndex >= totalRounds) {
                 this.finish();
                 return;
@@ -94,7 +111,7 @@ export function createSession(_bundle, _locale) {
             hintStage = "hint-item";
             roundStartedAt = Date.now();
             verbEngine = currentLevel.engineFactory();
-            verbEngine.build();
+            await verbEngine.build();
 
             setState({
                 round: roundIndex + 1,
@@ -115,17 +132,41 @@ export function createSession(_bundle, _locale) {
 
         /**
          * 提交作答。
-         * @param {string} itemId
+         *
+         * 統一走引擎的 `submit()` 契約 —— 本方法**不對任何玩法做特判**。
+         *
+         * 核心規則（依 `submit()` 回傳的 status 判斷）：
+         *   "wrong"                 → 答錯 → advanceHint()（錯誤時永不扣分）
+         *   "correct" / "progress"  → 作答有效
+         *     · result.correct === true  → 分數 +1、連擊 +1
+         *     · result.done === true      → 本回合完成 → roundIndex++
+         *     · result.done === false     → 回合仍在進行（序列前進中／拼合中／配對中）
+         *                                     → 不得 roundIndex++，但不得觸發 round:wrong
+         *
+         * @param {string|{ slot?:number, pieceIndex?:number, targetIndex?:number }} input
+         * @returns {import("./verb-contract.js").SubmitResult} 本次作答結果
          */
-        answer(itemId) {
-            if (state.locked) return;
+        answer(input) {
+            if (state.locked) {
+                return { status: "wrong", correct: false, done: false };
+            }
 
-            // 記憶玩法由翻牌流程自行推進，完成時以 __memory_done__ 通知
-            const isMemoryDone = itemId === "__memory_done__";
-            const result = isMemoryDone
-                ? { correct: true }
-                : verbEngine.check(itemId);
-            attempts.push(result.correct);
+            const result = verbEngine?.submit?.(input) ?? { status: "wrong", correct: false, done: false };
+            const itemId = typeof input === "object" && input !== null
+                ? String((/** @type {any} */ (input)).slot ?? (/** @type {any} */ (input)).pieceIndex ?? "")
+                : String(input);
+
+            const status = result.status || (result.correct ? "correct" : "wrong");
+
+            if (status === "wrong") {
+                // 答錯：不扣分，只推進提示階段
+                setState({ combo: 0 });
+                emit({ type: "round:wrong", payload: { itemId, round: roundIndex + 1 } });
+                this.advanceHint();
+                return result;
+            }
+
+            attempts.push(Boolean(result.correct));
 
             // 學習樣本：供掌握度模型與圖鑑解鎖條件（locale／noHint）判定使用
             samples.push({
@@ -140,13 +181,24 @@ export function createSession(_bundle, _locale) {
             if (result.correct) {
                 setState({ score: state.score + 1, combo: state.combo + 1 });
                 emit({ type: "round:correct", payload: { itemId, round: roundIndex + 1 } });
-                roundIndex++;
-                setTimeout(() => this.nextRound(), 900);
             } else {
-                setState({ combo: 0 });
-                emit({ type: "round:wrong", payload: { itemId, round: roundIndex + 1 } });
-                this.advanceHint();
+                emit({ type: "round:progress", payload: { itemId, round: roundIndex + 1, status } });
             }
+
+            if (result.done) {
+                roundIndex++;
+                setTimeout(() => this.nextRound().catch((err) => this.handleFatal(err)), 900);
+            }
+
+            return result;
+        },
+
+        /**
+         * 本回合的正確答案（委派引擎）。
+         * @returns {string|null}
+         */
+        getFeedback() {
+            return verbEngine?.getFeedback?.() ?? null;
         },
 
         /**

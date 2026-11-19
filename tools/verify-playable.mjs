@@ -28,6 +28,7 @@ import {
     startLevel,
     answerRound,
     currentState,
+    openLevel,
     flush
 } from "./test-harness.mjs";
 
@@ -126,6 +127,74 @@ const CHECKS = [
             return {
                 ok,
                 detail: `startHidden=${overlay.classList.contains("hidden")} gameContainerVisible=${isVisible(container)}`
+            };
+        }
+    },
+
+    {
+        name: "engine-contract",
+        async run(env) {
+            // 六種玩法（含 memory 的 match／dual、puzzle 的 assembly／pattern）
+            // 的引擎都必須宣告 kind、都有 submit()、都有 isComplete()，
+            // 且 build() 皆為 async。
+            await bootGame(env);
+
+            const loadContentNs = env.getModule("src/js/data/load-content.js");
+            const verbsNs = env.getModule("src/js/verbs/index.js");
+            const contractNs = await env.loadModule("src/js/core/verb-contract.js");
+            if (!loadContentNs || !verbsNs || !contractNs) {
+                return { ok: false, detail: "無法取得 verbs／contract 模組的公開命名空間" };
+            }
+
+            const bundle = await loadContentNs.loadContent("zh-TW");
+
+            /** @type {string[]} */
+            const problems = [];
+            /** @type {string[]} */
+            const checked = [];
+
+            /** 六種玩法的引擎工廠。 */
+            const factories = [
+                { name: "sequence", make: () => verbsNs.createVerb(bundle, "zh-TW", { options: 2, sequenceLength: 3 }, "sequence") },
+                { name: "minimal-pair", make: () => verbsNs.createVerb(bundle, "zh-TW", { options: 2 }, "minimal-pair") },
+                { name: "rhythm", make: () => verbsNs.createVerb(bundle, "zh-TW", { options: 3 }, "rhythm") },
+                { name: "interference", make: () => verbsNs.createVerb(bundle, "zh-TW", { options: 2, interference: 1 }, "interference") },
+                { name: "puzzle:assembly", make: () => verbsNs.createVerb(bundle, "zh-TW", { options: 4 }, "puzzle") },
+                { name: "puzzle:pattern", make: () => verbsNs.createVerbForLevel(bundle, "zh-TW", { verb: "puzzle", spec: { options: 4, variant: "pattern" } }) },
+                { name: "memory:match", make: () => verbsNs.createVerb(bundle, "zh-TW", { options: 4 }, "memory") },
+                { name: "memory:dual", make: () => verbsNs.createVerbForLevel(bundle, "zh-TW", { verb: "memory", spec: { sequenceLength: 3, variant: "dual" } }) }
+            ];
+
+            for (const f of factories) {
+                let engine = null;
+                try {
+                    engine = f.make();
+                    if (engine && typeof engine.build === "function") {
+                        const built = engine.build();
+                        if (built && typeof built.then === "function") await built;
+                    }
+                } catch (err) {
+                    problems.push(`${f.name}: 建立失敗 → ${err?.message || String(err)}`);
+                    continue;
+                }
+
+                const verdict = contractNs.verifyEngineContract(engine);
+                if (!verdict.ok) {
+                    problems.push(`${f.name}: ${verdict.problems.join("; ")}`);
+                    continue;
+                }
+                if (typeof engine.submit !== "function") {
+                    problems.push(`${f.name}: 缺少 submit()`);
+                    continue;
+                }
+                checked.push(`${f.name}(${engine.kind})`);
+            }
+
+            return {
+                ok: problems.length === 0,
+                detail: problems.length
+                    ? `問題 → ${problems.join(" | ")}`
+                    : `已驗 ${checked.length} 種引擎：${checked.join(", ")}`
             };
         }
     },
@@ -239,23 +308,28 @@ const CHECKS = [
 
             /** @type {any} */
             let completed = null;
+            let roundListens = 0;
             env.onEvent("level:complete", (payload) => { completed = payload; });
+            env.onEvent("round:listen", () => { roundListens++; });
 
             await enterLevel(env, 1);
 
-            // 關卡 1 為 sequence 玩法：正確作答順序由公開狀態的 sequence 得知
+            // 關卡 1 為 sequence 玩法：每回合需依序送出整條序列
             for (let r = 0; r < 3; r++) {
                 const st = currentState(env);
                 const seq = st.sequence || [];
                 if (!seq.length) {
                     return { ok: false, detail: `round ${r + 1}: 公開狀態無 sequence（phase=${st.phase}）` };
                 }
-                const answered = await answerRound(env, String(seq[0]));
-                if (!answered) {
-                    return { ok: false, detail: `round ${r + 1}: 找不到可點擊的選項 ${seq[0]}` };
+                for (const id of seq) {
+                    const answered = await answerRound(env, String(id));
+                    if (!answered) {
+                        return { ok: false, detail: `round ${r + 1}: 找不到可點擊的選項 ${id}` };
+                    }
+                    await env.clock.advance(700);
                 }
-                await env.clock.advance(1400);
-                await env.clock.advance(2600);
+                // 下一回合的聆聽階段（900ms 排程 + 2400ms 聆聽）必須走完，否則輸入仍鎖住
+                await env.clock.advance(3600);
             }
 
             await env.clock.advance(2000);
@@ -263,7 +337,7 @@ const CHECKS = [
             const ok = completed !== null || st.phase === "levelup";
             return {
                 ok,
-                detail: `levelCompleteEvent=${completed !== null} phase=${st.phase} score=${st.score} round=${st.round}`
+                detail: `levelCompleteEvent=${completed !== null} roundListens=${roundListens} phase=${st.phase} score=${st.score} round=${st.round}`
             };
         }
     },
@@ -271,11 +345,7 @@ const CHECKS = [
     {
         name: "play-all-verbs",
         async run(env) {
-            await bootGame(env);
-            await clickStart(env);
-            await env.clock.advance(3000);
-            await advanceTutorial(env);
-            await pickCharacter(env, "santa");
+            void env;
 
             /** @type {string[]} */
             const failed = [];
@@ -283,64 +353,69 @@ const CHECKS = [
             const passed = [];
 
             for (const [verb, levelId] of Object.entries(VERB_LEVELS)) {
-                await enterLevel(env, levelId);
-                const els = roundElements(env);
-                const verdict = watchVerdict(env);
+                // 每個關卡使用獨立環境（關卡地圖進入遊戲後會隱藏）
+                const levelEnv = await openLevel(levelId);
+                try {
+                    const els = roundElements(levelEnv);
+                    const verdict = watchVerdict(levelEnv);
 
-                let judged = false;
+                    let judged = false;
 
-                if (els.pieces.length) {
-                    // 拼合玩法：必須能選取片段並放置
-                    const piece = els.pieces[0];
-                    const target = els.targets[0];
-                    if (piece && target) {
-                        click(env, piece);
-                        await flush(10);
-                        click(env, target);
-                        await env.clock.advance(400);
-                        judged = verdict.correct > 0;
-                    }
-                } else if (els.cards.length) {
-                    // 配對玩法：依卡片 id 兩兩配對翻牌，直到完成
-                    const cards = els.cards;
-                    const pairs = new Map();
-                    for (const card of cards) {
-                        const label = card.querySelector(".memory-face--front .control-btn__label")?.textContent || "";
-                        const list = pairs.get(label) || [];
-                        list.push(card);
-                        pairs.set(label, list);
-                    }
-                    for (const group of pairs.values()) {
-                        for (let i = 0; i + 1 < group.length; i += 2) {
-                            click(env, group[i]);
-                            await env.clock.advance(900);
-                            click(env, group[i + 1]);
-                            await env.clock.advance(900);
-                            if (verdict.correct > 0) judged = true;
+                    if (els.pieces.length) {
+                        // 拼合玩法：必須能選取片段並放置
+                        const piece = els.pieces[0];
+                        const target = els.targets[0];
+                        if (piece && target) {
+                            click(levelEnv, piece);
+                            await flush(10);
+                            click(levelEnv, target);
+                            await levelEnv.clock.advance(400);
+                            judged = verdict.correct > 0;
+                        }
+                    } else if (els.cards.length) {
+                        // 配對玩法：依卡片 id 兩兩配對翻牌，直到完成
+                        const pairs = new Map();
+                        for (const card of els.cards) {
+                            const label = card.querySelector(".memory-face--front .control-btn__label")?.textContent
+                                || card.dataset.slot || "";
+                            const list = pairs.get(label) || [];
+                            list.push(card);
+                            pairs.set(label, list);
+                        }
+                        for (const group of pairs.values()) {
+                            for (let i = 0; i + 1 < group.length; i += 2) {
+                                click(levelEnv, group[i]);
+                                await levelEnv.clock.advance(900);
+                                click(levelEnv, group[i + 1]);
+                                await levelEnv.clock.advance(900);
+                                if (verdict.correct > 0) judged = true;
+                            }
+                        }
+                    } else if (els.options.length) {
+                        // 單選玩法：逐一嘗試，直到出現判定
+                        for (const btn of els.options) {
+                            click(levelEnv, btn);
+                            await levelEnv.clock.advance(300);
+                            if (verdict.correct > 0) {
+                                judged = true;
+                                break;
+                            }
                         }
                     }
-                } else if (els.options.length) {
-                    // 單選玩法：逐一嘗試，直到出現判定
-                    for (const btn of els.options) {
-                        click(env, btn);
-                        await env.clock.advance(300);
-                        if (verdict.correct > 0) {
-                            judged = true;
-                            break;
-                        }
-                    }
-                }
 
-                if (judged) {
-                    passed.push(verb);
-                } else {
-                    failed.push(verb);
+                    if (judged) {
+                        passed.push(verb);
+                    } else {
+                        failed.push(`${verb}(L${levelId} 元素：選項${els.options.length}／卡${els.cards.length}／片${els.pieces.length})`);
+                    }
+                } finally {
+                    disposeEnv(levelEnv);
                 }
             }
 
             return {
                 ok: failed.length === 0,
-                detail: `passed=[${passed.join(",")}] failed=[${failed.join(",")}]`
+                detail: `passed=[${passed.join(",")}] failed=[${failed.join(" | ")}]`
             };
         }
     },
