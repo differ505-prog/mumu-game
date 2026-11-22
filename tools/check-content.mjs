@@ -76,6 +76,32 @@ if (levels) {
     }
 }
 
+/* --- 2b. 每關搭檔 companion（Step 119）--- */
+if (levels && characters) {
+    const validCompanions = new Set(
+        [...(characters.playable || []), ...(characters.dex || [])].map((/** @type {any} */ c) => c.id)
+    );
+    /** @type {Map<number, Set<string>>} */
+    const byChapter = new Map();
+    for (const level of levels || []) {
+        if (!level.companion) {
+            problems.push(`關卡 ${level.id} 缺少 companion`);
+            continue;
+        }
+        if (!validCompanions.has(level.companion)) {
+            problems.push(`關卡 ${level.id} 的 companion 不存在於 characters.json: ${level.companion}`);
+        }
+        if (!byChapter.has(level.chapter)) byChapter.set(level.chapter, new Set());
+        byChapter.get(level.chapter)?.add(level.companion);
+    }
+    // 每章搭檔不得過於分散（最多 2 隻）
+    for (const [chapter, set] of byChapter) {
+        if (set.size > 2) {
+            problems.push(`第 ${chapter} 章的搭檔過於分散: ${[...set].join(", ")}`);
+        }
+    }
+}
+
 /* --- 3. characters --- */
 if (characters) {
     const playable = characters.playable || [];
@@ -151,6 +177,17 @@ if (arcs) {
     for (const c of chapters) {
         if (!c.title || !c.letter || !c.verbs?.length) {
             problems.push(`章節 ${c.chapter} 缺少 title／letter／verbs`);
+        }
+        // Step 119：章節搭檔必須存在於 characters.json
+        if (!c.companion) {
+            problems.push(`章節 ${c.chapter} 缺少 companion`);
+        } else if (characters) {
+            const valid = new Set(
+                [...(characters.playable || []), ...(characters.dex || [])].map((/** @type {any} */ x) => x.id)
+            );
+            if (!valid.has(c.companion)) {
+                problems.push(`章節 ${c.chapter} 的 companion 不存在於 characters.json: ${c.companion}`);
+            }
         }
     }
 }

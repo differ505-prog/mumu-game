@@ -4,7 +4,7 @@
 
 import { loadContent } from "./data/load-content.js";
 import { getLevel } from "./data/levels.js";
-import { playableCharacters, getCharacter } from "./data/characters.js";
+import { playableCharacters, getAnyCharacter, anyCharacterVoice } from "./data/characters.js";
 import { chapterTitle, pickLine } from "./data/story.js";
 import { createSession } from "./core/session.js";
 import { createVerbForLevel } from "./verbs/index.js";
@@ -323,8 +323,9 @@ async function startGame() {
     const letter = typeof prologueRaw === "string"
         ? prologueRaw
         : (prologueRaw?.[locale] || "");
-    const char = getCharacter(bundle, selectedCharacter);
-    setVoiceProfile(locale, char.voice);
+    // 序章搭檔為聖誕老人（Step 119）
+    const char = getAnyCharacter(bundle, "santa");
+    setVoiceProfile(locale, anyCharacterVoice(bundle, "santa"));
     renderCharacter($("santa-container"), char, "idle");
 
     showLetter(letter, () => {
@@ -385,7 +386,17 @@ function showLetter(text, onClose) {
         return;
     }
 
-    showLetterScene(root, text, locale === "en-US" ? "— Santa" : "—— 聖誕老人", onClose);
+    // 署名 = 該章搭檔的角色名稱（Step 119）
+    const companionId = bundle.storyArcs?.chapters?.[0]?.companion || "santa";
+    let name = "Santa";
+    try {
+        const companion = getAnyCharacter(bundle, companionId);
+        name = companion?.name?.[locale] || companion?.name?.["zh-TW"] || name;
+    } catch {
+        // 找不到角色時用預設名
+    }
+    const dash = locale === "en-US" ? "— " : "—— ";
+    showLetterScene(root, text, dash + name, onClose);
 }
 
 /**
@@ -490,8 +501,10 @@ function startLevel(levelId) {
         chapterTitle: chapterTitle(bundle, locale, level.chapter)
     });
 
-    // 角色跟上章節
-    const char = getCharacter(bundle, selectedCharacter);
+    // 角色跟上章節（Step 119）：孩子進關卡看到的是**該章的夥伴**，
+    // 而不是自己選的那一隻。玩家選定的角色保留在隊伍中（Step 124 會讓隊伍可見）。
+    const companionId = level.companion || selectedCharacter;
+    const char = getAnyCharacter(bundle, companionId);
     renderCharacter($("santa-container"), char, "listen");
 
     session = createSession(bundle, locale);

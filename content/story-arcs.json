@@ -3,75 +3,166 @@
   "chapters": [
     {
       "chapter": 0,
-      "title": { "zh-TW": "序章：北極的星星", "en-US": "Prologue: The North Star" },
+      "title": {
+        "zh-TW": "序章：北極的星星",
+        "en-US": "Prologue: The North Star"
+      },
       "mood": "wonder",
       "scene": "christmas",
-      "verbs": ["sequence"],
-      "unlockDex": [0, 1, 2, 3],
+      "verbs": [
+        "sequence"
+      ],
+      "unlockDex": [
+        0,
+        1,
+        2,
+        3
+      ],
       "letter": {
         "zh-TW": "親愛的孩子：\n\n今天是聖誕夜，我一個人守在北極的雪地裡。這裡有星星，真的星星——它們從天上掉下來，滾進了雪堆裡，一點一點熄掉了。\n\n我試過很多辦法。我把禮物一件一件搬出來，搖鈴鐺、吹口哨、對著星星唱歌。可是星星們都沒有回應我。牠們明明還在雪地裡，發著微弱的光，卻沒有人聽得見牠們。\n\n後來老朋友曉龍告訴我原因：「牠們不用眼睛看，牠們用耳朵聽。」\n\n原來在恐龍谷，有一群很特別的恐龍。牠們的聲音會變成星星，牠們的耳朵比我們靈敏一百倍。可是牠們也怕聽錯，怕自己發出的聲音太輕，沒有人會注意到。\n\n孩子，牠們需要你。\n\n願意幫我嗎？",
         "en-US": "Dear child:\n\nIt is Christmas Eve, and I am alone in the snow of the North Pole. There are stars here, real stars. They fell from the sky, rolled into the drifts, and went out one by one.\n\nI tried everything. I carried out present after present, rang bells, blew whistles, and sang to the stars. But none of them answered. They were still there in the snow, glowing faintly, and no one could hear them.\n\nThen my old friend Eoraptor told me why: \"They do not look with their eyes. They listen.\"\n\nSo in Dinosaur Valley there lives a very special herd. Their voices turn into stars, and their ears are a hundred times sharper than ours. But they are afraid of listening wrong, afraid their own sounds are too quiet for anyone to notice.\n\nChild, they need you.\n\nWill you help me?"
-      }
+      },
+      "companion": "santa"
     },
     {
       "chapter": 1,
-      "title": { "zh-TW": "第一章：恐龍谷", "en-US": "Chapter 1: Dinosaur Valley" },
+      "title": {
+        "zh-TW": "第一章：恐龍谷",
+        "en-US": "Chapter 1: Dinosaur Valley"
+      },
       "mood": "play",
       "scene": "valley",
-      "verbs": ["minimal-pair"],
-      "unlockDex": [4, 5, 6, 7, 8, 9, 10, 11],
+      "verbs": [
+        "minimal-pair"
+      ],
+      "unlockDex": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
       "letter": {
         "zh-TW": "你走進了恐龍谷。\n\n雪比你想的還厚，每走一步都會陷下去。但是雪底下有聲音——不是風聲，是有人在等你。三角龍是第一個發現你的。牠用額頭上厚實的角推開雪堆，抬頭看你，眼睛很溫柔：「你聽得見我嗎？」\n\n你點頭。牠好像鬆了一口氣。\n\n後來你才知道，這裡的恐龍要用聲音說話。暴龍的吼聲震得雪從樹上掉下來，腕龍的脖子太長，能把消息從山谷的一頭送到另一頭。牠們會聽、會分、會記——然後把聽見的，變成天上的星星。\n\n可是牠們也常常聽錯。兩個很像的聲音，牠們分不出哪個是哪個。\n\n所以牠們需要一個耳朵很仔細的新朋友。\n\n那個朋友，就是你。從今天起，你要學會分辨一樣與不一樣。",
         "en-US": "You walk into Dinosaur Valley.\n\nThe snow is deeper than you expected, and every step sinks. But there are sounds under the snow. Not wind. Someone waiting for you. The Triceratops is the first to find you. It pushes a drift aside with the heavy horn on its forehead, looks up at you, and its eyes are gentle: \"Can you hear me?\"\n\nYou nod. It seems to relax.\n\nLater you learn that the dinosaurs here speak with their voices. The T-Rex can roar so hard that snow falls off the trees, and the Brachiosaurus has a neck so long it carries news from one end of the valley to the other. They listen, they tell apart, they remember. And then they turn what they heard into stars.\n\nBut they often mishear. Two similar sounds, and they cannot tell which is which.\n\nSo they need a new friend with very careful ears.\n\nThat friend is you. From today on, you will learn to tell the same from the different."
-      }
+      },
+      "companion": "dino-triceratops"
     },
     {
       "chapter": 2,
-      "title": { "zh-TW": "第二章：恐龍的語言", "en-US": "Chapter 2: The Language of Dinosaurs" },
+      "title": {
+        "zh-TW": "第二章：恐龍的語言",
+        "en-US": "Chapter 2: The Language of Dinosaurs"
+      },
       "mood": "brave",
       "scene": "forest",
-      "verbs": ["minimal-pair", "rhythm"],
-      "unlockDex": [12, 13, 14, 15, 16, 17, 18, 19],
+      "verbs": [
+        "minimal-pair",
+        "rhythm"
+      ],
+      "unlockDex": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
       "letter": {
         "zh-TW": "森林深處有兩座谷，中間隔著一條河。\n\n一座說華語，一座說英語。你站在河邊，聽見左邊喊「媽」，右邊喊「ma」——聽起來像一樣，其實住在兩邊的恐龍聽到的完全不是那個字。牠們各自都聽得懂自己的那一座谷，卻聽不懂對岸的。\n\n恐龍谷的長老說過，聽得懂兩種語言的人，耳朵最厲害。因為牠能在聽到聲音的同時，注意到聲音「長什麼樣子」。\n\n森林裡的腕龍把節拍傳給你。牠的脖子一點一點晃，像一座慢慢擺動的鐘。牠說，你的節奏比昨天穩了。\n\n你也開始教牠們。異特龍很會模仿別人的叫聲，卻常把順序搞錯；副栉龍的冠狀骨會發聲，最愛重複你說的音。你說一次，牠說一次，像兩個孩子交換秘密。\n\n這一章，你要聽懂兩種語言，也要把節奏放進耳朵裡。",
         "en-US": "Deep in the forest there are two valleys, separated by a river.\n\nOne speaks Chinese, one speaks English. You stand at the water and hear the left bank call \"ma\" and the right bank call \"ma\" too. They sound the same, but the dinosaurs living on each side are not hearing the same thing at all. Each understands its own valley perfectly, and neither understands the other.\n\nThe elders of Dinosaur Valley say that whoever understands two languages has the finest ears of all. Because you can hear a sound and notice what it looks like at the same time.\n\nIn the forest, the Brachiosaurus passes the rhythm to you. Its neck sways slowly, like a great clock settling. It tells you that your beat is steadier than yesterday.\n\nYou start teaching them too. The Allosaurus copies other roars better than anyone, but often gets the order wrong. The Parasaurolophus can make sounds with its crest, and it loves repeating the sound you make. You say it, it says it back, like two children trading secrets.\n\nIn this chapter, you will learn to understand two languages, and you will learn to put a rhythm inside your ears."
-      }
+      },
+      "companion": "dino-brachiosaurus"
     },
     {
       "chapter": 3,
-      "title": { "zh-TW": "第三章：深海與天空", "en-US": "Chapter 3: Deep Sea and Open Sky" },
+      "title": {
+        "zh-TW": "第三章：深海與天空",
+        "en-US": "Chapter 3: Deep Sea and Open Sky"
+      },
       "mood": "kind",
       "scene": "ice-age",
-      "verbs": ["rhythm", "interference"],
-      "unlockDex": [20, 21, 22, 23, 24, 25, 26, 27],
+      "verbs": [
+        "rhythm",
+        "interference"
+      ],
+      "unlockDex": [
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ],
       "letter": {
         "zh-TW": "這一章，聲音從很高的地方來，也從很深的地方來。\n\n翼龍在頭頂盤旋。牠的耳朵在風裡轉了個角度，然後俯衝下來：「找到了！北邊那座山後面，有星星在叫。」牠從天空帶回線索，那線索是一段很長很長的聲音。\n\n而在深海裡，滄龍低聲呼喚。水把聲音傳得比誰都遠，牠的呼喚穿過幾百里的海水，聽起來輕得像一根羽毛。棘龍背上的帆接住水面傳來的訊息，一點一點讀給你聽。\n\n麻煩是，風聲到處都是。冰河紀的風不像北極的風，它會嗚嗚地叫，會模仿很多聲音，會在你專心時突然大聲。迅猛龍跑得最快，牠說迷宮擋不住你，但牠也說，在亂的地方，答案常常是最安靜的那個。\n\n偵察暴龍在前面帶路，牠專找藏在雜音裡的那一個。\n\n你要做的，是把真正的聲音從一片亂雜裡揀出來。像在一堆石頭中間，挑出那一顆會發亮的。",
         "en-US": "In this chapter, sounds arrive from very high and from very deep.\n\nThe Pteranodon wheels overhead. Its ear turns into the wind, then it dives. \"Found it! Behind the mountain to the north, a star is calling.\" It brings back a clue from the sky, and the clue is a very long sound.\n\nDown in the deep sea, the Mosasaurus calls in a low voice. Water carries sound farther than anything else, and its call travels through hundreds of miles of ocean, arriving as light as a feather. The Spinosaurus catches the messages coming across the water with its sail and reads them to you one piece at a time.\n\nThe trouble is that wind is everywhere. The ice age wind is not like the north wind. It moans, it mimics many sounds, and it gets loud exactly when you are concentrating. The Velociraptor is the fastest of them all, and it tells you no maze can stop you, but it also says that in noisy places the answer is often the quietest one.\n\nThe scout Tyrannosaurus leads from the front, hunting for the one hidden in the noise.\n\nYour job is to pick the real sound out of all that clatter. Like finding the one stone in a pile that glitters."
-      }
+      },
+      "companion": "dino-pteranodon"
     },
     {
       "chapter": 4,
-      "title": { "zh-TW": "第四章：冰河紀的聖誕", "en-US": "Chapter 4: A Christmas in the Ice Age" },
+      "title": {
+        "zh-TW": "第四章：冰河紀的聖誕",
+        "en-US": "Chapter 4: A Christmas in the Ice Age"
+      },
       "mood": "home",
       "scene": "ice-age-christmas",
-      "verbs": ["puzzle", "memory"],
-      "unlockDex": [28, 29, 30, 31, 32, 33, 34, 35],
+      "verbs": [
+        "puzzle",
+        "memory"
+      ],
+      "unlockDex": [
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35
+      ],
       "letter": {
         "zh-TW": "冰河來了。\n\n不是慢慢來的。牠把恐龍谷整個吞掉，連谷裡最老的曉龍都沒見過這麼大的冰。樹被壓在下面，星星被雪埋得更深。\n\n恐龍們害怕了。牠們不會用聲音說「我害怕」，牠們只是安靜下來，一隻一隻靠在一起。\n\n所以我要你做兩件事。\n\n第一件，把恐龍的樣子拼回來。骨頭散在冰裡，你要一塊一塊找到它們，把頭、脖子、身體接回去，拼成一隻能站起來的恐龍。拼好了，牠才有力氣走出來。\n\n第二件，記住雪地上留下的每一個腳跡。冰把很多東西抹掉了——路、窩、名字——可是腳印還在。你只要記得，牠們就不算真的消失。\n\n孩子，我小時候也送過禮物。我送到一半就忘了，後來那個孩子一直沒收到。\n\n禮物不能送給看不見的人——除非有人記得。\n\n今年，請你替我記得。",
         "en-US": "The ice came.\n\nIt did not come slowly. It swallowed Dinosaur Valley whole, and even Eoraptor, the oldest of them all, had never seen ice this big. Trees were pressed flat underneath it, and the stars were buried deeper in the snow.\n\nThe dinosaurs were afraid. They cannot say \"I am afraid\" with their voices. They simply went quiet and stood close together, one after another.\n\nSo I need you to do two things.\n\nFirst, put the dinosaurs back together. Their bones are scattered in the ice, and you must find them one by one and fit head to neck to body, until a dinosaur that can stand is complete. Only then will it have the strength to walk out.\n\nSecond, remember every footprint in the snow. The ice rubs away many things. Paths, nests, names. But the prints stay. As long as you remember, they are not truly gone.\n\nChild, I gave a present once when I was small. I forgot halfway through, and that child never received it.\n\nA gift cannot be given to someone you cannot see, unless someone remembers.\n\nThis year, please remember for me."
-      }
+      },
+      "companion": "dino-trex"
     },
     {
       "chapter": 5,
-      "title": { "zh-TW": "第五章：北方的一夜", "en-US": "Chapter 5: One Night in the North" },
+      "title": {
+        "zh-TW": "第五章：北方的一夜",
+        "en-US": "Chapter 5: One Night in the North"
+      },
       "mood": "together",
       "scene": "north",
-      "verbs": ["memory", "interference", "puzzle"],
-      "unlockDex": [36, 37, 38, 39, 40, 41, 42, 43],
+      "verbs": [
+        "memory",
+        "interference",
+        "puzzle"
+      ],
+      "unlockDex": [
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43
+      ],
       "letter": {
         "zh-TW": "北方的一夜，星星回來了。\n\n牠們從雪裡爬出來，一顆一顆亮起來，比我記憶裡還亮。恐龍群圍著爐火，影子被火光拉得很長很長，疊在一起變成一整片牆。\n\n你把牠們的聲音一個一個排好。曉龍先開口，那是故事的最後一句；三角龍接著，穩穩的，像從前那樣；迅猛龍跳上跳下，搶著要說；腕龍把最後一個長長的音送出去。肉食龍安靜地站在最後面，當你的聲音聽錯時，牠只是輕輕碰碰你的手。\n\n那一刻牠們終於都聽懂了彼此。\n\n孩子，你知道嗎？牠們能聽懂彼此，是因為牠們花了整整五個章節，一次一次地聽錯、再一次一次地聽對。沒有那些搞錯的日子，就沒有今晚。\n\n你幫我送出的禮物，比我準備的還多。\n\n我希望牠們每一隻，都記得你的聲音。",
         "en-US": "On a night in the north, the stars came back.\n\nThey climbed out of the snow and lit up one by one, brighter than I remembered. The herd stood around the fire, their shadows stretched long by the flames, overlapping until they became a single wall.\n\nYou lined up all their sounds, one after another. Eoraptor spoke first, the last line of the story. Triceratops followed, steady, just as before. Velociraptor jumped about, fighting to talk. Brachiosaurus sent out the last long note. Carnotaurus stood quietly at the back, and when you misheard, it only nudged your hand.\n\nIn that moment, they finally understood each other.\n\nChild, do you know why they understood each other? Because for five whole chapters they listened wrong, and then listened right again and again. Without the days of getting it wrong, there would be no tonight.\n\nThe gift you sent out for me is bigger than the one I prepared.\n\nI hope every one of them remembers your voice."
-      }
+      },
+      "companion": "dino-mosasaurus"
     }
   ]
 }
