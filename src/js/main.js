@@ -51,6 +51,63 @@ let session = null;
 let selectedCharacter = "santa";
 /** 遊戲是否已啟動（F7：`startGame` 只能執行一次）。 @type {boolean} */
 let started = false;
+
+/**
+ * 遮罩堆疊（F8）。
+ *
+ * 每一層的返回**必須記錄來源**，不得假設「上一層永遠是某個畫面」。
+ * @type {string[]}
+ */
+const overlayStack = [];
+
+/**
+ * 推入一層遮罩（記錄來源）。
+ * @param {string} id
+ */
+function pushOverlay(id) {
+    overlayStack.push(id);
+}
+
+/**
+ * 彈出一層遮罩（回到上一層）。
+ *
+ * 回傳上一層的 id；若堆疊已空則回傳 null。
+ * @returns {string|null}
+ */
+function popOverlay() {
+    overlayStack.pop();
+    return overlayStack.length ? overlayStack[overlayStack.length - 1] : null;
+}
+
+/**
+ * 關閉最上層遮罩並回到它的來源畫面。
+ *
+ * @param {HTMLElement} root 要關閉的遮罩元素
+ * @returns {string|null} 回到的畫面 id
+ */
+function closeTopOverlay(root) {
+    root?.classList.add("hidden");
+    const top = currentOverlay();
+    const source = popOverlay();
+    if (source === "levelmap") {
+        $("levelmap-root")?.classList.remove("hidden");
+    } else if (source === "character-select") {
+        $("character-select-overlay")?.classList.remove("hidden");
+    }
+    if (top && top !== source) {
+        // 堆疊不一致（理論上不該發生）；記錄以便診斷
+        console.warn("[overlay] 關閉層級與堆疊不一致", { top, source });
+    }
+    return source;
+}
+
+/**
+ * 目前堆疊頂層（除錯用）。
+ * @returns {string|null}
+ */
+function currentOverlay() {
+    return overlayStack.length ? overlayStack[overlayStack.length - 1] : null;
+}
 /** @type {number} */
 let currentLevelId = 1;
 /** @type {any} */
@@ -355,14 +412,36 @@ function showCharacterSelect() {
         });
     });
 
+    // F8：角色選擇必須有「返回」路徑（回到序章／開始畫面）
+    const back = document.createElement("button");
+    back.className = "level-btn level-btn--secondary overlay__back";
+    back.id = "character-select-back";
+    back.type = "button";
+    back.setAttribute("aria-label", locale === "en-US" ? "Back" : "返回");
+    back.textContent = locale === "en-US" ? "Back" : "返回";
+    back.addEventListener("click", () => {
+        overlay.classList.add("hidden");
+        popOverlay();
+        showStart();
+    });
+    overlay.appendChild(back);
+
     overlay.classList.remove("hidden");
+    pushOverlay("character-select");
 }
 
 /**
  * 關卡地圖。
+ *
+ * F8：回到地圖時必須把**遊戲畫面收起來**，否則地圖底下仍殘留回合畫面。
  */
 function showLevelMap() {
     const overlay = $("levelmap-root");
+
+    // 收起遊戲畫面（地圖是全屏遮罩）
+    $("game-container")?.classList.add("hidden");
+    $("level-up-overlay")?.classList.add("hidden");
+    $("level-complete-container")?.classList.add("hidden");
 
     const map = renderLevelMap(overlay, bundle, progress, locale);
     map.onSelect((levelId) => {
@@ -370,7 +449,22 @@ function showLevelMap() {
         startLevel(levelId);
     });
 
+    // F8：地圖必須有「返回」路徑（回到角色選擇）
+    const back = document.createElement("button");
+    back.className = "level-btn level-btn--secondary overlay__back";
+    back.id = "levelmap-back";
+    back.type = "button";
+    back.setAttribute("aria-label", locale === "en-US" ? "Back" : "返回");
+    back.textContent = locale === "en-US" ? "Back" : "返回";
+    back.addEventListener("click", () => {
+        overlay.classList.add("hidden");
+        popOverlay();
+        showCharacterSelect();
+    });
+    overlay.appendChild(back);
+
     overlay.classList.remove("hidden");
+    pushOverlay("levelmap");
 }
 
 /**
@@ -461,6 +555,17 @@ function onLevelFinish(r) {
         replayBtn.onclick = () => {
             container.classList.add("hidden");
             startLevel(currentLevelId);
+        };
+    }
+
+    // F8：關卡完成後必須有「回地圖」的路徑（否則孩子回不去選關）
+    const mapBtn = $("back-to-map-btn");
+    if (mapBtn) {
+        mapBtn.textContent = locale === "en-US" ? "Level Map" : "回到地圖";
+        mapBtn.onclick = () => {
+            container.classList.add("hidden");
+            $("level-up-overlay")?.classList.add("hidden");
+            showLevelMap();
         };
     }
     container.classList.remove("hidden");
@@ -925,8 +1030,12 @@ function wire() {
     // 圖鑑 / 家長報告 / 付費牆 事件（由關卡地圖與 HUD 觸發）
     document.addEventListener("dex:request", () => {
         const root = $("dex-root");
-        renderDex(root, bundle, progress, locale);
+        // F8：圖鑑自帶「關上」按鈕，關上後回到**開啟圖鑑的那個畫面**
+        renderDex(root, bundle, progress, locale, () => {
+            closeTopOverlay(root);
+        });
         root.classList.remove("hidden");
+        pushOverlay("dex");
         track("level_map_view", { chapter: 0 });
     });
 
@@ -940,7 +1049,19 @@ function wire() {
 
         const root = $("parent-report-root");
         renderParentReport(root, progress, bundle, locale);
+        // F8：家長報告必須有「關上」路徑（仍需經過家長閘門才能進入，此處只是離開）
+        const back = document.createElement("button");
+        back.className = "level-btn level-btn--secondary overlay__back";
+        back.id = "parent-report-close";
+        back.type = "button";
+        back.setAttribute("aria-label", locale === "en-US" ? "Close" : "關上");
+        back.textContent = locale === "en-US" ? "Close" : "關上";
+        back.addEventListener("click", () => {
+            closeTopOverlay(root);
+        });
+        root.appendChild(back);
         root.classList.remove("hidden");
+        pushOverlay("parent-report");
         track("parent_report_view", {});
     });
 

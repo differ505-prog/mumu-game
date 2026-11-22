@@ -9,12 +9,17 @@ import { itemLabel } from "../data/items.js";
 
 /**
  * 渲染圖鑑。
+ *
+ * F8：圖鑑**必須有「關上」按鈕**（點進去就出不來是既有缺陷）。
+ * 關上後回到**開啟圖鑑的那個畫面**（由呼叫端透過 `onClose` 決定）。
+ *
  * @param {HTMLElement} root
  * @param {any} bundle
  * @param {any} progress
  * @param {string} locale
+ * @param {() => void} [onClose]
  */
-export function renderDex(root, bundle, progress, locale) {
+export function renderDex(root, bundle, progress, locale, onClose) {
     const dex = bundle?.dex || [];
     const voice = childVoice() || {};
     const key = locale === "en-US" ? "en-US" : "zh-TW";
@@ -28,8 +33,7 @@ export function renderDex(root, bundle, progress, locale) {
             </p>
         </div>
         <div class="dex-grid">
-            ${dex.map((/** @type {any} */ d) => {
-                const unlocked = checkDexUnlock(bundle, progress, d.id);
+            ${dex.map((/** @type {any} */ d) => {                const unlocked = checkDexUnlock(bundle, progress, d.id);
                 const pct = dexUnlockProgress(bundle, progress, d.id);
                 const name = d.name?.[locale] || d.name?.["zh-TW"] || d.id;
                 const milestone = d.personality?.[locale] || d.personality?.["zh-TW"] || "";
@@ -86,12 +90,24 @@ export function renderDex(root, bundle, progress, locale) {
         });
     }
 
+    // F8：關上按鈕（右上角），關上後回到開啟圖鑑的那個畫面
+    const close = document.createElement("button");
+    close.className = "level-btn level-btn--secondary overlay__back";
+    close.id = "dex-close";
+    close.type = "button";
+    close.setAttribute("aria-label", locale === "en-US" ? "Close" : "關上");
+    close.textContent = locale === "en-US" ? "Close" : "關上";
+    close.addEventListener("click", () => {
+        root.classList.add("hidden");
+        onClose?.();
+    });
+    root.appendChild(close);
+
     return { onSelect };
 }
 
 /**
- * 取得圖鑑條目的解鎖狀態。
- * @param {any} bundle
+ * 取得圖鑑條目的解鎖狀態。 * @param {any} bundle
  * @param {any} progress
  * @param {string} dinoId
  * @returns {{ unlocked:boolean, condition:string, progressPct:number }}

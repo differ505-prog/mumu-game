@@ -18,6 +18,14 @@
     overflow-y: auto;
 }
 
+/* 遮罩返回／關上按鈕（置於右上角，任何畫面都回得去） */
+.overlay__back {
+    position: absolute;
+    top: var(--s-4);
+    right: var(--s-4);
+    z-index: 2;
+}
+
 .overlay h1 {
     font-size: var(--fs-2xl);
     color: var(--text-primary);

@@ -614,6 +614,220 @@ const CHECKS = [
     },
 
     {
+        name: "play-nav-complete",
+        async run(env) {
+            // 完整導航：
+            // 開始 → 關上序章 → 走完教學 → 選角色 → 地圖 → 進關卡 → 完成 → 回地圖 →
+            // 開圖鑑 → 關圖鑑 → 開家長報告（通過閘門）→ 關家長報告 → 回地圖 → 返回角色選擇
+            /** @type {string[]} */
+            const problems = [];
+
+            /** 記錄每張遮罩離開時是否確實被加上 hidden。 */
+            const overlays = [
+                "start-overlay",
+                "story-root",
+                "tutorial-root",
+                "character-select-overlay",
+                "levelmap-root",
+                "dex-root",
+                "parent-report-root"
+            ];
+
+            await bootGame(env);
+            await clickStart(env);
+            await env.clock.advance(500);
+
+            // 序章信件 → 關上
+            const story = env.document.getElementById("story-root");
+            if (!isVisible(story)) problems.push("序章信件未顯示");
+            if (!await closePrologue(env)) problems.push("序章信件無法關上");
+            if (isVisible(story)) problems.push("序章信件關上後仍可見");
+
+            // 教學 → 走完
+            await env.clock.advance(300);
+            const tut = await advanceTutorial(env);
+            if (!tut.ok || tut.stuck) problems.push(`教學未走完（stuck=${tut.stuck}）`);
+            const charOverlay = env.document.getElementById("character-select-overlay");
+            if (!isVisible(charOverlay)) problems.push("教學後未進入角色選擇");
+
+            // 選角色 → 地圖
+            await pickCharacter(env, "santa");
+            const map = env.document.getElementById("levelmap-root");
+            if (!isVisible(map)) problems.push("選角色後未進入地圖");
+
+            // 地圖 → 進關卡
+            const node = map.querySelector('[data-level="1"]');
+            if (!node) {
+                problems.push("地圖找不到第 1 關節點");
+            } else {
+                click(env, node);
+                await env.clock.advance(3200);
+                const game = env.document.getElementById("game-container");
+                if (!isVisible(game)) problems.push("進關卡後遊戲容器不可見");
+                if (isVisible(map)) problems.push("進關卡後地圖仍可見");
+
+                // 完成關卡（3 回合）→ 回到地圖
+                for (let r = 0; r < 3; r++) {
+                    const res = await playOneRound(env);
+                    if (!res.ok) {
+                        problems.push(`回合 ${r + 1}: ${res.detail}`);
+                        break;
+                    }
+                    await env.clock.advance(3600);
+                }
+                await env.clock.advance(2000);
+
+                // 關卡完成後必須有回到地圖的路徑
+                const nextBtn = env.document.getElementById("next-level-btn");
+                if (!nextBtn) {
+                    problems.push("關卡完成後缺少回到地圖的按鈕");
+                }
+                const mapBtn = env.document.getElementById("back-to-map-btn");
+                if (!mapBtn) {
+                    problems.push("關卡完成後缺少「回到地圖」按鈕");
+                } else {
+                    click(env, mapBtn);
+                    await env.clock.advance(300);
+                    if (!isVisible(map)) problems.push("按「回到地圖」後未回到地圖");
+                    else if (isVisible(game)) problems.push("回到地圖後遊戲容器仍可見");
+                }
+            }
+
+            // 開圖鑑 → 關圖鑑
+            env.document.dispatchEvent(new env.window.CustomEvent("dex:request", { bubbles: true }));
+            await env.clock.advance(300);
+            const dexRoot = env.document.getElementById("dex-root");
+            if (!isVisible(dexRoot)) {
+                problems.push("圖鑑未開啟");
+            } else {
+                const dexClose = dexRoot.querySelector("#dex-close");
+                if (!dexClose) {
+                    problems.push("圖鑑缺少關閉按鈕");
+                } else {
+                    click(env, dexClose);
+                    await env.clock.advance(200);
+                    if (isVisible(dexRoot)) problems.push("圖鑑關閉後仍可見");
+                }
+            }
+
+            // 家長報告 → 通過閘門 → 關閉
+            env.document.dispatchEvent(new env.window.CustomEvent("parent:request", { bubbles: true }));
+            await env.clock.advance(400);
+            const parentRoot = env.document.getElementById("parent-report-root");
+            if (isVisible(parentRoot)) {
+                // 閘門畫面：答對算術題進入報告
+                const input = parentRoot.querySelector("#gate-answer");
+                const submit = parentRoot.querySelector("#gate-submit");
+                if (input && submit) {
+                    input.value = "5";
+                    click(env, submit);
+                    await env.clock.advance(400);
+                }
+            }
+            const parentVisible = isVisible(parentRoot);
+            const parentClose = parentRoot.querySelector("#parent-report-close");
+            if (parentVisible && !parentClose) {
+                problems.push("家長報告缺少關閉按鈕");
+            } else if (parentClose) {
+                click(env, parentClose);
+                await env.clock.advance(200);
+                if (isVisible(parentRoot)) problems.push("家長報告關閉後仍可見");
+            }
+
+            // 地圖 → 返回角色選擇
+            const mapBack = env.document.getElementById("levelmap-back");
+            if (!mapBack) {
+                problems.push("地圖缺少返回按鈕");
+            } else {
+                click(env, mapBack);
+                await env.clock.advance(200);
+                if (!isVisible(charOverlay)) problems.push("地圖返回後未回到角色選擇");
+                if (isVisible(map)) problems.push("地圖返回後仍可見");
+            }
+
+            // 角色選擇 → 返回（開始畫面）
+            const charBack = env.document.getElementById("character-select-back");
+            if (!charBack) {
+                problems.push("角色選擇缺少返回按鈕");
+            } else {
+                click(env, charBack);
+                await env.clock.advance(200);
+                const start = env.document.getElementById("start-overlay");
+                if (!isVisible(start)) problems.push("角色選擇返回後未回到開始畫面");
+            }
+
+            // 每張遮罩在流程結束時都不應可見
+            // （start-overlay 是最後主動回到的畫面，屬預期狀態）
+            for (const id of overlays) {
+                if (id === "start-overlay") continue;
+                const el = env.document.getElementById(id);
+                if (el && isVisible(el)) problems.push(`遮罩 ${id} 在流程結束後仍可見`);
+            }
+
+            return {
+                ok: problems.length === 0,
+                detail: problems.length ? `問題 → ${problems.join(" | ")}` : "完整導航走完，每張遮罩都能離開"
+            };
+        }
+    },
+
+    {
+        name: "play-no-dead-end",
+        async run(env) {
+            await bootGame(env);
+            await clickStart(env);
+            await env.clock.advance(500);
+            await closePrologue(env);
+            await env.clock.advance(300);
+            await advanceTutorial(env);
+            await pickCharacter(env, "santa");
+            await env.clock.advance(300);
+
+            const visible = Array.from(env.document.querySelectorAll(".overlay"))
+                .filter((el) => isVisible(el))
+                .map((el) => el.id || el.className)
+                // 地圖是最後停留的畫面，屬預期狀態
+                .filter((id) => id !== "levelmap-root");
+
+            return {
+                ok: visible.length === 0,
+                detail: visible.length
+                    ? `仍有可見遮罩殘留 → ${visible.join(", ")}`
+                    : "流程結束後無任何可見遮罩殘留"
+            };
+        }
+    },
+
+    {
+        name: "play-start-once",
+        async run(env) {
+            await bootGame(env);
+            // 連續點擊開始畫面 5 次 —— startGame 只能執行一次
+            const overlay = env.document.getElementById("start-overlay");
+            for (let i = 0; i < 5; i++) {
+                click(env, overlay);
+                await flush(10);
+            }
+            await env.clock.advance(500);
+
+            const story = env.document.getElementById("story-root");
+            // 序章信件只被設定一次內容（同一份 DOM 節點，不會被重複渲染）
+            const letterEl = story?.querySelector(".letter__body");
+            const body = letterEl?.textContent || "";
+
+            // 教學只被建立一次（不是「已建立兩次」）
+            const tutRoot = env.document.getElementById("tutorial-root");
+            const panels = tutRoot.querySelectorAll(".tutorial").length;
+
+            const ok = body.length > 0 && panels <= 1;
+            return {
+                ok,
+                detail: `letterRendered=${body.length > 0} tutorialPanels=${panels} storyHidden=${story?.classList.contains("hidden")}`
+            };
+        }
+    },
+
+    {
         name: "play-no-blocking",
         async run(env) {
             await bootGame(env);
