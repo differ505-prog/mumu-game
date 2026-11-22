@@ -148,3 +148,129 @@ function ensureCanvas(layer) {
     window.addEventListener("resize", resize, { once: true });
     return canvas;
 }
+
+/**
+ * 依天氣啟動環境粒子（Step 120）。
+ *
+ * 支援的 `weather`：
+ * - `snow`  → 三層視差雪花
+ * - `mist`  → 緩慢上升的霧帶
+ * - `aurora`→ 極光帶（半透明漸層橫帶）
+ * - 其他    → 不啟動任何粒子（不得留下死欄位）
+ *
+ * @param {HTMLElement} layer
+ * @param {string} weather
+ */
+export function startAmbientWeather(layer, weather) {
+    stopAmbientWeather(layer);
+    if (!layer || !weather) return;
+
+    if (weather === "mist") {
+        startAmbientMist(layer);
+    } else if (weather === "aurora") {
+        startAmbientAurora(layer);
+    } else {
+        // `snow` 與既有環境雪花相同
+        startAmbientSnow(layer);
+    }
+}
+
+/**
+ * 停止所有環境粒子。
+ * @param {HTMLElement} layer
+ */
+export function stopAmbientWeather(layer) {
+    const canvas = layer?.querySelector("canvas");
+    if (canvas) canvas.remove();
+}
+
+/**
+ * 緩慢上升的霧帶。
+ * @param {HTMLElement} layer
+ */
+function startAmbientMist(layer) {
+    const canvas = ensureCanvas(layer);
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const w = canvas.width;
+    const h = canvas.height;
+    const bands = Array.from({ length: 7 }, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        rx: 90 + Math.random() * 160,
+        ry: 26 + Math.random() * 44,
+        speed: 0.12 + Math.random() * 0.22,
+        alpha: 0.05 + Math.random() * 0.07
+    }));
+
+    const step = () => {
+        ctx.clearRect(0, 0, w, h);
+        for (const b of bands) {
+            b.y -= b.speed;
+            b.x += 0.18;
+            if (b.y + b.ry < 0) {
+                b.y = h + b.ry;
+                b.x = Math.random() * w;
+            }
+            if (b.x - b.rx > w) b.x = -b.rx;
+            const g = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.rx);
+            g.addColorStop(0, `rgba(220,235,245,${b.alpha})`);
+            g.addColorStop(1, "rgba(220,235,245,0)");
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.ellipse(b.x, b.y, b.rx, b.ry, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+}
+
+/**
+ * 極光帶。
+ * @param {HTMLElement} layer
+ */
+function startAmbientAurora(layer) {
+    const canvas = ensureCanvas(layer);
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const w = canvas.width;
+    const h = canvas.height;
+    const ribbons = Array.from({ length: 3 }, (_, i) => ({
+        offset: 0.08 + i * 0.12,
+        amp: 26 + i * 14,
+        speed: 0.004 + i * 0.002,
+        hue: 130 + i * 42,
+        alpha: 0.1 + i * 0.045
+    }));
+
+    const step = () => {
+        ctx.clearRect(0, 0, w, h);
+        ribbons.forEach((r, idx) => {
+            const t = performance.now() * r.speed;
+            ctx.beginPath();
+            ctx.moveTo(0, h);
+            for (let x = 0; x <= w; x += 12) {
+                const y = h * r.offset
+                    + Math.sin((x / w) * Math.PI * 2 + t) * r.amp
+                    + Math.sin((x / w) * Math.PI * 5 + t * 1.7) * (r.amp * 0.35);
+                ctx.lineTo(x, y);
+            }
+            ctx.lineTo(w, h);
+            ctx.closePath();
+            const g = ctx.createLinearGradient(0, h * r.offset - r.amp, 0, h * r.offset + r.amp);
+            g.addColorStop(0, `hsla(${r.hue}, 80%, 70%, 0)`);
+            g.addColorStop(0.5, `hsla(${r.hue}, 80%, 70%, ${r.alpha})`);
+            g.addColorStop(1, `hsla(${r.hue}, 80%, 70%, 0)`);
+            ctx.fillStyle = g;
+            ctx.fill();
+            void idx;
+        });
+        requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+}

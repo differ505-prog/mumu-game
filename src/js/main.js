@@ -17,7 +17,7 @@ import { playSfx, playDinoRoar, setSfxMap } from "./audio/sfx.js";
 import { createHud } from "./ui/hud.js";
 import { renderCharacter, playRoar, playHatch, playUnlock, playComplete, lookAt } from "./ui/character-render.js";
 import { haptic } from "./ui/haptics.js";
-import { burst, startAmbientSnow } from "./ui/particles.js";
+import { burst, startAmbientSnow, startAmbientWeather } from "./ui/particles.js";
 import { animate } from "./ui/motion.js";
 import { APP } from "./core/config.js";
 import { verbLabel, verbById } from "./core/verbs.js";
@@ -205,6 +205,9 @@ async function loadChildVoice() {
 /** 目前場景（用於音樂與視覺切換）。 @type {string} */
 let currentSceneId = "";
 
+/** 場景資料（content/scenes.json），用於消費 `weather`。 @type {any} */
+let scenesData = {};
+
 /**
  * 套用場景音樂。
  *
@@ -233,7 +236,11 @@ function applySceneAudio(scene) {
 function applySceneVisual(scene) {
     if (!scene) return;
     applyTheme($("scene"), scene);
-    setParallax($("scene"), 0);
+    setParallax($("scene"), 0, 0);
+
+    // Step 120：消費 scenes.json 的 `weather` 欄位（無天氣則不啟動粒子）
+    const weather = scenesData?.[scene]?.weather || "";
+    startAmbientWeather($("snow-container"), weather);
 }
 
 /**
@@ -260,7 +267,11 @@ function childVerbLabel(verb, locale) {
 async function loadScenes() {
     try {
         const res = await fetch("./content/scenes.json", { cache: "no-cache" });
-        if (res.ok) setScenePalettes(await res.json());
+        if (res.ok) {
+            const data = await res.json();
+            setScenePalettes(data);
+            scenesData = data;
+        }
     } catch (err) {
         console.warn("[main] 場景設定載入失敗", err);
     }
@@ -1034,11 +1045,21 @@ function wire() {
         lookAt($("santa-container"), e.clientX, e.clientY);
     });
 
-    // 視差場景
+    // 視差場景（Step 120：水平 + 垂直位移）
     document.addEventListener("pointermove", (e) => {
-        const offset = (e.clientX / Math.max(1, window.innerWidth) - 0.5) * 40;
-        setParallax($("scene"), offset);
+        const x = (e.clientX / Math.max(1, window.innerWidth) - 0.5) * 40;
+        const y = (e.clientY / Math.max(1, window.innerHeight) - 0.5) * 24;
+        setParallax($("scene"), x, y);
     });
+
+    // 觸控視差（Step 120）：觸控裝置的等效視差來源，必須 passive
+    document.addEventListener("touchmove", (e) => {
+        const touch = e.touches?.[0];
+        if (!touch) return;
+        const x = (touch.clientX / Math.max(1, window.innerWidth) - 0.5) * 40;
+        const y = (touch.clientY / Math.max(1, window.innerHeight) - 0.5) * 24;
+        setParallax($("scene"), x, y);
+    }, { passive: true });
 
     // 圖鑑 / 家長報告 / 付費牆 事件（由關卡地圖與 HUD 觸發）
     document.addEventListener("dex:request", () => {

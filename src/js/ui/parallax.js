@@ -95,14 +95,25 @@ export function applyTheme(sceneRoot, theme) {
 
 /**
  * 依層深位移各層。
+ *
+ * Step 120：支援**水平位移**。
+ *   - 兩參數 `setParallax(root, x, y)` → 水平與垂直位移
+ *   - 單參數 `setParallax(root, y)` → 向後相容，視為**垂直**位移
+ *
  * @param {HTMLElement} sceneRoot
- * @param {number} px
+ * @param {number} x 水平位移（像素）
+ * @param {number} [y] 垂直位移（像素）
  */
-export function setParallax(sceneRoot, px) {
+export function setParallax(sceneRoot, x, y = 0) {
     if (!sceneRoot) return;
+    // 向後相容：單參數呼叫視為垂直位移
+    const dx = y === 0 ? 0 : x;
+    const dy = y === 0 ? x : y;
+
     Array.from(sceneRoot.querySelectorAll(".scene__layer")).forEach((/** @type {HTMLElement} */ layer) => {
         const depth = Number(layer.dataset.depth ?? layer.style.getPropertyValue("--depth") ?? 0);
-        layer.style.transform = `translate3d(0, ${(px * depth).toFixed(2)}px, 0)`;
+        layer.style.transform =
+            `translate3d(${(dx * depth).toFixed(2)}px, ${(dy * depth).toFixed(2)}px, 0)`;
     });
 }
 

@@ -1,9 +1,19 @@
 {
   "christmas": {
     "id": "christmas",
-    "title": { "zh-TW": "北極的聖誕", "en-US": "Arctic Christmas" },
-    "music": { "scene": "christmas", "gainDb": -15, "tempo": 62 },
-    "ambience": { "kind": "wind", "gainDb": -24 },
+    "title": {
+      "zh-TW": "北極的聖誕",
+      "en-US": "Arctic Christmas"
+    },
+    "music": {
+      "scene": "christmas",
+      "gainDb": -15,
+      "tempo": 62
+    },
+    "ambience": {
+      "kind": "wind",
+      "gainDb": -24
+    },
     "palette": {
       "sky": "#16294f",
       "glow": "#f1c40f",
@@ -16,9 +26,19 @@
   },
   "valley": {
     "id": "valley",
-    "title": { "zh-TW": "恐龍谷", "en-US": "Dinosaur Valley" },
-    "music": { "scene": "valley", "gainDb": -15, "tempo": 96 },
-    "ambience": { "kind": "none", "gainDb": -26 },
+    "title": {
+      "zh-TW": "恐龍谷",
+      "en-US": "Dinosaur Valley"
+    },
+    "music": {
+      "scene": "valley",
+      "gainDb": -15,
+      "tempo": 96
+    },
+    "ambience": {
+      "kind": "none",
+      "gainDb": -26
+    },
     "palette": {
       "sky": "#1d3b2a",
       "glow": "#f7d774",
@@ -26,14 +46,23 @@
       "ridge": "#2f5d3a",
       "midground": "#3d7a4a",
       "foreground": "#1a3324"
-    },
-    "weather": "none"
+    }
   },
   "forest": {
     "id": "forest",
-    "title": { "zh-TW": "語言之森", "en-US": "Forest of Voices" },
-    "music": { "scene": "forest", "gainDb": -16, "tempo": 84 },
-    "ambience": { "kind": "forest", "gainDb": -25 },
+    "title": {
+      "zh-TW": "語言之森",
+      "en-US": "Forest of Voices"
+    },
+    "music": {
+      "scene": "forest",
+      "gainDb": -16,
+      "tempo": 84
+    },
+    "ambience": {
+      "kind": "forest",
+      "gainDb": -25
+    },
     "palette": {
       "sky": "#123a3d",
       "glow": "#9ad8a0",
@@ -46,9 +75,19 @@
   },
   "ice-age": {
     "id": "ice-age",
-    "title": { "zh-TW": "冰原與深海", "en-US": "Ice and Deep Sea" },
-    "music": { "scene": "ice-age", "gainDb": -17, "tempo": 58 },
-    "ambience": { "kind": "wind", "gainDb": -26 },
+    "title": {
+      "zh-TW": "冰原與深海",
+      "en-US": "Ice and Deep Sea"
+    },
+    "music": {
+      "scene": "ice-age",
+      "gainDb": -17,
+      "tempo": 58
+    },
+    "ambience": {
+      "kind": "wind",
+      "gainDb": -26
+    },
     "palette": {
       "sky": "#1b2f52",
       "glow": "#bfe4ff",
@@ -61,9 +100,19 @@
   },
   "ice-age-christmas": {
     "id": "ice-age-christmas",
-    "title": { "zh-TW": "冰原聖誕夜", "en-US": "Christmas on the Ice" },
-    "music": { "scene": "ice-age-christmas", "gainDb": -16, "tempo": 72 },
-    "ambience": { "kind": "snow", "gainDb": -25 },
+    "title": {
+      "zh-TW": "冰原聖誕夜",
+      "en-US": "Christmas on the Ice"
+    },
+    "music": {
+      "scene": "ice-age-christmas",
+      "gainDb": -16,
+      "tempo": 72
+    },
+    "ambience": {
+      "kind": "snow",
+      "gainDb": -25
+    },
     "palette": {
       "sky": "#2c1f45",
       "glow": "#ffd98a",
@@ -76,9 +125,19 @@
   },
   "north": {
     "id": "north",
-    "title": { "zh-TW": "北方之夜", "en-US": "Northern Night" },
-    "music": { "scene": "north", "gainDb": -17, "tempo": 52 },
-    "ambience": { "kind": "wind", "gainDb": -25 },
+    "title": {
+      "zh-TW": "北方之夜",
+      "en-US": "Northern Night"
+    },
+    "music": {
+      "scene": "north",
+      "gainDb": -17,
+      "tempo": 52
+    },
+    "ambience": {
+      "kind": "wind",
+      "gainDb": -25
+    },
     "palette": {
       "sky": "#2a2050",
       "glow": "#e8d9ff",
