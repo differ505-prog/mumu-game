@@ -23,6 +23,7 @@ import {
     disposeEnv,
     bootGame,
     clickStart,
+    closePrologue,
     advanceTutorial,
     pickCharacter,
     startLevel,
@@ -384,19 +385,21 @@ const CHECKS = [
         async run(env) {
             // #bubble / #bubble-content 必須在 renderCharacter() 覆寫 #santa-container 之後仍然存在。
             // 若被覆蓋，序章信件（showLetter）會拋出 TypeError，整條導航中斷。
-            // 此檢查**不套用** DOM fixture，以如實反映真實產品的 DOM 契約狀態。
+            // Step 118 已把氣泡移出 #santa-container，此檢查如實驗證該契約。
             await bootGame(env);
             await clickStart(env);
             await env.clock.advance(500);
             const bubble = env.document.getElementById("bubble");
             const content = env.document.getElementById("bubble-content");
+            const container = env.document.getElementById("santa-container");
+            const insideCharacter = container ? container.contains(bubble) : false;
             const crashed = env.errors.some((e) => /bubble-content/.test(e));
-            const ok = Boolean(bubble && content) && !crashed;
+            const ok = Boolean(bubble && content) && !insideCharacter && !crashed;
             return {
                 ok,
                 detail: ok
-                    ? "bubble 與 bubble-content 在角色渲染後仍存在"
-                    : `缺陷：renderCharacter() 覆寫 #santa-container，#bubble / #bubble-content 消失（序章信件拋 TypeError）errors=${env.errors.length}`
+                    ? "bubble 與 bubble-content 獨立於 #santa-container，角色渲染後仍存在"
+                    : `缺陷：bubble 在角色容器內（insideCharacter=${insideCharacter}）或已消失，errors=${env.errors.length}`
             };
         }
     },
@@ -406,7 +409,9 @@ const CHECKS = [
         async run(env) {
             await bootGame(env);
             await clickStart(env);
-            await env.clock.advance(3000);
+            await env.clock.advance(500);
+            await closePrologue(env);
+            await env.clock.advance(300);
             const root = env.document.getElementById("tutorial-root");
             const wasVisible = !root.classList.contains("hidden");
             const res = await advanceTutorial(env);
@@ -425,7 +430,9 @@ const CHECKS = [
         async run(env) {
             await bootGame(env);
             await clickStart(env);
-            await env.clock.advance(3000);
+            await env.clock.advance(500);
+            await closePrologue(env);
+            await env.clock.advance(300);
             await advanceTutorial(env);
             const overlay = env.document.getElementById("character-select-overlay");
             const hadButton = Boolean(overlay.querySelector("[data-character]"));
@@ -444,7 +451,9 @@ const CHECKS = [
         async run(env) {
             await bootGame(env);
             await clickStart(env);
-            await env.clock.advance(3000);
+            await env.clock.advance(500);
+            await closePrologue(env);
+            await env.clock.advance(300);
             await advanceTutorial(env);
             await pickCharacter(env, "santa");
             const map = env.document.getElementById("levelmap-root");
@@ -462,7 +471,9 @@ const CHECKS = [
         async run(env) {
             await bootGame(env);
             await clickStart(env);
-            await env.clock.advance(3000);
+            await env.clock.advance(500);
+            await closePrologue(env);
+            await env.clock.advance(300);
             await advanceTutorial(env);
             await pickCharacter(env, "santa");
             await enterLevel(env, 1);
@@ -482,7 +493,9 @@ const CHECKS = [
         async run(env) {
             await bootGame(env);
             await clickStart(env);
-            await env.clock.advance(3000);
+            await env.clock.advance(500);
+            await closePrologue(env);
+            await env.clock.advance(300);
             await advanceTutorial(env);
             await pickCharacter(env, "santa");
 
@@ -605,7 +618,9 @@ const CHECKS = [
         async run(env) {
             await bootGame(env);
             await clickStart(env);
-            await env.clock.advance(3000);
+            await env.clock.advance(500);
+            await closePrologue(env);
+            await env.clock.advance(300);
             await advanceTutorial(env);
             await pickCharacter(env, "santa");
             await enterLevel(env, 1);
@@ -645,11 +660,7 @@ async function main() {
     let failed = 0;
 
     for (const c of list) {
-        // play-dom-contract 不套用 DOM fixture，以如實回報真實產品的 DOM 契約缺陷
-        const env = createGameEnv({
-            locale: "zh-TW",
-            applyDomFixture: c.name !== "play-dom-contract"
-        });
+        const env = createGameEnv({ locale: "zh-TW" });
         let result = { ok: false, detail: "未執行" };
         try {
             result = await c.run(env);

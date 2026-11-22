@@ -597,12 +597,11 @@ function seedProgress(unlocked) {
 /**
  * 建立一個 jsdom 遊戲環境（尚未啟動）。
  *
- * @param {{ locale?: string, unlockAllLevels?: boolean, applyDomFixture?: boolean }} [options]
+ * @param {{ locale?: string, unlockAllLevels?: boolean }} [options]
  */
 export function createGameEnv(options = {}) {
     const locale = options.locale || "zh-TW";
     const unlockAllLevels = options.unlockAllLevels !== false;
-    const applyDomFixture = options.applyDomFixture !== false;
 
     const html = fs.readFileSync(INDEX_HTML, "utf8");
 
@@ -663,29 +662,22 @@ export function createGameEnv(options = {}) {
         }
     };
 
-    // ── DOM 契約修補（見 docs/notes/step-109.md）────────────────
-    // index.html 把 #bubble / #bubble-content 放在 #santa-container 內，
+    // ── DOM 契約檢查（Step 118 已修復）──────────────────────
+    // 原本 index.html 把 #bubble / #bubble-content 放在 #santa-container 內，
     // 但 renderCharacter() 會以 innerHTML 覆寫 #santa-container，
-    // 導致序章信件（showLetter）在第一次點擊時拋出 TypeError，整條導航就此中斷。
-    // 該缺陷屬 Step 115／118 的修復範圍；Step 109 只建立守門，不得修改 src/。
-    // 因此守門在測試環境中把 #bubble 搬到 #game-container 底下，
-    // 讓「按真實路徑玩到回合」這件事可被驗證；
-    // 同時以 `play-dom-contract` 檢查項**主動回報這個缺陷**，不得掩蓋。
+    // 導致氣泡消失、序章信件拋 TypeError。
+    // Step 118 已把氣泡移出 #santa-container；此處僅**觀察**並如實回報，
+    // 不得再以 fixture 掩蓋缺陷。
     env.domFixture = [];
     try {
         const bubble = w.document.getElementById("bubble");
         const content = w.document.getElementById("bubble-content");
         const container = w.document.getElementById("santa-container");
         if (bubble && content && container) {
-            env.bubbleOriginallyInsideCharacter = true;
-            if (applyDomFixture) {
-                const game = w.document.getElementById("game-container");
-                (game || w.document.body).appendChild(bubble);
-                env.domFixture.push("#bubble relocated out of #santa-container");
-            }
+            env.bubbleOriginallyInsideCharacter = Boolean(container.contains(bubble));
         }
     } catch {
-        // DOM 契約修補失敗時忽略（後續檢查會如實回報）
+        // DOM 契約檢查失敗時忽略（後續檢查會如實回報）
     }
 
     // ── fake clock 注入視窗 ───────────────────────────────────
@@ -948,6 +940,23 @@ export async function clickStart(env) {
 }
 
 /**
+ * 關上序章信件（序章是 `#story-root` 的可關閉過場，關上後才進入教學）。
+ *
+ * @param {any} env
+ * @returns {Promise<boolean>} 是否確實關上了
+ */
+export async function closePrologue(env) {
+    const root = env.document.getElementById("story-root");
+    if (!root || root.classList.contains("hidden")) return true;
+    const close = root.querySelector("#letter-close");
+    if (!close) return false;
+    clickElement(env, close);
+    await flush(20);
+    await env.clock.advance(200);
+    return root.classList.contains("hidden");
+}
+
+/**
  * 完成教學。
  *
  * 教學策略：逐步點擊該步驟的主要動作按鈕；若某一步無法推進（教學卡死），
@@ -991,7 +1000,15 @@ export async function advanceTutorial(env) {
 
         const before = panel?.dataset?.step;
         clickElement(env, action);
-        await env.clock.advance(900);
+        // 示範音步驟需 900ms 才會前進
+        await env.clock.advance(1200);
+
+        // 教學結束時 root 會被加上 hidden（內容不一定清空）
+        if (root.classList.contains("hidden")) {
+            result.ok = result.shown;
+            return result;
+        }
+
         const after = root.querySelector(".tutorial")?.dataset?.step;
         if (after === before) {
             // 該步驟無法推進 → 教學卡死
@@ -1182,7 +1199,9 @@ export async function openLevel(levelId) {
     const env = createGameEnv({ locale: "zh-TW" });
     await bootGame(env);
     await clickStart(env);
-    await env.clock.advance(3000);
+    await env.clock.advance(500);
+    await closePrologue(env);
+    await env.clock.advance(300);
     await advanceTutorial(env);
     await pickCharacter(env, "santa");
     await startLevel(env, levelId);

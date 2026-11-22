@@ -40,14 +40,16 @@ export function pickVoice(locale) {
 
 /**
  * 朗讀文字。
+ *
  * @param {string} text
- * @param {{ locale?: string, pitch?: number, rate?: number }} [opts]
+ * @param {{ locale?: string, pitch?: number, rate?: number, onEnd?: () => void }} [opts]
  */
 export function speak(text, opts = {}) {
     if (!text) return;
     if (!window.speechSynthesis) {
         emit({ type: "voice:unavailable", payload: { text } });
         showSubtitle(text);
+        opts.onEnd?.();
         return;
     }
 
@@ -65,6 +67,12 @@ export function speak(text, opts = {}) {
     utter.onerror = () => {
         emit({ type: "voice:unavailable", payload: { text } });
         showSubtitle(text);
+        opts.onEnd?.();
+    };
+
+    // 朗讀正常結束
+    utter.onend = () => {
+        opts.onEnd?.();
     };
 
     // 語音期間壓低背景音樂（側鏈 ducking）

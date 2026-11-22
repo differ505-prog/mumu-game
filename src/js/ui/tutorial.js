@@ -2,9 +2,18 @@
  * 教學流程 — 由角色一邊示範一邊說，不另開靜態教學頁。
  *
  * 規範：可跳過；設定可重播。
+ *
+ * **F4 修正要點**：三個步驟**每一個都必須有前進路徑**。
+ *   listen → 播放真實示範音後自動前進
+ *   watch  → 播放真實示範音後自動前進
+ *   choose → 選項後自動前進
+ *
+ * **不得**以 `setTimeout` 猜測朗讀長度來推進流程；
+ * 推進一律由「使用者行為」或「語音結束事件」觸發。
  */
 
 import { speak } from "../audio/voice.js";
+import { playTone } from "../audio/sfx.js";
 
 /**
  * @typedef {"listen"|"watch"|"choose"} TutorialStep
@@ -20,6 +29,10 @@ export function createTutorial(root, bundle, locale) {
     /** @type {TutorialStep[]} */
     const steps = ["listen", "watch", "choose"];
     let index = 0;
+    /** 完成回呼（由呼叫端提供）。 @type {((done:boolean)=>void)|null} */
+    let doneCb = null;
+    /** 是否已完成（避免重複觸發完成回呼）。 @type {boolean} */
+    let finished = false;
 
     const en = locale === "en-US";
 
@@ -30,14 +43,16 @@ export function createTutorial(root, bundle, locale) {
             body: en
                 ? "Press the button and the character will play a sound. Listen all the way to the end."
                 : "按下按鈕，角色會播放一個聲音。請完整聽到最後。",
-            hint: en ? "You can replay it as many times as you like." : "想再聽幾次都可以，隨時按重播。"
+            hint: en ? "You can replay it as many times as you like." : "想再聽幾次都可以，隨時按重播。",
+            action: en ? "Play sound" : "播放聲音"
         },
         watch: {
             title: en ? "Watch the character" : "看著角色",
             body: en
                 ? "The character shows you how it works first. Try to copy it."
                 : "角色會先示範一次，試著跟著做。",
-            hint: en ? "There is no wrong answer while you are learning." : "學習的時候沒有錯答案，放心試。"
+            hint: en ? "There is no wrong answer while you are learning." : "學習的時候沒有錯答案，放心試。",
+            action: en ? "Show me" : "示範給我看"
         },
         choose: {
             title: en ? "Choose the answer" : "選出答案",
@@ -47,6 +62,19 @@ export function createTutorial(root, bundle, locale) {
             hint: en ? "If you are not sure, ask for a hint." : "不確定的話，可以要求提示。"
         }
     };
+
+    /**
+     * 播放一個真實的示範音（listen／watch 步驟用）。
+     *
+     * 以兩個不同音高的短音構成最小對，讓孩子聽得出「不一樣」，
+     * 呼應教學本意（聽覺辨識）。
+     */
+    function playDemoSound() {
+        playTone(520, 180, -12);
+        window.setTimeout(() => {
+            playTone(660, 180, -12);
+        }, 400);
+    }
 
     /**
      * 渲染當前步驟。
@@ -67,12 +95,12 @@ export function createTutorial(root, bundle, locale) {
                 <div class="tutorial__actions">
                     ${step === "listen" ? `
                         <button class="level-btn" id="tut-listen" type="button">
-                            ${en ? "Play sound" : "播放聲音"}
+                            ${c.action}
                         </button>
                     ` : ""}
                     ${step === "watch" ? `
                         <button class="level-btn" id="tut-watch" type="button">
-                            ${en ? "Show me" : "示範給我看"}
+                            ${c.action}
                         </button>
                     ` : ""}
                     ${step === "choose" ? `
@@ -95,11 +123,22 @@ export function createTutorial(root, bundle, locale) {
         speak(c.body, { locale, rate: 0.85 });
 
         root.querySelector("#tut-listen")?.addEventListener("click", () => {
-            root.dispatchEvent(new CustomEvent("tutorial:demo", { detail: { step }, bubbles: true }));
+            // F4：播放真實示範音，示範音結束後自動前進
+            const btn = root.querySelector("#tut-listen");
+            btn?.setAttribute("disabled", "disabled");
+            playDemoSound();
+            window.setTimeout(() => {
+                next();
+            }, 900);
         });
 
         root.querySelector("#tut-watch")?.addEventListener("click", () => {
-            root.dispatchEvent(new CustomEvent("tutorial:demo", { detail: { step }, bubbles: true }));
+            const btn = root.querySelector("#tut-watch");
+            btn?.setAttribute("disabled", "disabled");
+            playDemoSound();
+            window.setTimeout(() => {
+                next();
+            }, 900);
         });
 
         root.querySelectorAll("[data-tut-option]").forEach((btn) => {
@@ -119,6 +158,8 @@ export function createTutorial(root, bundle, locale) {
 
     /**
      * 前進到下一步；已是最後一步則完成。
+     *
+     * 完成判定：`index >= steps.length` 才 `onDone(true)`。
      * @param {(done:boolean)=>void} [onDone]
      */
     function next(onDone) {
@@ -126,6 +167,10 @@ export function createTutorial(root, bundle, locale) {
         if (index >= steps.length) {
             index = steps.length - 1;
             root.classList.add("hidden");
+            if (!finished) {
+                finished = true;
+                doneCb?.(true);
+            }
             onDone?.(true);
             return;
         }
@@ -138,6 +183,10 @@ export function createTutorial(root, bundle, locale) {
      */
     function skip(onDone) {
         root.classList.add("hidden");
+        if (!finished) {
+            finished = true;
+            doneCb?.(true);
+        }
         onDone?.(true);
     }
 
@@ -146,6 +195,13 @@ export function createTutorial(root, bundle, locale) {
     return {
         next,
         skip,
+        /**
+         * 註冊完成回呼（取代過往在呼叫端包裝 `next` 的做法）。
+         * @param {(done:boolean)=>void} cb
+         */
+        onDone(cb) {
+            doneCb = cb;
+        },
         get current() {
             return steps[index];
         },

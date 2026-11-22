@@ -144,9 +144,14 @@
 
             <div id="santa-container">
                 <img id="character-img" alt="角色" src="">
-                <div id="bubble">
-                    <div id="bubble-content" class="prompt-content"></div>
-                </div>
+            </div>
+
+            <!--
+                氣泡獨立於 #santa-container —— renderCharacter() 會覆寫
+                #santa-container.innerHTML，若氣泡在其內部會被一併清掉（F5／DOM 契約）。
+            -->
+            <div id="bubble">
+                <div id="bubble-content" class="prompt-content"></div>
             </div>
         </div>
 

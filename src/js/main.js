@@ -27,6 +27,7 @@ import { renderParentReport } from "./ui/parent-report.js";
 import { createAudioSettings } from "./ui/settings-audio.js";
 import { createPreferencesPanel, applyPreferences } from "./ui/a11y.js";
 import { createTutorial } from "./ui/tutorial.js";
+import { showLetter as showLetterScene } from "./ui/story.js";
 import { showPaywall } from "./ui/paywall.js";
 import { buildShareCard, shareToLine } from "./ui/share-card.js";
 import { loadProgress, saveProgress, recordLevelResult, unlockDex, updateStreak, todayString } from "./core/progress.js";
@@ -48,6 +49,8 @@ let hud = null;
 let session = null;
 /** @type {string} */
 let selectedCharacter = "santa";
+/** 遊戲是否已啟動（F7：`startGame` 只能執行一次）。 @type {boolean} */
+let started = false;
 /** @type {number} */
 let currentLevelId = 1;
 /** @type {any} */
@@ -230,16 +233,27 @@ async function loadTimeline() {
 }
 
 /* ---------- 畫面流程 ---------- */
+
+/**
+ * 顯示開始畫面。
+ *
+ * **只負責顯示遮罩** —— 事件綁定統一在 `wire()`（F7：
+ * `showStart()` 曾自行綁 `click`，導致 `startGame` 被執行兩次）。
+ */
 function showStart() {
     const overlay = $("start-overlay");
     overlay.classList.remove("hidden");
-    overlay.addEventListener("click", startGame, { once: true });
 }
 
 /**
  * 開始遊戲：解鎖音訊 → 序章信 → 角色選擇 → 首次教學。
+ *
+ * F7：加了 `started` 旗標，已啟動則直接 return。
  */
 async function startGame() {
+    if (started) return;
+    started = true;
+
     ensureAudio(locale);
     // 初始場景（聖誕）：音樂、色票、視差同步
     currentSceneId = "christmas";
@@ -256,60 +270,65 @@ async function startGame() {
     setVoiceProfile(locale, char.voice);
     renderCharacter($("santa-container"), char, "idle");
 
-    showLetter(letter);
-
-    // 首次啟動才跑教學；之後可從設定重播
-    const firstRun = !localStorage.getItem("mumu.tutorial.done");
-    if (firstRun) {
-        setTimeout(() => runTutorial(), 2600);
-    } else {
-        setTimeout(() => showCharacterSelect(), 2600);
-    }
+    showLetter(letter, () => {
+        // 首次啟動才跑教學；之後可從設定重播
+        const firstRun = !localStorage.getItem("mumu.tutorial.done");
+        if (firstRun) {
+            runTutorial();
+        } else {
+            showCharacterSelect();
+        }
+    });
 }
 
 /**
  * 執行教學流程，完成後進入角色選擇。
+ *
+ * F4：不得包裝 `tutorial.next`、不得 fallback 到 `#levelmap-root`、
+ * 不得用 `setTimeout` 推進流程。
  */
 function runTutorial() {
-    const root = $("tutorial-root") || $("levelmap-root");
+    const root = $("tutorial-root");
+    if (!root) {
+        showCharacterSelect();
+        return;
+    }
+
     const tutorial = createTutorial(root, bundle, locale);
 
     const finish = () => {
         localStorage.setItem("mumu.tutorial.done", "1");
-        if (root.id === "tutorial-root") {
-            root.classList.add("hidden");
-            showCharacterSelect();
-        } else {
-            showCharacterSelect();
-        }
+        root.classList.add("hidden");
+        showCharacterSelect();
     };
 
-    tutorial.skip(finish);
-    // 每一步完成後自動前進
-    const originalNext = tutorial.next;
-    tutorial.next = (/** @type {(done:boolean)=>void} */ onDone) => {
-        originalNext(() => {
-            if (tutorial.isFinished) {
-                finish();
-            } else {
-                originalNext(() => { });
-            }
-            onDone?.(tutorial.isFinished);
-        });
-    };
+    // 直接使用 tutorial 公開的 next()／skip()，不包裝
+    tutorial.onDone(finish);
 }
 
 /**
- * 顯示序章信件。
+ * 顯示序章信件（可關閉的劇情過場）。
+ *
+ * F6：序章信件**必須是一個可以關上的過場**，不是塞在氣泡裡的無按鈕文字。
+ *
+ * 掛載於 `#story-root`，關上後才由 `onClose` 觸發後續流程（教學 → 角色選擇 → 地圖）。
+ *
  * @param {string} text
+ * @param {() => void} [onClose]
  */
-function showLetter(text) {
-    const bubble = $("bubble");
-    const content = $("bubble-content");
-    content.textContent = text;
-    bubble.classList.add("show");
-    speak(text, { locale });
-    burst($("snow-container"), { kind: "sparkle", count: 16 });
+function showLetter(text, onClose) {
+    const root = $("story-root");
+    if (!root) {
+        // 沒有過場容器時退回氣泡（不中斷流程）
+        const bubble = $("bubble");
+        const content = $("bubble-content");
+        if (content) content.textContent = text;
+        bubble?.classList.add("show");
+        onClose?.();
+        return;
+    }
+
+    showLetterScene(root, text, locale === "en-US" ? "— Santa" : "—— 聖誕老人", onClose);
 }
 
 /**

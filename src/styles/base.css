@@ -312,27 +312,39 @@ body {
 /* 角色與對話氣泡 */
 #santa-container {
     position: absolute;
-    bottom: 0;
+    bottom: var(--s-6);
     left: 50%;
     transform: translateX(-50%);
     z-index: var(--z-character);
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: var(--s-2);
     pointer-events: none;
 }
 
-#character-img {
-    max-height: 46dvh;
-    max-width: min(300px, 60vw);
+/*
+ * 角色尺寸契約（F5）：
+ * 角色穩定佔畫面 25–40%、不溢出、不遮住氣泡。
+ * `--char-max-h` 由 media query 於橫向／直向分別覆寫。
+ */
+.char__art {
+    display: block;
+    max-height: var(--char-max-h, 34dvh);
+    max-width: min(280px, 46vw);
     height: auto;
     width: auto;
     object-fit: contain;
-    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .35));
 }
 
 #bubble {
+    position: absolute;
+    left: 50%;
+    bottom: calc(var(--s-6) + var(--char-max-h, 34dvh) + var(--s-3));
+    transform: translateX(-50%);
+    z-index: var(--z-character);
     display: none;
+    max-width: min(560px, 78vw);
     margin-bottom: var(--s-2);
     padding: var(--s-3) var(--s-4);
     background: var(--bg-elevated);
@@ -340,6 +352,8 @@ body {
     border-radius: var(--r-lg);
     box-shadow: var(--mat-border-light), var(--mat-shadow-1);
     text-align: center;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 #bubble.show {

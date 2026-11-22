@@ -53,6 +53,10 @@ function syncShadowScale(img, shadow) {
 
 /**
  * 渲染角色。
+ *
+ * F5：`mount.className = ...` 會清掉承載版面定位的 class，
+ * 改為 `classList` 增量操作（只更新 mood class）。
+ *
  * @param {HTMLElement} mount
  * @param {any} character
  * @param {CharacterMood} mood
@@ -61,7 +65,12 @@ export function renderCharacter(mount, character, mood = "idle") {
     if (!mount || !character) return;
 
     const art = character.art?.file || "";
-    mount.className = `char char--${mood}`;
+    mount.classList.add("char");
+    // 只移除既有的 mood class（保留版面定位用的 class）
+    for (const cls of Array.from(mount.classList)) {
+        if (cls.startsWith("char--")) mount.classList.remove(cls);
+    }
+    mount.classList.add(`char--${mood}`);
     mount.innerHTML = `
         <img class="char__art" src="${art}" alt="${character.name?.["zh-TW"] || character.id}" />
         <div class="char__shadow"></div>
