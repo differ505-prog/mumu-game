@@ -1,0 +1,252 @@
+{
+  "_comment": "演出層 — 每個場景的卡司、登場位置、道具與舞台指示。",
+  "christmas": {
+    "id": "christmas",
+    "title": {
+      "zh-TW": "北極的聖誕",
+      "en-US": "Arctic Christmas"
+    },
+    "cast": [
+      {
+        "id": "santa",
+        "role": {
+          "zh-TW": "雪地裡的守夜人",
+          "en-US": "the Watchman of the Snowfield"
+        },
+        "entrance": "center",
+        "props": [
+          "lantern",
+          "sack"
+        ]
+      },
+      {
+        "id": "dino-triceratops",
+        "role": {
+          "zh-TW": "擋風雪的三角衛士",
+          "en-US": "the Horned Sentinel that Blocks the Wind"
+        },
+        "entrance": "left",
+        "props": [
+          "cloak"
+        ]
+      },
+      {
+        "id": "dino-eoraptor",
+        "role": {
+          "zh-TW": "帶路的小獵手",
+          "en-US": "the Little Hunter that Shows the Way"
+        },
+        "entrance": "right",
+        "props": []
+      }
+    ],
+    "ambience": "snow-wind",
+    "backdrop": "frozen-village"
+  },
+  "valley": {
+    "id": "valley",
+    "title": {
+      "zh-TW": "恐龍谷",
+      "en-US": "Dinosaur Valley"
+    },
+    "cast": [
+      {
+        "id": "dino-triceratops",
+        "role": {
+          "zh-TW": "谷口的長者",
+          "en-US": "the Elder at the Valley Mouth"
+        },
+        "entrance": "left",
+        "props": [
+          "staff"
+        ]
+      },
+      {
+        "id": "dino-brachiosaurus",
+        "role": {
+          "zh-TW": "把聲音送到高處的長頸者",
+          "en-US": "the Long-Neck that Sends Sound Upward"
+        },
+        "entrance": "center",
+        "props": []
+      },
+      {
+        "id": "dino-parasaurolophus",
+        "role": {
+          "zh-TW": "回聲的傳話者",
+          "en-US": "the Echo Bearer"
+        },
+        "entrance": "right",
+        "props": [
+          "horn"
+        ]
+      }
+    ],
+    "ambience": "fern-wind",
+    "backdrop": "fern-valley"
+  },
+  "forest": {
+    "id": "forest",
+    "title": {
+      "zh-TW": "語言之森",
+      "en-US": "Forest of Voices"
+    },
+    "cast": [
+      {
+        "id": "dino-brachiosaurus",
+        "role": {
+          "zh-TW": "穿過林梢的引路人",
+          "en-US": "the Guide Above the Treetops"
+        },
+        "entrance": "center",
+        "props": []
+      },
+      {
+        "id": "dino-dilophosaurus",
+        "role": {
+          "zh-TW": "會複述的獵手",
+          "en-US": "the Hunter that Repeats"
+        },
+        "entrance": "left",
+        "props": [
+          "frill"
+        ]
+      },
+      {
+        "id": "dino-ceratosaurus",
+        "role": {
+          "zh-TW": "守著林徑的角衛士",
+          "en-US": "the Horned Guard of the Path"
+        },
+        "entrance": "right",
+        "props": []
+      }
+    ],
+    "ambience": "forest-hum",
+    "backdrop": "echo-trees"
+  },
+  "ice-age": {
+    "id": "ice-age",
+    "title": {
+      "zh-TW": "冰原與深海",
+      "en-US": "Ice and Deep Sea"
+    },
+    "cast": [
+      {
+        "id": "dino-pteranodon",
+        "role": {
+          "zh-TW": "從冰原上方滑翔的斥候",
+          "en-US": "the Scout that Glides Above the Ice"
+        },
+        "entrance": "left",
+        "props": []
+      },
+      {
+        "id": "dino-mosasaurus",
+        "role": {
+          "zh-TW": "深海裡傳聲最遠的獵手",
+          "en-US": "the Hunter whose Voice Travels Furthest"
+        },
+        "entrance": "center",
+        "props": []
+      },
+      {
+        "id": "dino-spinosaurus",
+        "role": {
+          "zh-TW": "帆背上的聲音收集者",
+          "en-US": "the Sail-Backed Collector of Sound"
+        },
+        "entrance": "right",
+        "props": [
+          "sail"
+        ]
+      }
+    ],
+    "ambience": "ice-wind",
+    "backdrop": "shelf-and-deep"
+  },
+  "ice-age-christmas": {
+    "id": "ice-age-christmas",
+    "title": {
+      "zh-TW": "冰河紀的聖誕",
+      "en-US": "Ice Age Christmas"
+    },
+    "cast": [
+      {
+        "id": "dino-trex",
+        "role": {
+          "zh-TW": "雪原上的守護者",
+          "en-US": "the Guardian of the Snowfield"
+        },
+        "entrance": "center",
+        "props": [
+          "wreath"
+        ]
+      },
+      {
+        "id": "dino-tyrannosaurus",
+        "role": {
+          "zh-TW": "帶禮物來的霸王龍",
+          "en-US": "the Tyrant that Brings Gifts"
+        },
+        "entrance": "left",
+        "props": [
+          "sack"
+        ]
+      },
+      {
+        "id": "dino-ankylosaurus",
+        "role": {
+          "zh-TW": "推著禮物車的甲衛士",
+          "en-US": "the Armored Guard that Pushes the Cart"
+        },
+        "entrance": "right",
+        "props": [
+          "cart"
+        ]
+      }
+    ],
+    "ambience": "snow-wind",
+    "backdrop": "frozen-village"
+  },
+  "north": {
+    "id": "north",
+    "title": {
+      "zh-TW": "北方的一夜",
+      "en-US": "Northern Night"
+    },
+    "cast": [
+      {
+        "id": "dino-mosasaurus",
+        "role": {
+          "zh-TW": "潛在最深的聲音",
+          "en-US": "the Deepest Voice"
+        },
+        "entrance": "center",
+        "props": []
+      },
+      {
+        "id": "dino-giganotosaurus",
+        "role": {
+          "zh-TW": "最後一位守夜者",
+          "en-US": "the Last Watchman"
+        },
+        "entrance": "left",
+        "props": [
+          "lantern"
+        ]
+      },
+      {
+        "id": "dino-pteranodon",
+        "role": {
+          "zh-TW": "把星星帶回來的飛行者",
+          "en-US": "the Flier that Brings Back the Stars"
+        },
+        "entrance": "right",
+        "props": []
+      }
+    ],
+    "ambience": "aurora-hum",
+    "backdrop": "starfield"
+  }
+}

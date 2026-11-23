@@ -650,6 +650,31 @@
     opacity: calc(var(--shadow-opacity) * .5);
 }
 
+/* ---------- 演出層卡司（Step 123） ---------- */
+/*
+ * 場景卡司渲染到 #scene 的 data-layer="character" 層，
+ * 與 #santa-container（主角／搭檔）分開渲染。
+ */
+.cast-member {
+    position: absolute;
+    bottom: 4%;
+    left: var(--cast-left, 50%);
+    transform: translateX(-50%) scale(var(--cast-scale, 1));
+    transform-origin: 50% 100%;
+    opacity: 0.42;
+    pointer-events: none;
+    transition: opacity var(--t-settle) var(--e-standard),
+                transform var(--t-settle) var(--e-spring);
+}
+
+.cast-member__art {
+    display: block;
+    height: clamp(64px, 14dvh, 132px);
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .35));
+}
+
 /* ---------- 情緒回饋（Step 94） ---------- */
 
 /* 圖鑑解鎖：短促跳躍（影子同步收縮再回彈） */

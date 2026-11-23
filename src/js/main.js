@@ -6,6 +6,7 @@ import { loadContent } from "./data/load-content.js";
 import { getLevel } from "./data/levels.js";
 import { playableCharacters, getAnyCharacter, anyCharacterVoice } from "./data/characters.js";
 import { chapterTitle, pickLine } from "./data/story.js";
+import { loadPerformances as injectPerformances, loadNarrative, applySceneCast } from "./core/performance.js";
 import { createSession } from "./core/session.js";
 import { createVerbForLevel } from "./verbs/index.js";
 import { state, setState } from "./core/state.js";
@@ -152,6 +153,7 @@ async function boot() {
     await loadMusic();
     await loadChildVoice();
     await loadScenes();
+    await loadPerformances();
 
     // 場景與偏好
     buildScene($("scene"));
@@ -236,6 +238,8 @@ function applySceneAudio(scene) {
 function applySceneVisual(scene) {
     if (!scene) return;
     applyTheme($("scene"), scene);
+    // Step 123：同時套用色票**與卡司**（演出層）
+    applySceneCast(scene, $("scene"));
     setParallax($("scene"), 0, 0);
 
     // Step 120：消費 scenes.json 的 `weather` 欄位（無天氣則不啟動粒子）
@@ -274,6 +278,22 @@ async function loadScenes() {
         }
     } catch (err) {
         console.warn("[main] 場景設定載入失敗", err);
+    }
+}
+
+/**
+ * 載入演出資料（content/performances.json）與敘事對白。
+ */
+async function loadPerformances() {
+    try {
+        const res = await fetch("./content/performances.json", { cache: "no-cache" });
+        if (res.ok) {
+            injectPerformances(await res.json());
+            // 演出層的台詞來自 narrative（已載入 bundle.narrative）
+            loadNarrative(bundle?.narrative);
+        }
+    } catch (err) {
+        console.warn("[main] 演出資料載入失敗", err);
     }
 }
 

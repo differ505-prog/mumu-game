@@ -924,6 +924,36 @@ const CHECKS = [
     },
 
     {
+        name: "play-scene-cast",
+        async run(env) {
+            // 場景卡司必須渲染到 #scene 的 data-layer="character" 層（Step 123）
+            await bootGame(env);
+            await clickStart(env);
+            await env.clock.advance(500);
+            await closePrologue(env);
+            await env.clock.advance(300);
+            await advanceTutorial(env);
+            await pickCharacter(env, "santa");
+            await enterLevel(env, 1);
+
+            const layer = env.document.querySelector('#scene [data-layer="character"]');
+            const members = Array.from(layer?.querySelectorAll(".cast-member") || []);
+            const ids = members.map((m) => m.getAttribute("data-cast-id") || "");
+            const hasCenter = members.some((m) => m.getAttribute("data-entrance") === "center");
+            // 卡司必須與主角容器分開（不是只有 #santa-container 一隻）
+            const inMain = env.document.querySelectorAll("#santa-container .cast-member").length;
+
+            const ok = members.length >= 2 && hasCenter && inMain === 0;
+            return {
+                ok,
+                detail: ok
+                    ? `卡司 ${members.length} 隻 [${ids.join(",")}]，含 center 登场，主角容器內 ${inMain} 隻`
+                    : `卡司數=${members.length} center=${hasCenter} 主角容器內=${inMain}`
+            };
+        }
+    },
+
+    {
         name: "play-scene-applied",
         async run(env) {
             // 進入第 N 章的關卡後，#scene 的 dataset.theme 必須等於該關的 scene，

@@ -198,6 +198,39 @@ if (arcs) {
     }
 }
 
+/* --- 6b. 演出層 performances（Step 123）--- */
+if (characters) {
+    const perf = readJson("content/performances.json");
+    const scenes = readJson("content/scenes.json");
+    if (perf) {
+        const validIds = new Set(
+            [...(characters.playable || []), ...(characters.dex || [])].map((/** @type {any} */ c) => c.id)
+        );
+        const sceneIds = Object.keys(scenes || {}).filter((k) => !k.startsWith("_"));
+        for (const sceneId of sceneIds) {
+            const entry = perf[sceneId];
+            if (!entry) {
+                problems.push(`performances.json 缺少場景: ${sceneId}`);
+                continue;
+            }
+            if (!Array.isArray(entry.cast) || !entry.cast.length) {
+                problems.push(`performances.json 的 ${sceneId} 無卡司`);
+            }
+            for (const member of entry?.cast || []) {
+                if (!validIds.has(member.id)) {
+                    problems.push(`performances.json 的 ${sceneId} 卡司 ${member.id} 不存在於 characters.json`);
+                }
+                if (!member.role?.["zh-TW"] || !member.role?.["en-US"]) {
+                    problems.push(`performances.json 的 ${sceneId} 卡司 ${member.id} 的 role 雙語不全`);
+                }
+            }
+            if (!entry.title?.["zh-TW"] || !entry.title?.["en-US"]) {
+                problems.push(`performances.json 的 ${sceneId} 標題雙語不全`);
+            }
+        }
+    }
+}
+
 /* --- 7. 練習效應防護 --- */
 if (assessment) {
     /** @type {Set<string>} */
