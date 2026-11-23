@@ -18,6 +18,10 @@
  *   - 測試必須是**真實的行為模擬**，不得直接改 state 跳過流程。
  */
 
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 import {
     createGameEnv,
     disposeEnv,
@@ -32,6 +36,9 @@ import {
     openLevel,
     flush
 } from "./test-harness.mjs";
+
+/** 專案根目錄。 */
+const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 /** 各玩法的代表關卡 id。 */
 const VERB_LEVELS = {
@@ -823,6 +830,135 @@ const CHECKS = [
             return {
                 ok,
                 detail: `letterRendered=${body.length > 0} tutorialPanels=${panels} storyHidden=${story?.classList.contains("hidden")}`
+            };
+        }
+    },
+
+    {
+        name: "play-character-visible",
+        async run(env) {
+            // 進入關卡後，.char__art 的 src 必須指向**存在於磁碟**的檔案，
+            // 且 CSS 契約中的 max-height 不得為 none 或 0。
+            // jsdom 不做真實排版，因此只斷言**樣式契約**（不得假裝能測像素）。
+            await bootGame(env);
+            await clickStart(env);
+            await env.clock.advance(500);
+            await closePrologue(env);
+            await env.clock.advance(300);
+            await advanceTutorial(env);
+            await pickCharacter(env, "santa");
+            await enterLevel(env, 1);
+
+            const art = env.document.querySelector("#santa-container .char__art");
+            const src = art?.getAttribute("src") || "";
+            const file = src.replace(/^\.\//, "");
+            const exists = src ? fs.existsSync(path.join(ROOT, file)) : false;
+
+            // 樣式契約：.char__art 必須有 max-height 且非 none／0
+            const css = fs.readFileSync(path.join(ROOT, "src/styles/base.css"), "utf8");
+            const ruleMatch = css.match(/\.char__art\s*\{([^}]*)\}/);
+            const rule = ruleMatch ? ruleMatch[1] : "";
+            const maxHeight = (rule.match(/max-height:\s*([^;]+);/) || [])[1] || "";
+            const hasMaxHeight = Boolean(maxHeight)
+                && !/none/i.test(maxHeight)
+                && !/^0(px|%|vh|dvh)?$/.test(maxHeight.trim());
+
+            const ok = Boolean(art) && exists && hasMaxHeight;
+            return {
+                ok,
+                detail: ok
+                    ? `src=${src} 存在於磁碟；.char__art max-height=${maxHeight.trim()}`
+                    : `art=${Boolean(art)} src=${src} 存在=${exists} maxHeight=${maxHeight.trim() || "(無)"}`
+            };
+        }
+    },
+
+    {
+        name: "play-companion-matches",
+        async run(env) {
+            // 進入第 N 章的關卡時，.char__art 的 src 必須對應該關的 companion。
+            const levels = JSON.parse(
+                fs.readFileSync(path.join(ROOT, "content/levels.json"), "utf8")
+            );
+            const arr = Array.isArray(levels) ? levels : levels.levels;
+
+            /** @type {string[]} */
+            const problems = [];
+
+            await bootGame(env);
+            await clickStart(env);
+            await env.clock.advance(500);
+            await closePrologue(env);
+            await env.clock.advance(300);
+            await advanceTutorial(env);
+            await pickCharacter(env, "santa");
+
+            // 抽樣每章第一關
+            const seen = new Set();
+            for (const level of arr) {
+                if (seen.has(level.chapter)) continue;
+                seen.add(level.chapter);
+
+                // 同一個環境內切換關卡（不可重複 boot —— VM module 不可重複連結）
+                await startLevel(env, level.id);
+                await env.clock.advance(1200);
+
+                const art = env.document.querySelector("#santa-container .char__art");
+                const src = art?.getAttribute("src") || "";
+                const expected = `./assets/characters/${level.companion}.svg`;
+                if (src !== expected) {
+                    problems.push(`第 ${level.chapter} 章第 ${level.id} 關：src=${src} 期望=${expected}`);
+                }
+            }
+
+            return {
+                ok: problems.length === 0,
+                detail: problems.length
+                    ? `搭檔不符 → ${problems.join(" | ")}`
+                    : `六章搭檔皆正確（${seen.size} 章抽樣）`
+            };
+        }
+    },
+
+    {
+        name: "play-scene-applied",
+        async run(env) {
+            // 進入第 N 章的關卡後，#scene 的 dataset.theme 必須等於該關的 scene，
+            // 且 --scene-sky 必須不同於上一個場景。
+            const levels = JSON.parse(
+                fs.readFileSync(path.join(ROOT, "content/levels.json"), "utf8")
+            );
+            const arr = Array.isArray(levels) ? levels : levels.levels;
+            const first = arr[0];
+            const other = arr.find((/** @type {any} */ l) => l.scene !== first.scene) || arr[1];
+
+            await bootGame(env);
+            await clickStart(env);
+            await env.clock.advance(500);
+            await closePrologue(env);
+            await env.clock.advance(300);
+            await advanceTutorial(env);
+            await pickCharacter(env, "santa");
+            await enterLevel(env, first.id);
+
+            const scene = env.document.getElementById("scene");
+            const theme1 = scene?.dataset?.theme || "";
+            const sky1 = scene?.style?.getPropertyValue("--scene-sky") || "";
+
+            await enterLevel(env, other.id);
+            const theme2 = scene?.dataset?.theme || "";
+            const sky2 = scene?.style?.getPropertyValue("--scene-sky") || "";
+
+            const ok = theme1 === first.scene
+                && theme2 === other.scene
+                && Boolean(sky1)
+                && sky1 !== sky2;
+
+            return {
+                ok,
+                detail: ok
+                    ? `theme ${theme1}→${theme2}；sky ${sky1}→${sky2}`
+                    : `theme1=${theme1}（期望 ${first.scene}）theme2=${theme2}（期望 ${other.scene}）sky1=${sky1} sky2=${sky2}`
             };
         }
     },
