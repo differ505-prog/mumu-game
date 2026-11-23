@@ -7,19 +7,28 @@ import { speak } from "../audio/voice.js";
 
 /**
  * 顯示全屏過場。
+ *
+ * Step 122：過場是章節信件的呈現方式 —— 含標題、正文、搭檔立繪與 CTA。
+ *   - 信件**必須**朗讀，且朗讀期間 CTA 顯示「正在說…」
+ *   - 關上後才由 `onClose` 觸發後續流程（切場景 → 進關卡）
+ *
  * @param {HTMLElement} root
- * @param {{ title:string, body:string, cta:string, theme?:string, art?:string }} scene
+ * @param {{ title:string, body:string, cta?:string, theme?:string, art?:string, tagline?:string }} scene
+ * @param {() => void} [onClose]
  */
-export function showStoryScene(root, scene) {
+export function showStoryScene(root, scene, onClose) {
     const en = (localStorage.getItem("mumu.locale") || "zh-TW") === "en-US";
+    const speakingLabel = en ? "Speaking\u2026" : "正在說\u2026";
+    const ctaLabel = scene.cta || (en ? "Continue" : "繼續");
 
     root.innerHTML = `
         <div class="story-scene" data-theme="${scene.theme || ""}">
             ${scene.art ? `<img class="story-scene__art" src="${scene.art}" alt="" />` : ""}
             <div class="story-scene__body">
                 <h2 class="story-scene__title">${scene.title}</h2>
+                ${scene.tagline ? `<p class="story-scene__tagline">${scene.tagline}</p>` : ""}
                 <p class="story-scene__text">${scene.body}</p>
-                <button class="level-btn" id="story-cta" type="button">${scene.cta}</button>
+                <button class="level-btn" id="story-cta" type="button">${speakingLabel}</button>
             </div>
         </div>
     `;
@@ -29,10 +38,20 @@ export function showStoryScene(root, scene) {
         applyTheme(root, scene.theme);
     }
 
-    speak(scene.body, { locale: en ? "en-US" : "zh-TW", rate: 0.85 });
+    const cta = root.querySelector("#story-cta");
 
-    root.querySelector("#story-cta")?.addEventListener("click", () => {
+    // 朗讀結束（onend／onerror）後恢復 CTA 文案
+    speak(scene.body, {
+        locale: en ? "en-US" : "zh-TW",
+        rate: 0.85,
+        onEnd: () => {
+            if (cta) cta.textContent = ctaLabel;
+        }
+    });
+
+    cta?.addEventListener("click", () => {
         hideStoryScene(root);
+        onClose?.();
     });
 }
 

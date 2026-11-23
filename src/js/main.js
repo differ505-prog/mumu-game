@@ -27,7 +27,7 @@ import { renderParentReport } from "./ui/parent-report.js";
 import { createAudioSettings } from "./ui/settings-audio.js";
 import { createPreferencesPanel, applyPreferences } from "./ui/a11y.js";
 import { createTutorial } from "./ui/tutorial.js";
-import { showLetter as showLetterScene } from "./ui/story.js";
+import { showLetter as showLetterScene, showStoryScene } from "./ui/story.js";
 import { showPaywall } from "./ui/paywall.js";
 import { buildShareCard, shareToLine } from "./ui/share-card.js";
 import { loadProgress, saveProgress, recordLevelResult, unlockDex, updateStreak, todayString } from "./core/progress.js";
@@ -330,16 +330,27 @@ async function startGame() {
     setParallax($("scene"), 0);
     $("start-overlay").classList.add("hidden");
 
+    // 序章信件：優先取 narrative.letters.prologue，缺漏時回退到
+    // story-arcs 第 0 章的 letter（後者才是完整內容所在）
     const prologueRaw = bundle.narrative?.letters?.prologue;
-    const letter = typeof prologueRaw === "string"
+    const prologueText = typeof prologueRaw === "string"
         ? prologueRaw
         : (prologueRaw?.[locale] || "");
+    const arc0 = bundle.storyArcs?.chapters?.find((/** @type {any} */ c) => c.chapter === 0);
+    const letter = prologueText
+        || arc0?.letter?.[locale]
+        || arc0?.letter?.["zh-TW"]
+        || "";
     // 序章搭檔為聖誕老人（Step 119）
     const char = getAnyCharacter(bundle, "santa");
     setVoiceProfile(locale, anyCharacterVoice(bundle, "santa"));
     renderCharacter($("santa-container"), char, "idle");
 
     showLetter(letter, () => {
+        // 序章信件即第 0 章的過場 —— 記錄已看過，避免進入第 1 關時重複顯示
+        progress["story.0"] = 1;
+        saveProgress(progress);
+
         // 首次啟動才跑教學；之後可從設定重播
         const firstRun = !localStorage.getItem("mumu.tutorial.done");
         if (firstRun) {
@@ -373,6 +384,70 @@ function runTutorial() {
 
     // 直接使用 tutorial 公開的 next()／skip()，不包裝
     tutorial.onDone(finish);
+}
+
+/**
+ * 進入章節過場（Step 122）。
+ *
+ * 順序：**過場（信件）→ 場景切換 → 進關卡**。
+ * 玩家在過場中就應該看到該章的場景與搭檔。
+ *
+ * @param {number} chapter
+ * @param {() => void} onClose
+ */
+function showChapterScene(chapter, onClose) {
+    const arc = bundle.storyArcs?.chapters?.find((/** @type {any} */ c) => c.chapter === chapter);
+    if (!arc) {
+        onClose();
+        return;
+    }
+
+    const root = $("story-root");
+    const letter = arc.letter?.[locale] || arc.letter?.["zh-TW"] || "";
+
+    // 搭檔立繪使用該章的 companion（Step 119）
+    let art = "";
+    try {
+        const companion = getAnyCharacter(bundle, arc.companion);
+        art = companion?.art?.file || "";
+    } catch {
+        art = "";
+    }
+
+    // 過場中先切到該章的場景（孩子看得到「畫面對上劇情」）
+    applySceneVisual(arc.scene);
+    renderCharacter($("santa-container"), getAnyCharacterSafe(bundle, arc.companion), "idle");
+
+    if (!root) {
+        onClose();
+        return;
+    }
+
+    showStoryScene(root, {
+        title: arc.sceneTitle?.[locale] || arc.sceneTitle?.["zh-TW"] || arc.title?.[locale] || "",
+        tagline: arc.sceneTagline?.[locale] || arc.sceneTagline?.["zh-TW"] || "",
+        body: letter,
+        theme: arc.scene,
+        art
+    }, () => {
+        // 記錄本章已看過（progress 鍵為 "story.<chapter>"）
+        progress["story." + chapter] = 1;
+        saveProgress(progress);
+        onClose();
+    });
+}
+
+/**
+ * 取得角色，失敗時回傳 null（不得中斷流程）。
+ * @param {any} bundle
+ * @param {string} id
+ */
+function getAnyCharacterSafe(bundle, id) {
+    try {
+        return getAnyCharacter(bundle, id);
+    } catch {
+        return null;
+    }
 }
 
 /**
@@ -496,6 +571,15 @@ function showLevelMap() {
 function startLevel(levelId) {
     currentLevelId = levelId;
     const level = getLevel(bundle, levelId);
+
+    // Step 122：進入某章的第一個關卡時，先顯示該章過場（信件）
+    // 順序：過場 → 場景切換 → 進關卡
+    if (!progress["story." + level.chapter]) {
+        showChapterScene(level.chapter, () => {
+            startLevel(levelId);
+        });
+        return;
+    }
 
     $("game-container").classList.remove("hidden");
     $("mode-indicator").textContent = childVerbLabel(level.verb, locale);

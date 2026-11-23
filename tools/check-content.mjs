@@ -178,6 +178,12 @@ if (arcs) {
         if (!c.title || !c.letter || !c.verbs?.length) {
             problems.push(`章節 ${c.chapter} 缺少 title／letter／verbs`);
         }
+        // Step 122：過場標題與副標必須雙語齊備
+        for (const key of ["sceneTitle", "sceneTagline"]) {
+            if (!c[key]?.["zh-TW"] || !c[key]?.["en-US"]) {
+                problems.push(`章節 ${c.chapter} 的 ${key} 雙語不全`);
+            }
+        }
         // Step 119：章節搭檔必須存在於 characters.json
         if (!c.companion) {
             problems.push(`章節 ${c.chapter} 缺少 companion`);

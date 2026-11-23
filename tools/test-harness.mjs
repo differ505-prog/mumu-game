@@ -948,9 +948,27 @@ export async function clickStart(env) {
 export async function closePrologue(env) {
     const root = env.document.getElementById("story-root");
     if (!root || root.classList.contains("hidden")) return true;
-    const close = root.querySelector("#letter-close");
+    // 序章信件用 #letter-close；章節過場用 #story-cta
+    const close = root.querySelector("#letter-close") || root.querySelector("#story-cta");
     if (!close) return false;
     clickElement(env, close);
+    await flush(20);
+    await env.clock.advance(200);
+    return root.classList.contains("hidden");
+}
+
+/**
+ * 關閉章節過場（若正在顯示）。返回是否確實有過場被關掉。
+ *
+ * @param {any} env
+ * @returns {Promise<boolean>}
+ */
+export async function closeChapterScene(env) {
+    const root = env.document.getElementById("story-root");
+    if (!root || root.classList.contains("hidden")) return false;
+    const cta = root.querySelector("#story-cta");
+    if (!cta) return false;
+    clickElement(env, cta);
     await flush(20);
     await env.clock.advance(200);
     return root.classList.contains("hidden");
@@ -1205,6 +1223,8 @@ export async function openLevel(levelId) {
     await advanceTutorial(env);
     await pickCharacter(env, "santa");
     await startLevel(env, levelId);
+    // Step 122：章節過場可能擋在關卡前面，必須關掉它
+    await closeChapterScene(env);
     await env.clock.advance(3000);
     return env;
 }
@@ -1215,7 +1235,9 @@ export async function openLevel(levelId) {
  */
 export async function navigateToLevelMap(env) {
     await clickStart(env);
-    await env.clock.advance(3000);
+    await env.clock.advance(500);
+    await closePrologue(env);
+    await env.clock.advance(300);
     await advanceTutorial(env);
     await pickCharacter(env, "santa");
     await flush(15);

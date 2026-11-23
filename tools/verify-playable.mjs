@@ -28,6 +28,7 @@ import {
     bootGame,
     clickStart,
     closePrologue,
+    closeChapterScene,
     advanceTutorial,
     pickCharacter,
     startLevel,
@@ -67,6 +68,8 @@ function isVisible(el) {
  */
 async function enterLevel(env, levelId) {
     await startLevel(env, levelId);
+    // Step 122：章節過場可能擋在關卡前面
+    await closeChapterScene(env);
     await env.clock.advance(3000);
 }
 
