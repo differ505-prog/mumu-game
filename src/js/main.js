@@ -24,6 +24,7 @@ import { APP } from "./core/config.js";
 import { verbLabel, verbById } from "./core/verbs.js";
 import { renderLevelMap } from "./ui/levelmap.js";
 import { renderDex } from "./ui/dex.js";
+import { renderTeamDock } from "./ui/team-dock.js";
 import { renderParentReport } from "./ui/parent-report.js";
 import { createAudioSettings } from "./ui/settings-audio.js";
 import { createPreferencesPanel, applyPreferences } from "./ui/a11y.js";
@@ -163,6 +164,9 @@ async function boot() {
 
     wire();
     startAmbientSnow($("snow-container"));
+
+    // Step 124：隊伍列在遊戲中隨時可見
+    renderTeamDock($("team-dock"), bundle, progress, locale);
 
     track("session_start", { chapter: 1, sessionMs: 0 });
     showStart();
@@ -350,16 +354,16 @@ async function startGame() {
     setParallax($("scene"), 0);
     $("start-overlay").classList.add("hidden");
 
-    // 序章信件：優先取 narrative.letters.prologue，缺漏時回退到
-    // story-arcs 第 0 章的 letter（後者才是完整內容所在）
+    // 序章信件：優先取 story-arcs 第 0 章的完整 letter，
+    // 缺漏時回退到 narrative.letters.prologue（較短的一段引言）
     const prologueRaw = bundle.narrative?.letters?.prologue;
     const prologueText = typeof prologueRaw === "string"
         ? prologueRaw
         : (prologueRaw?.[locale] || "");
     const arc0 = bundle.storyArcs?.chapters?.find((/** @type {any} */ c) => c.chapter === 0);
-    const letter = prologueText
-        || arc0?.letter?.[locale]
+    const letter = arc0?.letter?.[locale]
         || arc0?.letter?.["zh-TW"]
+        || prologueText
         || "";
     // 序章搭檔為聖誕老人（Step 119）
     const char = getAnyCharacter(bundle, "santa");
@@ -502,7 +506,10 @@ function showLetter(text, onClose) {
         // 找不到角色時用預設名
     }
     const dash = locale === "en-US" ? "— " : "—— ";
-    showLetterScene(root, text, dash + name, onClose);
+    // 章節標題（第 0 章即序章）
+    const arc = bundle.storyArcs?.chapters?.find((/** @type {any} */ c) => c.chapter === 0);
+    const title = arc?.sceneTitle?.[locale] || arc?.sceneTitle?.["zh-TW"] || "";
+    showLetterScene(root, text, dash + name, onClose, title);
 }
 
 /**
@@ -723,15 +730,29 @@ function onLevelFinish(r) {
     }
 
     // 檢查是否有新恐龍解鎖
+    /** @type {string[]} */
+    const justUnlocked = [];
     for (const dino of bundle.dex || []) {
         if (!checkDexUnlock(bundle, progress, dino.id)) continue;
         if (unlockDex(progress, dino.id)) {
+            justUnlocked.push(dino.id);
             track("dex_unlock", { dinoId: dino.id, chapter: level.chapter });
             hud.toast(
                 locale === "en-US" ? `New dinosaur: ${dino.name?.[locale] || dino.id}` : `新夥伴解鎖：${dino.name?.["zh-TW"] || dino.id}`,
                 "good"
             );
             playEvent("dex:unlock");
+        }
+    }
+
+    // Step 124：新解鎖的恐龍必須在隊伍列「走出來」
+    if (justUnlocked.length) {
+        renderTeamDock($("team-dock"), bundle, progress, locale, justUnlocked);
+        for (const id of justUnlocked) {
+            const dino = bundle.dex.find((/** @type {any} */ x) => x.id === id);
+            burst($("snow-container"), { kind: "sparkle", count: 14 });
+            playUnlock($("santa-container"), $("snow-container"));
+            void dino;
         }
     }
 

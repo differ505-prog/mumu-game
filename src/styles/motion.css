@@ -483,6 +483,16 @@
         transition-duration: 1ms !important;
         scroll-behavior: auto !important;
     }
+
+    /* 隊伍列走入動畫（Step 124）：退化成靜態淡入，仍保留資訊量 */
+    .team-member--entering {
+        animation: team-fade-in var(--t-settle) var(--e-standard) both;
+    }
+
+    @keyframes team-fade-in {
+        0% { opacity: 0; }
+        100% { opacity: 0.86; }
+    }
 }
 
 /* 家長設定強制關閉（由 a11y.js 設定 data-reduced-motion） */

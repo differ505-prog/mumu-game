@@ -650,6 +650,170 @@
     opacity: calc(var(--shadow-opacity) * .5);
 }
 
+/* ---------- 劇情過場與信件（Step 115／122） ---------- */
+.story-scene {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-4);
+    width: 100%;
+    max-width: min(620px, 88vw);
+    text-align: center;
+}
+
+.story-scene__art {
+    display: block;
+    max-height: 30dvh;
+    max-width: min(240px, 56vw);
+    height: auto;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 6px 16px rgba(0, 0, 0, .4));
+}
+
+.story-scene__body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--s-3);
+    width: 100%;
+}
+
+.story-scene__title {
+    margin: 0;
+    font-size: var(--fs-2xl);
+    color: var(--text-primary);
+}
+
+.story-scene__tagline {
+    margin: 0;
+    font-size: var(--fs-lg);
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.story-scene__text {
+    margin: 0;
+    font-size: var(--fs-md);
+    line-height: 1.8;
+    color: var(--text-primary);
+    text-align: left;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+/* 信件 */
+.letter-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-height: 86dvh;
+}
+
+.letter {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+    width: min(560px, 88vw);
+    max-height: 82dvh;
+    padding: var(--s-6) var(--s-5);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--r-lg);
+    box-shadow: var(--mat-border-light), var(--mat-shadow-1);
+    overflow-y: auto;
+}
+
+.letter__title {
+    margin: 0 0 var(--s-2);
+    font-size: var(--fs-xl);
+    color: var(--text-primary);
+    text-align: center;
+}
+
+.letter__body {
+    font-size: var(--fs-md);
+    line-height: 1.8;
+    color: var(--text-primary);
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+.letter__signature {
+    font-style: italic;
+    text-align: right;
+    color: var(--text-secondary);
+}
+
+.letter__close {
+    align-self: center;
+}
+
+/* ---------- 隊伍列（Step 124） ---------- */
+/*
+ * 讓收集成果在遊戲中看得見。
+ * 只顯示**已解鎖**的夥伴；未解鎖的數量不顯示（避免挫敗）。
+ * 不得顯示任何評量構件（正確率／掌握度／雷達圖）。
+ */
+#team-dock {
+    position: absolute;
+    left: var(--s-4);
+    bottom: var(--s-4);
+    z-index: calc(var(--z-character) - 1);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--s-2);
+    max-width: 46vw;
+    padding: var(--s-2);
+    border-radius: var(--r-lg);
+    background: color-mix(in srgb, var(--bg-elevated) 72%, transparent);
+    border: 1px solid var(--border-soft);
+    backdrop-filter: blur(4px);
+    pointer-events: none;
+}
+
+#team-dock.is-empty {
+    display: none;
+}
+
+.team-member {
+    width: 30px;
+    height: 30px;
+    opacity: 0.86;
+    transition: transform var(--t-settle) var(--e-spring),
+                opacity var(--t-settle) var(--e-standard);
+}
+
+.team-member__art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* 新解鎖的夥伴「走出來」 */
+.team-member--entering {
+    animation: team-walk-in var(--t-scene) var(--e-spring) both;
+}
+
+@keyframes team-walk-in {
+    0% {
+        opacity: 0;
+        transform: translateX(-22px) scale(0.5);
+    }
+    55% {
+        opacity: 1;
+        transform: translateX(4px) scale(1.14);
+    }
+    100% {
+        opacity: 0.86;
+        transform: translateX(0) scale(1);
+    }
+}
+
 /* ---------- 演出層卡司（Step 123） ---------- */
 /*
  * 場景卡司渲染到 #scene 的 data-layer="character" 層，

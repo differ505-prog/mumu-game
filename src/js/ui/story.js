@@ -76,8 +76,9 @@ export function hideStoryScene(root) {
  * @param {string} letter
  * @param {string} [signature]
  * @param {() => void} [onClose]
+ * @param {string} [title] 章節標題（雙語由呼叫端決定）
  */
-export function showLetter(root, letter, signature = "", onClose) {
+export function showLetter(root, letter, signature = "", onClose, title = "") {
     const en = (localStorage.getItem("mumu.locale") || "zh-TW") === "en-US";
     const speakingLabel = en ? "Speaking…" : "正在說…";
     const closeLabel = en ? "Close" : "關上";
@@ -85,6 +86,7 @@ export function showLetter(root, letter, signature = "", onClose) {
     root.innerHTML = `
         <div class="letter-wrap">
             <article class="letter" id="print-letter">
+                ${title ? `<h2 class="letter__title">${title}</h2>` : ""}
                 <div class="letter__body">${letter}</div>
                 ${signature ? `<div class="letter__signature">${signature}</div>` : ""}
                 <button class="level-btn letter__close" id="letter-close" type="button">

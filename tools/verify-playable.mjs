@@ -997,6 +997,191 @@ const CHECKS = [
     },
 
     {
+        name: "play-story-per-chapter",
+        async run(env) {
+            // 六章各取一關，斷言「畫面跟人物對得上劇情」：
+            //  - 進入該關前**有過場**（#story-root 可見且含該章標題）
+            //  - 過場關上後 #scene 的 dataset.theme 等於該章 scene
+            //  - 場景卡司非空（data-layer="character" 層內有 .cast-member）
+            //  - .char__art 的 src 對應該關的 companion
+            const levels = JSON.parse(
+                fs.readFileSync(path.join(ROOT, "content/levels.json"), "utf8")
+            );
+            const arr = Array.isArray(levels) ? levels : levels.levels;
+            const arcs = JSON.parse(
+                fs.readFileSync(path.join(ROOT, "content/story-arcs.json"), "utf8")
+            );
+            const arcByChapter = new Map(
+                arcs.chapters.map((/** @type {any} */ c) => [c.chapter, c])
+            );
+
+            /** @type {string[]} */
+            const problems = [];
+
+            await bootGame(env);
+            await clickStart(env);
+            await env.clock.advance(500);
+
+            // 第 0 章的過場就是「開始畫面的序章信件」——先確認它確實出現
+            const storyRoot = env.document.getElementById("story-root");
+            const prologueVisible = Boolean(storyRoot && !storyRoot.classList.contains("hidden"));
+            const prologueText = storyRoot?.textContent || "";
+            const arc0 = arcByChapter.get(0);
+            const arc0Letter = arc0?.letter?.["zh-TW"] || "";
+            if (!prologueVisible) {
+                problems.push("第 0 章的序章信件未顯示");
+            } else if (arc0Letter && !prologueText.includes(arc0Letter.slice(0, 20))) {
+                problems.push("序章信件內容不是第 0 章的 letter");
+            }
+            await closePrologue(env);
+            await env.clock.advance(300);
+            await advanceTutorial(env);
+            await pickCharacter(env, "santa");
+
+            const seen = new Set();
+            for (const level of arr) {
+                if (seen.has(level.chapter)) continue;
+                seen.add(level.chapter);
+                const arc = arcByChapter.get(level.chapter);
+
+                // 第 0 章已在序章看過，不再重複顯示
+                if (level.chapter === 0) {
+                    await startLevel(env, level.id);
+                    await env.clock.advance(200);
+                    if (storyRoot && !storyRoot.classList.contains("hidden")) {
+                        problems.push("第 0 章進關時重複顯示過場");
+                    }
+                    await env.clock.advance(1500);
+                } else {
+                    // 進入關卡（過場應該出現）
+                    await startLevel(env, level.id);
+                    await env.clock.advance(200);
+
+                    // 斷言過場出現，且含該章標題
+                    const storyVisible = storyRoot && !storyRoot.classList.contains("hidden");
+                    if (!storyVisible) {
+                        problems.push(`第 ${level.chapter} 章進關前沒有過場`);
+                    } else {
+                        const title = storyRoot.querySelector(".story-scene__title")?.textContent || "";
+                        const expected = arc?.sceneTitle?.["zh-TW"] || "";
+                        if (!title || !title.includes(expected.slice(0, 4))) {
+                            problems.push(`第 ${level.chapter} 章過場標題不符：${title}`);
+                        }
+                    }
+
+                    // 關上過場 → 進關卡
+                    await closeChapterScene(env);
+                    await env.clock.advance(1500);
+                }
+
+                // 過場關上後 #scene 的 theme 必須等於該章 scene
+                const scene = env.document.getElementById("scene");
+                const theme = scene?.dataset?.theme || "";
+                if (theme !== level.scene) {
+                    problems.push(`第 ${level.chapter} 章場景不符：theme=${theme} 期望=${level.scene}`);
+                }
+
+                // 場景卡司非空
+                const layer = env.document.querySelector('#scene [data-layer="character"]');
+                const members = layer?.querySelectorAll(".cast-member").length || 0;
+                if (!members) {
+                    problems.push(`第 ${level.chapter} 章場景卡司為空`);
+                }
+
+                // .char__art 的 src 對應該關的 companion
+                const art = env.document.querySelector("#santa-container .char__art");
+                const src = art?.getAttribute("src") || "";
+                const expectedSrc = `./assets/characters/${level.companion}.svg`;
+                if (src !== expectedSrc) {
+                    problems.push(`第 ${level.chapter} 章搭檔不符：src=${src} 期望=${expectedSrc}`);
+                }
+            }
+
+            return {
+                ok: problems.length === 0,
+                detail: problems.length
+                    ? `劇情連貫問題 → ${problems.join(" | ")}`
+                    : `六章過場、場景、卡司、搭檔皆對得上`
+            };
+        }
+    },
+
+    {
+        name: "play-team-visible",
+        async run(env) {
+            // 完成一關後，#team-dock 內**至少有一個**成員。
+            // 必須**實際玩**出一顆星星，不得直接改 progress。
+            await bootGame(env);
+            await clickStart(env);
+            await env.clock.advance(500);
+            await closePrologue(env);
+            await env.clock.advance(300);
+            await advanceTutorial(env);
+            await pickCharacter(env, "santa");
+            await enterLevel(env, 1);
+
+            const dock = env.document.getElementById("team-dock");
+            const before = dock?.querySelectorAll(".team-member").length || 0;
+
+            // 實際玩出 3 回合
+            for (let r = 0; r < 3; r++) {
+                const res = await playOneRound(env);
+                if (!res.ok) break;
+                await env.clock.advance(3600);
+            }
+            await env.clock.advance(2000);
+
+            const after = dock?.querySelectorAll(".team-member").length || 0;
+            // 未解鎖者不顯示數量，也不得顯示評量構件
+            const text = dock?.textContent || "";
+            const hasAssessment = /\d+\s*%|正確率|掌握度|雷達/.test(text);
+
+            const ok = after >= 1 && !hasAssessment;
+            return {
+                ok,
+                detail: ok
+                    ? `隊伍列成員 ${before} → ${after}`
+                    : `隊伍列成員 ${before} → ${after}（需 ≥ 1）hasAssessment=${hasAssessment}`
+            };
+        }
+    },
+
+    {
+        name: "play-story-once-per-chapter",
+        async run(env) {
+            // 同一章的**第二關**不再顯示過場。
+            await bootGame(env);
+            await clickStart(env);
+            await env.clock.advance(500);
+            await closePrologue(env);
+            await env.clock.advance(300);
+            await advanceTutorial(env);
+            await pickCharacter(env, "santa");
+
+            // 第 5 關（第 1 章）→ 顯示第 1 章過場 → 關上
+            await startLevel(env, 5);
+            await env.clock.advance(200);
+            const storyRoot = env.document.getElementById("story-root");
+            const firstVisible = Boolean(storyRoot && !storyRoot.classList.contains("hidden"));
+            await closeChapterScene(env);
+            await env.clock.advance(1500);
+
+            // 第 6 關（同章）→ 不應再有過場
+            await startLevel(env, 6);
+            await env.clock.advance(200);
+            const secondVisible = Boolean(storyRoot && !storyRoot.classList.contains("hidden"));
+
+            const ok = firstVisible && !secondVisible;
+            return {
+                ok,
+                detail: ok
+                    ? "第 1 章首關有過場、同章第二關無過場"
+                    : `firstVisible=${firstVisible} secondVisible=${secondVisible}`
+            };
+        }
+    },
+
+    {
         name: "play-no-blocking",
         async run(env) {
             await bootGame(env);
