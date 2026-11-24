@@ -266,9 +266,32 @@
     pointer-events: none;
 }
 
+/* 答對：放大回彈 + 綠色描邊（Step 126） */
 .control-btn--correct {
     background: rgba(39, 174, 96, .28);
     border-color: var(--c-green-500);
+    animation: option-pop var(--t-base) var(--e-spring);
+}
+
+/* 序列玩法中「已答對的項」—— 點亮並留在原位（Step 126） */
+.control-btn--lit {
+    background: rgba(241, 196, 15, .22);
+    border-color: var(--c-gold-400);
+    box-shadow: 0 0 0 2px rgba(241, 196, 15, .5);
+}
+
+@keyframes option-pop {
+    0% {
+        transform: scale(1);
+    }
+
+    45% {
+        transform: scale(1.14);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 .control-btn--wrong {

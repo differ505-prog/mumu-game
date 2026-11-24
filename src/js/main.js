@@ -16,7 +16,7 @@ import { ensureAudio } from "./audio/mixer.js";
 import { speak, setVoiceProfile } from "./audio/voice.js";
 import { playSfx, playDinoRoar, setSfxMap } from "./audio/sfx.js";
 import { createHud } from "./ui/hud.js";
-import { renderCharacter, playRoar, playHatch, playUnlock, playComplete, lookAt } from "./ui/character-render.js";
+import { renderCharacter, setMood, playRoar, playHatch, playUnlock, playComplete, lookAt } from "./ui/character-render.js";
 import { haptic } from "./ui/haptics.js";
 import { burst, startAmbientSnow, startAmbientWeather } from "./ui/particles.js";
 import { animate } from "./ui/motion.js";
@@ -112,6 +112,8 @@ function currentOverlay() {
 }
 /** @type {number} */
 let currentLevelId = 1;
+/** 目前關卡的搭檔角色 id。 @type {string} */
+let currentCompanionId = "santa";
 /** @type {any} */
 let progress = null;
 /** @type {any} */
@@ -626,6 +628,7 @@ function startLevel(levelId) {
     // 角色跟上章節（Step 119）：孩子進關卡看到的是**該章的夥伴**，
     // 而不是自己選的那一隻。玩家選定的角色保留在隊伍中（Step 124 會讓隊伍可見）。
     const companionId = level.companion || selectedCharacter;
+    currentCompanionId = companionId;
     const char = getAnyCharacter(bundle, companionId);
     renderCharacter($("santa-container"), char, "listen");
 
@@ -819,6 +822,94 @@ function playEvent(eventName) {
     playTimeline(eventName, (track, step) => runTimelineStep(eventName, track, step));
 }
 
+/* ---------- 回合回饋輔助（Step 126） ---------- */
+
+/**
+ * 播放角色專屬的慶祝音效與動作。
+ *
+ * 依 `content/characters.json` 的 `traits.celebrate` 決定動作
+ * （目前有 "jump"／"bounce"／"roar" 等描述），並搭配對應的音效。
+ *
+ * @param {"celebrate"|"roar"|"idle"} trait
+ */
+function playCompanionSfx(trait) {
+    const mount = $("santa-container");
+    const character = currentCompanion();
+    const motion = character?.traits?.celebrate || "jump";
+
+    // 音效
+    const map = {
+        celebrate: "glass.chime",
+        roar: "dino.roar.warm",
+        idle: "ui.tap"
+    };
+    playSfx(map[trait] || "ui.tap");
+
+    // 角色動作（依 traits 決定）
+    if (trait !== "celebrate") return;
+    if (motion === "roar") playRoar(mount);
+    else if (motion === "bounce") playComplete(mount);
+    else playHatch(mount);
+}
+
+/**
+ * 取得目前的搭檔角色資料。
+ * @returns {any}
+ */
+function currentCompanion() {
+    const id = currentCompanionId;
+    if (!id) return null;
+    try {
+        return getAnyCharacter(bundle, id);
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * 取得角色相對於粒子層的座標原點。
+ * @param {HTMLElement} mount
+ * @returns {{ x: number, y: number }}
+ */
+function characterOrigin(mount) {
+    const layer = $("snow-container");
+    if (!mount || !layer) return { x: 0, y: 0 };
+    const rect = mount.getBoundingClientRect();
+    const layerRect = layer.getBoundingClientRect();
+    return {
+        x: rect.left - layerRect.left + rect.width / 2,
+        y: rect.top - layerRect.top + rect.height * 0.4
+    };
+}
+
+/**
+ * 標記序列玩法中「已答對的項」（持久化的視覺標記）。
+ *
+ * 該項必須**點亮並留在原位**，不得移走或換掉。
+ */
+function markSequenceStepLit() {
+    const engine = session?.engine;
+    const seq = engine?.getSequence?.() || [];
+    if (!seq.length) return;
+
+    const done = sequenceDoneCount();
+    if (!done) return;
+
+    const controls = $("controls-view");
+    if (!controls) return;
+
+    const buttons = Array.from(controls.querySelectorAll("[data-item]"));
+    // 由引擎回饋取得最後答對的一項
+    const lastId = engine.getFeedback?.() || seq[done - 1];
+    for (const btn of buttons) {
+        const id = /** @type {HTMLElement} */ (btn).dataset.item || "";
+        if (id === lastId) {
+            btn.classList.add("control-btn--lit");
+            btn.classList.remove("control-btn--chosen");
+        }
+    }
+}
+
 /* ---------- 回合 UI ---------- */
 on("round:listen", () => {
     setStatus(locale === "en-US" ? "Listen..." : "聽一聽…");
@@ -833,21 +924,53 @@ on("round:input-ready", () => {
 
 on("round:correct", () => {
     haptic("correct");
-    playSfx("chime.bell");
-    const engine = session?.engine;
-    const opts = engine?.getOptions?.() || [];
-    const btn = document.querySelector(".control-btn");
+    playSfx("glass.chime");
+
+    // ① 角色表情：切到 happy mood
+    setMood($("santa-container"), "happy");
+
+    // ② 角色專屬的慶祝音效（content/characters.json 的 traits.celebrate）
+    playCompanionSfx("celebrate");
+
+    // ③ 粒子於角色位置
+    const mount = $("santa-container");
+    if (mount) {
+        burst($("snow-container"), {
+            kind: "sparkle",
+            count: 16,
+            origin: characterOrigin(mount)
+        });
+    }
+
+    // ④ 選項按鈕的成功動畫（放大回彈 + 綠色描邊）
+    const btn = document.querySelector(".control-btn--chosen") || document.querySelector(".control-btn");
     if (btn) {
         btn.classList.add("control-btn--correct");
-        setTimeout(() => btn.classList.remove("control-btn--correct"), 500);
+        window.setTimeout(() => {
+            btn.classList.remove("control-btn--correct");
+            btn.classList.remove("control-btn--chosen");
+        }, 600);
     }
-    void opts;
 });
 
 on("round:wrong", () => {
     haptic("wrong");
     playSfx("ui.soft-low");
-    animate(".char__art", "shake");
+
+    // 角色切到 **hint** mood（友善）—— 不得使用 sad（幼兒產品原則：錯了不懲罰）
+    setMood($("santa-container"), "hint");
+
+    // 角色搖頭動畫（既有 char-wiggle）
+    const mount = $("santa-container");
+    if (mount) {
+        const art = /** @type {HTMLElement|null} */ (mount.querySelector(".char__art"));
+        art?.classList.remove("anim-wiggle");
+        void art?.offsetWidth;
+        art?.classList.add("anim-wiggle");
+        window.setTimeout(() => art?.classList.remove("anim-wiggle"), 900);
+    }
+
+    // 不得有倒數、扣分、負面音效
     setStatus(locale === "en-US" ? "Try again!" : "再試一次！");
 });
 
@@ -857,8 +980,22 @@ on("round:hint", () => {
 });
 
 on("round:progress", () => {
-    // 序列／拼合的進行中回饋（回合尚未結束）
+    // 中性過程回饋（如記憶玩法翻牌未配對）—— 不播放慶祝也不顯示「答錯」
     haptic("tap");
+    updateSequenceProgress();
+});
+
+on("round:step", () => {
+    // Step 126：序列玩法的中間步驟（答對一項但回合未完成）必須有**獨立的回饋**
+    //  - 該項點亮（持久化的視覺標記）
+    //  - 角色給一個小反應（char-bounce）
+    //  - 不得顯示「答錯」、不得扣分
+    haptic("tap");
+    markSequenceStepLit();
+    // 小反應（char-bounce）後自動還原為 listen；
+    // 若期間發生其他回饋，setMood 會取消這個還原計時器（不得覆蓋新 mood）
+    setMood($("santa-container"), "happy", { revertAfter: 900, revertTo: "listen" });
+
     updateSequenceProgress();
 });
 
@@ -1046,8 +1183,8 @@ function renderPuzzleBoard(controls, engine) {
                 slot.classList.add("is-filled");
                 tray?.querySelector(`[data-piece-index="${pieceIndex}"]`)?.remove();
                 haptic("correct");
-                playSfx("chime.bell");
-                burst($("particle-layer"), { kind: "sparkle", count: 10 });
+                playSfx("glass.chime");
+                burst($("snow-container"), { kind: "sparkle", count: 10 });
             } else {
                 // 錯誤：素材彈回 ＋ 低音回饋
                 const btn = tray?.querySelector(`[data-piece-index="${pieceIndex}"]`);
@@ -1099,7 +1236,7 @@ function renderMemoryBoard(controls, engine) {
         const result = session.answer({ slot }) ?? { correct: false, done: false };
 
         if (result.correct) {
-            playSfx("chime.bell");
+            playSfx("glass.chime");
             haptic("correct");
             setTimeout(() => {
                 card.classList.add("is-matched");

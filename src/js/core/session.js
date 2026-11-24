@@ -140,9 +140,12 @@ export function createSession(_bundle, _locale) {
          *   "wrong"                 → 答錯 → advanceHint()（錯誤時永不扣分）
          *   "correct" / "progress"  → 作答有效
          *     · result.correct === true  → 分數 +1、連擊 +1
-         *     · result.done === true      → 本回合完成 → roundIndex++
+         *     · result.done === true      → 本回合完成 → roundIndex++，發 "round:correct"
          *     · result.done === false     → 回合仍在進行（序列前進中／拼合中／配對中）
-         *                                     → 不得 roundIndex++，但不得觸發 round:wrong
+         *                                     → 不得 roundIndex++，發 "round:step"
+         *                                     （獨立的進行中回饋，不得觸發 round:wrong）
+         *   result.correct === false 且 status !== "wrong"
+         *                                    → 發 "round:progress"（中性過程回饋，如翻牌未配對）
          *
          * @param {string|{ slot?:number, pieceIndex?:number, targetIndex?:number }} input
          * @returns {import("./verb-contract.js").SubmitResult} 本次作答結果
@@ -181,7 +184,13 @@ export function createSession(_bundle, _locale) {
 
             if (result.correct) {
                 setState({ score: state.score + 1, combo: state.combo + 1 });
-                emit({ type: "round:correct", payload: { itemId, round: roundIndex + 1 } });
+                if (result.done) {
+                    // 回合完成 → 完整回饋（聲音＋表情＋動態）
+                    emit({ type: "round:correct", payload: { itemId, round: roundIndex + 1 } });
+                } else {
+                    // 回合仍在進行（序列前進中／拼合中／配對中）→ 獨立的進行中回饋
+                    emit({ type: "round:step", payload: { itemId, round: roundIndex + 1, status } });
+                }
             } else {
                 emit({ type: "round:progress", payload: { itemId, round: roundIndex + 1, status } });
             }

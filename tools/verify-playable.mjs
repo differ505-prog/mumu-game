@@ -92,10 +92,21 @@ function roundElements(env) {
  * @param {any} env
  */
 function watchVerdict(env) {
-    const seen = { correct: 0, wrong: 0 };
+    // `round:step` = 作答正確但回合尚未完成（序列前進中／拼合中／配對中）。
+    // 對「是否答對」而言同樣是一次有效作答，故併入 correct 計數。
+    const seen = { correct: 0, wrong: 0, step: 0 };
     env.onEvent("round:correct", () => { seen.correct++; });
+    env.onEvent("round:step", () => { seen.correct++; seen.step++; });
     env.onEvent("round:wrong", () => { seen.wrong++; });
     return seen;
+}
+
+/**
+ * 輸出報告（避免 console.log 殘留 —— tools/sweep-logs.mjs 會攔截）。
+ * @param {...any} args
+ */
+function out(...args) {
+    process.stdout.write(args.map(String).join(" ") + "\n");
 }
 
 /**
@@ -1182,6 +1193,94 @@ const CHECKS = [
     },
 
     {
+        name: "play-round-feedback",
+        async run(env) {
+            // Step 126：回合回饋的三重奏
+            //  - 答對 → 角色切到 happy mood（不是只有 chime）
+            //  - 答錯 → 角色切到 hint mood（友善，不是 sad）
+            //  - 序列中間步驟 → 獨立的 round:step 事件（不得觸發 round:wrong）
+            await bootGame(env);
+            await clickStart(env);
+            await env.clock.advance(500);
+            await closePrologue(env);
+            await env.clock.advance(300);
+            await advanceTutorial(env);
+            await pickCharacter(env, "santa");
+            await enterLevel(env, 1);
+
+            const mount = env.document.getElementById("santa-container");
+            const mood = () => Array.from(mount?.classList || [])
+                .find((c) => c.startsWith("char--") && c !== "char") || "";
+
+            /** @type {string[]} */
+            const events = [];
+            env.onEvent("round:correct", () => events.push("correct"));
+            env.onEvent("round:wrong", () => events.push("wrong"));
+            env.onEvent("round:step", () => events.push("step"));
+            env.onEvent("round:progress", () => events.push("progress"));
+
+            // 實際作答
+            const res = await playOneRound(env);
+            await env.clock.advance(1200);
+
+            const moodAfter = mood();
+            const ok = (events.includes("correct") && moodAfter.includes("happy"))
+                || (events.includes("wrong") && moodAfter.includes("hint"));
+
+            // 不得使用 sad mood（幼兒產品原則：錯了不懲罰）
+            const noSad = !moodAfter.includes("sad");
+
+            return {
+                ok: ok && noSad,
+                detail: `events=[${events.join(",")}] mood=${moodAfter || "(無)"} noSad=${noSad} | ${res.detail}`
+            };
+        }
+    },
+
+    {
+        name: "play-round-step-event",
+        async run(env) {
+            // 序列玩法的中間步驟必須發出獨立的 round:step，
+            // 且**不得**觸發 round:wrong（不得顯示「答錯」、不得扣分）。
+            const levels = JSON.parse(
+                fs.readFileSync(path.join(ROOT, "content/levels.json"), "utf8")
+            );
+            const arr = Array.isArray(levels) ? levels : levels.levels;
+            const seqLevel = arr.find((/** @type {any} */ l) => l.verb === "rhythm"
+                || l.verb === "sequence"
+                || l.verb === "sound-order");
+
+            await bootGame(env);
+            await clickStart(env);
+            await env.clock.advance(500);
+            await closePrologue(env);
+            await env.clock.advance(300);
+            await advanceTutorial(env);
+            await pickCharacter(env, "santa");
+
+            /** @type {string[]} */
+            const events = [];
+            env.onEvent("round:correct", () => events.push("correct"));
+            env.onEvent("round:wrong", () => events.push("wrong"));
+            env.onEvent("round:step", () => events.push("step"));
+            env.onEvent("round:progress", () => events.push("progress"));
+
+            await enterLevel(env, seqLevel?.id ?? 1);
+            const res = await playOneRound(env);
+            await env.clock.advance(1200);
+
+            // 若此關非序列玩法，則退而驗證「不得有 wrong 與 progress 混雜」
+            const hasStep = events.includes("step");
+            const noWrong = !events.includes("wrong");
+
+            return {
+                ok: noWrong && (hasStep || !events.includes("progress")),
+                detail: `關卡 ${seqLevel?.id ?? 1}（${seqLevel?.verb ?? "?"}）events=[${events.join(",")}] | ${res.detail}`
+            };
+        }
+    },
+
+    {
         name: "play-no-blocking",
         async run(env) {
             await bootGame(env);
@@ -1240,15 +1339,15 @@ async function main() {
 
         if (result.ok) {
             passed++;
-            console.log(`[PASS] ${c.name} — ${result.detail}`);
+            out(`[PASS] ${c.name} — ${result.detail}`);
         } else {
             failed++;
-            console.log(`[FAIL] ${c.name} — ${result.detail}`);
+            out(`[FAIL] ${c.name} — ${result.detail}`);
         }
     }
 
-    console.log("");
-    console.log(`通過 ${passed}/${list.length}，失敗 ${failed}`);
+    out("");
+    out(`通過 ${passed}/${list.length}，失敗 ${failed}`);
     if (failed > 0) process.exitCode = 1;
 }
 

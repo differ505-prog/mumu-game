@@ -82,6 +82,51 @@ export function renderCharacter(mount, character, mood = "idle") {
 }
 
 /**
+ * 各角色的 mood 還原計時器。
+ *
+ * 避免舊的還原計時器覆蓋較新的 mood（例如序列進行中的 happy 被
+ * 900ms 後的 listen 蓋掉，而此時回合已正確完成）。
+ * @type {WeakMap<HTMLElement, number>}
+ */
+const moodTimers = new WeakMap();
+
+/**
+ * 切換角色 mood（Step 126）。
+ *
+ * `renderCharacter()` 只在初次渲染時設定 mood；之後的回饋（答對／答錯／
+ * 序列進行中）都靠 `setMood()` **連續切換**，不得重繪整個角色。
+ *
+ * @param {HTMLElement} mount
+ * @param {CharacterMood} mood
+ * @param {{ revertAfter?: number, revertTo?: CharacterMood }} [opts]
+ */
+export function setMood(mount, mood, opts) {
+    if (!mount) return;
+
+    // 取消尚未觸發的還原計時器（新的 mood 優先）
+    const pending = moodTimers.get(mount);
+    if (pending !== undefined) {
+        window.clearTimeout(pending);
+        moodTimers.delete(mount);
+    }
+
+    for (const cls of Array.from(mount.classList)) {
+        if (cls.startsWith("char--")) mount.classList.remove(cls);
+    }
+    mount.classList.add(`char--${mood}`);
+
+    // 需要自動還原時（例如序列進行中的小反應）
+    const revertAfter = opts?.revertAfter;
+    if (typeof revertAfter === "number" && revertAfter > 0) {
+        const timer = window.setTimeout(() => {
+            moodTimers.delete(mount);
+            setMood(mount, opts?.revertTo || "listen");
+        }, revertAfter);
+        moodTimers.set(mount, timer);
+    }
+}
+
+/**
  * 視線追隨游標。
  * @param {HTMLElement} mount
  * @param {number} x
