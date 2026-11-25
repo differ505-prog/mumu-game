@@ -28,10 +28,28 @@ export const FREE_CHAPTERS = [0, 1, 2, 3];
 
 /**
  * 目前權益。
+ *
+ * 優先讀取本機儲存的權益值；若尚未設定（例如首次啟動或測試環境），
+ * 再回退到 `window.__mumuEntitlements` 全域覆寫（測試／除錯用）。
+ *
+ * 注意：**不得**以解構 `window.__mumuEntitlements` 的方式取值 ——
+ * 該物件不存在時會直接拋 TypeError（Round 1 紅線 #1）。
+ *
  * @returns {Entitlement}
  */
 export function getEntitlement() {
-    return readJson(STORAGE_KEY, "free") === "premium" ? "premium" : "free";
+    const stored = readJson(STORAGE_KEY, "");
+    if (stored === "premium" || stored === "free") return stored;
+
+    // 全域覆寫（測試／除錯用）。
+    // 注意：**不得**以解構 `window.__mumuEntitlements` 的方式取值 ——
+    // 該物件不存在時會直接拋 TypeError（Round 1 紅線 #1）。
+    const scope = /** @type {any} */ (typeof window !== "undefined" ? window : globalThis);
+    const override = scope?.__mumuEntitlements;
+    if (override && typeof override.getEntitlement === "function") {
+        return override.getEntitlement() === "premium" ? "premium" : "free";
+    }
+    return "free";
 }
 
 /**

@@ -7,7 +7,11 @@
     <meta name="theme-color" content="#0a1a3c">
     <meta name="description" content="幼兒聽覺辨識與認知訓練遊戲：六個認知動詞、24 隻恐龍圖鑑與六章故事。">
     <meta name="referrer" content="no-referrer">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'">
+    <!--
+        CSP：frame-ancestors 僅能以 HTTP 標頭設定，寫在 meta 內會被瀏覽器忽略
+        並於 Console 噴出警告，故此處不宣告（改由伺服器標頭 / _headers 設定）。
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
     <title>木木遊戲：聖誕小幫手 | Santa's Little Helper</title>
 
     <!-- Open Graph（Step 168）-->
@@ -69,19 +73,10 @@
     <!-- 首次啟動同意閘（Step 133）：未取得法定代理人家長同意前不得進入遊戲 -->
     <div id="consent-gate-root" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="consent-gate-title"></div>
 
-    <!-- 教學遮罩 -->
-    <div id="orientation-overlay" class="overlay hidden">
-        <div class="overlay-icon" aria-hidden="true">
-            <svg width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-                stroke-linecap="round" stroke-linejoin="round">
-                <rect x="7" y="2" width="10" height="20" rx="2" />
-                <path d="M11 18h2" />
-                <path d="M2 12h3M19 12h3" />
-            </svg>
-        </div>
-        <h1>請將手機轉橫</h1>
-        <p>Please Rotate Your Device</p>
-    </div>
+    <!--
+        裝置方向：直向（portrait）已完整支援單欄遊玩，
+        不再鎖死畫面要求轉橫，故此處不設方向鎖定遮罩。
+    -->
 
     <!-- 開始畫面 -->
     <div id="start-overlay" class="overlay">
@@ -175,7 +170,7 @@
             </div>
 
             <div id="santa-container">
-                <img id="character-img" alt="角色" src="">
+                <img id="character-img" alt="角色" src="" hidden />
             </div>
 
             <!--
@@ -199,6 +194,9 @@
 
     <!-- 工具列 -->
     <nav id="toolbar" role="toolbar" aria-label="遊戲工具">
+        <button id="back-to-map-tool-btn" class="tool-btn" type="button" aria-label="回地圖">
+            <img src="./assets/icons/map.svg" alt="" width="24" height="24" />
+        </button>
         <button id="music-control-btn" class="tool-btn" type="button" aria-label="音樂">
             <img src="./assets/icons/music.svg" alt="" width="24" height="24" />
         </button>

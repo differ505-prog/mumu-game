@@ -193,13 +193,69 @@ function pulseMarkup(count) {
 }
 
 /**
+ * 順序大圖卡（示範播放時的視覺替代，V4）。
+ *
+ * 每張卡片帶**醒目序號**，讓不識字幼兒依序號對應示範節奏。
+ * 文字一律以 textContent 寫入（禁 innerHTML 注入）。
+ *
+ * @param {Array<string|{ label?: string, image?: string }>} steps
+ * @param {number} activeIndex 目前示範到第幾張（-1 表示尚未開始）
+ * @returns {HTMLElement}
+ */
+function buildSequenceCards(steps, activeIndex) {
+    const row = document.createElement("ol");
+    row.className = "visual-fallback__sequence";
+    row.setAttribute("aria-label", "順序提示卡");
+
+    steps.forEach((step, i) => {
+        const item = document.createElement("li");
+        item.className = "visual-fallback__step";
+        if (i === activeIndex) item.classList.add("is-active");
+
+        const no = document.createElement("span");
+        no.className = "visual-fallback__step-no";
+        no.setAttribute("aria-hidden", "true");
+        no.textContent = String(i + 1);
+        item.appendChild(no);
+
+        const body = document.createElement("span");
+        body.className = "visual-fallback__step-body";
+
+        const image = typeof step === "object" && step ? step.image : "";
+        const label = typeof step === "object" && step ? step.label : String(step ?? "");
+
+        if (image) {
+            const img = document.createElement("img");
+            img.className = "visual-fallback__step-art";
+            img.src = image;
+            img.alt = "";
+            img.loading = "lazy";
+            img.decoding = "async";
+            body.appendChild(img);
+        }
+        if (label) {
+            const text = document.createElement("span");
+            text.className = "visual-fallback__step-label";
+            text.textContent = safeText(String(label));
+            body.appendChild(text);
+        }
+        item.appendChild(body);
+        row.appendChild(item);
+    });
+
+    return row;
+}
+
+/**
  * 顯示視覺替代提示（語音不可用／靜音／無語音包時）。
  *
  * - 文字內容一律以 textContent 寫入（禁 innerHTML 注入）
  * - 最小對以兩張並列大字卡呈現，供幼兒「看」出兩個音
+ * - 示範（demonstration）時以**順序大圖卡 + 醒目序號**呈現當題步驟（V4）
  *
  * @param {HTMLElement} root
- * @param {{ text?: string, pair?: string[], reason?: string, beats?: number, locale?: string }} payload
+ * @param {{ text?: string, pair?: string[], reason?: string, beats?: number, locale?: string,
+ *           sequence?: Array<string|{label?:string,image?:string}>, activeIndex?: number }} payload
  */
 export function showVisualFallback(root, payload = {}) {
     const host = fallbackHost(root);
@@ -217,7 +273,10 @@ export function showVisualFallback(root, payload = {}) {
         : (en ? "Voice is unavailable. Use the cards." : "語音無法使用，請看圖卡作答");
     host.appendChild(hint);
 
-    if (Array.isArray(payload.pair) && payload.pair.length >= 2) {
+    // 順序大圖卡（示範播放時）——優先於最小對並列卡
+    if (Array.isArray(payload.sequence) && payload.sequence.length >= 1) {
+        host.appendChild(buildSequenceCards(payload.sequence, payload.activeIndex ?? -1));
+    } else if (Array.isArray(payload.pair) && payload.pair.length >= 2) {
         const row = document.createElement("div");
         row.className = "visual-fallback__cards";
         for (const word of payload.pair.slice(0, 4)) {

@@ -50,6 +50,22 @@ export function createSession(_bundle, _locale) {
     let startedAt = 0;
     /** @type {number} */
     let roundStartedAt = 0;
+    /** 等待中的計時器（離開關卡時必須清除，避免回合在背景繼續推進）。 @type {any[]} */
+    let pendingTimers = [];
+
+    /**
+     * 安排一個可取消的計時器。
+     * @param {() => void} fn
+     * @param {number} ms
+     */
+    function schedule(fn, ms) {
+        const id = setTimeout(() => {
+            pendingTimers = pendingTimers.filter((t) => t !== id);
+            fn();
+        }, ms);
+        pendingTimers.push(id);
+        return id;
+    }
 
     return {
         /**
@@ -125,7 +141,7 @@ export function createSession(_bundle, _locale) {
             verbEngine.playPrompt?.();
 
             // 聆聽結束後開放輸入
-            setTimeout(() => {
+            schedule(() => {
                 setState({ phase: "input", locked: false });
                 emit({ type: "round:input-ready", payload: {} });
             }, paceMs + 400);
@@ -197,7 +213,7 @@ export function createSession(_bundle, _locale) {
 
             if (result.done) {
                 roundIndex++;
-                setTimeout(() => this.nextRound().catch((err) => this.handleFatal(err)), 900);
+                schedule(() => this.nextRound().catch((err) => this.handleFatal(err)), 900);
             }
 
             return result;
@@ -224,6 +240,11 @@ export function createSession(_bundle, _locale) {
             emit({ type: "round:hint", payload: { stage: hintStage } });
 
             if (hintStage === "demonstrate") {
+                // V4：示範階段通知 UI 呈現「當題的順序大圖卡」（視覺替代）
+                emit({
+                    type: "round:demonstrate",
+                    payload: { stage: "demonstrate", round: roundIndex + 1 }
+                });
                 verbEngine.demonstrate?.();
             } else if (hintStage === "replay") {
                 verbEngine.replay?.();
@@ -238,10 +259,22 @@ export function createSession(_bundle, _locale) {
         },
 
         /**
+         * 停止關卡（中途離開，例如由工具列「回地圖」返回）。
+         *
+         * 清除所有待執行計時器並鎖住輸入 —— 回合不得在背景繼續推進。
+         */
+        stop() {
+            for (const id of pendingTimers) clearTimeout(id);
+            pendingTimers = [];
+            verbEngine = null;
+            setState({ phase: "idle", locked: true });
+        },
+
+        /**
          * 重播題目。
          */
         replay() {
-            verbEngine.replay?.();
+            verbEngine?.replay?.();
         },
 
         /**

@@ -18,32 +18,35 @@ export function createAudioSettings(root) {
     const initial = { ...getVolumes(), ...saved };
 
     root.innerHTML = `
-        <h2>${initial.locale === "en-US" ? "Sound Settings" : "音量設定"}</h2>
-        <div class="settings">
-            <label class="settings__row">
-                <span class="settings__label">${zh("主音量", "Master")}</span>
-                <input type="range" class="settings__slider" data-vol="master" min="0" max="100" value="${Math.round(initial.master * 100)}" />
-                <span class="settings__value" data-out="master">${Math.round(initial.master * 100)}</span>
-            </label>
-            <label class="settings__row">
-                <span class="settings__label">${zh("音樂", "Music")}</span>
-                <input type="range" class="settings__slider" data-vol="music" min="0" max="100" value="${Math.round(initial.music * 100)}" />
-                <span class="settings__value" data-out="music">${Math.round(initial.music * 100)}</span>
-            </label>
-            <label class="settings__row">
-                <span class="settings__label">${zh("音效", "Sound")}</span>
-                <input type="range" class="settings__slider" data-vol="sfx" min="0" max="100" value="${Math.round(initial.sfx * 100)}" />
-                <span class="settings__value" data-out="sfx">${Math.round(initial.sfx * 100)}</span>
-            </label>
-            <label class="settings__row">
-                <span class="settings__label">${zh("語音", "Voice")}</span>
-                <input type="range" class="settings__slider" data-vol="voice" min="0" max="100" value="${Math.round(initial.voice * 100)}" />
-                <span class="settings__value" data-out="voice">${Math.round(initial.voice * 100)}</span>
-            </label>
-            <label class="settings__row settings__row--toggle">
-                <span class="settings__label">${zh("靜音", "Mute all")}</span>
-                <input type="checkbox" id="settings-mute" ${initial.muted ? "checked" : ""} />
-            </label>
+        <div class="settings-card" role="dialog" aria-modal="true" aria-labelledby="settings-card-title">
+            <h2 class="settings-card__title" id="settings-card-title">${zh("音量設定", "Sound Settings")}</h2>
+            <div class="settings settings-card__body">
+                <label class="settings__row">
+                    <span class="settings__label">${zh("主音量", "Master")}</span>
+                    <input type="range" class="settings__slider" data-vol="master" min="0" max="100" value="${Math.round(initial.master * 100)}" aria-label="${zh("主音量", "Master")}" />
+                    <span class="settings__value" data-out="master">${Math.round(initial.master * 100)}</span>
+                </label>
+                <label class="settings__row">
+                    <span class="settings__label">${zh("音樂", "Music")}</span>
+                    <input type="range" class="settings__slider" data-vol="music" min="0" max="100" value="${Math.round(initial.music * 100)}" aria-label="${zh("音樂", "Music")}" />
+                    <span class="settings__value" data-out="music">${Math.round(initial.music * 100)}</span>
+                </label>
+                <label class="settings__row">
+                    <span class="settings__label">${zh("音效", "Sound")}</span>
+                    <input type="range" class="settings__slider" data-vol="sfx" min="0" max="100" value="${Math.round(initial.sfx * 100)}" aria-label="${zh("音效", "Sound")}" />
+                    <span class="settings__value" data-out="sfx">${Math.round(initial.sfx * 100)}</span>
+                </label>
+                <label class="settings__row">
+                    <span class="settings__label">${zh("語音", "Voice")}</span>
+                    <input type="range" class="settings__slider" data-vol="voice" min="0" max="100" value="${Math.round(initial.voice * 100)}" aria-label="${zh("語音", "Voice")}" />
+                    <span class="settings__value" data-out="voice">${Math.round(initial.voice * 100)}</span>
+                </label>
+                <label class="settings__row settings__row--toggle">
+                    <span class="settings__label">${zh("靜音", "Mute all")}</span>
+                    <input type="checkbox" id="settings-mute" ${initial.muted ? "checked" : ""} />
+                </label>
+            </div>
+            <div class="settings-card__actions" id="settings-card-actions"></div>
         </div>
     `;
 

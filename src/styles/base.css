@@ -25,6 +25,10 @@ body {
 
 body {
     height: 100dvh;
+    /* 頁尾固定貼底（V5）：以 flex 欄位讓頁尾佔據底部、遊戲區佔據其餘 */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
@@ -351,7 +355,9 @@ body {
     display: flex;
     flex-direction: row;
     width: 100%;
-    height: 100dvh;
+    flex: 1 1 auto;
+    min-height: 0;
+    height: auto;
     overflow: hidden;
 }
 
@@ -369,7 +375,26 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: auto;
+    /* 隱藏原生白色橫向捲軸（V2）——捲軸改成細窄深色樣式 */
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-soft) transparent;
+    -webkit-overflow-scrolling: touch;
+}
+
+#controls-view::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+#controls-view::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#controls-view::-webkit-scrollbar-thumb {
+    background: var(--border-soft);
+    border-radius: var(--r-full);
 }
 
 #snow-container {
@@ -401,6 +426,12 @@ body {
     font-size: var(--fs-sm);
     color: var(--text-secondary);
     text-shadow: 0 1px 3px rgba(0, 0, 0, .6);
+}
+
+/* V5：章節標題提高對比（原本偏淡、易被背景吃掉） */
+.hud__chapter {
+    color: var(--text-primary);
+    font-weight: 600;
 }
 
 .hud__medals {
@@ -437,6 +468,28 @@ body {
 
 .tool-btn:active {
     transform: scale(.94);
+}
+
+/*
+ * 工具列圖示高對比呈現（V2）
+ *
+ * assets/icons/*.svg 以 stroke="currentColor" 繪製，理論上會跟隨文字色；
+ * 但部分圖示檔內含填色的深色路徑，在深藍底上壓到幾乎看不見。
+ * 此處統一以濾鏡把圖示轉為高對比亮色，確保任何底色上都清晰可辨。
+ */
+.tool-btn img {
+    display: block;
+    width: 60%;
+    height: 60%;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    opacity: .92;
+}
+
+.tool-btn:hover img,
+.tool-btn:focus-visible img {
+    opacity: 1;
+    filter: brightness(0) invert(1) drop-shadow(0 0 6px var(--accent-warm));
 }
 
 /* 狀態文字 */
@@ -533,8 +586,9 @@ body {
     border-radius: var(--r-lg);
     box-shadow: var(--mat-border-light), var(--mat-shadow-1);
     text-align: center;
-    overflow-wrap: anywhere;
-    word-break: break-word;
+    overflow-wrap: break-word;
+    word-break: normal;
+    line-break: strict;
 }
 
 #bubble.show {
@@ -544,6 +598,12 @@ body {
 .prompt-content {
     font-size: var(--fs-xl);
     color: var(--text-primary);
+    /* 避免中文孤字換行（如「去」掉到第二行）—— V4 */
+    line-height: 1.6;
+    line-break: strict;
+    word-break: normal;
+    overflow-wrap: break-word;
+    text-wrap: pretty;
 }
 
 /* 提示訊息層 */

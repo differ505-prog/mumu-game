@@ -151,7 +151,8 @@
     display: flex;
     gap: var(--s-2);
     justify-content: center;
-    padding: var(--s-2) var(--s-3) 0;
+    /* V2：左右補白，避免最左／最右的進度圓點被容器裁切 */
+    padding: var(--s-2) var(--s-4);
 }
 
 .seq-dot {
@@ -1386,16 +1387,23 @@
 }
 
 /* ---------- 頁尾（Step 168） ---------- */
+/*
+ * V5：頁尾**穩定貼底**（body 為 flex 欄位，頁尾為最後一個 flex item），
+ * 且文字改用高對比淺色（--text-secondary），避免浮在畫面中間遮擋內容。
+ */
 .app-footer {
     position: relative;
     z-index: var(--z-hud);
+    flex: 0 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--s-2);
-    padding: var(--s-3) var(--s-4) calc(var(--s-4) + env(safe-area-inset-bottom));
-    background: rgba(10, 26, 60, .88);
+    gap: var(--s-1);
+    padding: var(--s-2) var(--s-4) calc(var(--s-2) + env(safe-area-inset-bottom));
+    background: var(--bg-scene);
     border-top: 1px solid var(--border-soft);
+    box-shadow: var(--mat-shadow-1);
+    text-align: center;
 }
 
 .app-footer__links {
@@ -1433,7 +1441,7 @@
     gap: var(--s-1);
     margin: 0;
     font-size: var(--fs-xs);
-    color: var(--text-muted);
+    color: var(--text-secondary);
 }
 
 .app-footer__sep {
@@ -1650,4 +1658,320 @@
 [data-reduced-motion="on"] .legal-panel__skeleton-line,
 .reduced-motion .legal-panel__skeleton-line {
     animation: none;
+}
+
+/* ============================================================
+   V3：設定卡片 / 關卡地圖 / 故事過場 / 角色選擇置中
+   ============================================================ */
+
+/* ---------- 設定卡片（置中、深色質感、垂直排列滑桿） ---------- */
+.settings-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+    width: min(520px, 92vw);
+    max-height: 88dvh;
+    padding: var(--s-6) var(--s-5);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--r-lg);
+    box-shadow: var(--mat-border-light), var(--mat-shadow-2);
+    text-align: left;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-soft) transparent;
+}
+
+.settings-card__title {
+    margin: 0;
+    font-size: var(--fs-xl);
+    color: var(--text-primary);
+    text-align: center;
+}
+
+.settings-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+}
+
+.settings-card__actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--touch-gap);
+    padding-top: var(--s-2);
+    border-top: 1px solid var(--border-soft);
+}
+
+.settings-card__actions .level-btn {
+    width: 100%;
+    min-height: max(48px, var(--touch-min));
+}
+
+.settings {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+}
+
+.settings__row {
+    display: grid;
+    grid-template-columns: 5.5em 1fr 3em;
+    align-items: center;
+    gap: var(--s-3);
+    min-height: max(48px, var(--touch-min));
+    font-size: var(--fs-md);
+    color: var(--text-secondary);
+}
+
+.settings__row--toggle {
+    grid-template-columns: 1fr auto;
+    justify-items: start;
+}
+
+.settings__row--toggle input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+    accent-color: var(--accent-warm);
+}
+
+.settings__slider {
+    width: 100%;
+    accent-color: var(--accent-warm);
+}
+
+.settings__value {
+    font-size: var(--fs-sm);
+    color: var(--text-primary);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 關卡地圖 ---------- */
+.levelmap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--s-4);
+    width: 100%;
+    max-width: var(--content-max, 1100px);
+    margin: 0 auto;
+}
+
+.levelmap__top {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: var(--s-3);
+    width: 100%;
+}
+
+.levelmap__top .mode-option {
+    min-height: max(48px, var(--touch-min));
+}
+
+.levelmap__daily.is-done .mode-desc {
+    color: var(--c-green-500);
+}
+
+.levelmap__chapter {
+    width: 100%;
+    padding: var(--s-3);
+    background: var(--bg-panel);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--r-lg);
+}
+
+.levelmap__chapter--premium {
+    background: color-mix(in srgb, var(--bg-panel) 80%, var(--accent-warm) 20%);
+}
+
+.levelmap__chapter-title {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    margin: 0 0 var(--s-3);
+    font-size: var(--fs-md);
+    color: var(--text-primary);
+    text-align: left;
+}
+
+.levelmap__badge {
+    padding: var(--s-1) var(--s-2);
+    font-size: var(--fs-xs);
+    color: var(--c-night-900);
+    background: var(--accent-warm);
+    border-radius: var(--r-full);
+}
+
+.levelmap__path {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-3);
+}
+
+.levelmap__node {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-1);
+    width: max(72px, var(--touch-min));
+    min-height: max(72px, var(--touch-min));
+    padding: var(--s-2);
+    background: var(--bg-elevated);
+    border: 2px solid var(--border-soft);
+    border-radius: var(--r-lg);
+    box-shadow: var(--mat-border-light), var(--mat-shadow-1);
+    transition: transform var(--t-micro) var(--e-standard), border-color var(--t-base) var(--e-standard);
+}
+
+.levelmap__node:active {
+    transform: scale(.95);
+}
+
+.levelmap__node:hover:not(.is-locked),
+.levelmap__node:focus-visible:not(.is-locked) {
+    border-color: var(--accent-warm);
+}
+
+.levelmap__node.is-locked {
+    opacity: .45;
+}
+
+.levelmap__node-no {
+    font-size: var(--fs-lg);
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.levelmap__node-stars {
+    display: flex;
+    gap: 2px;
+}
+
+.levelmap__star {
+    width: 16px;
+    height: 16px;
+    opacity: .35;
+}
+
+.levelmap__star.is-on {
+    opacity: 1;
+    filter: drop-shadow(0 0 4px var(--accent-warm));
+}
+
+/* 分頁列置中 */
+.levelmap__pager {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-3);
+    margin-top: var(--s-4);
+    flex-wrap: wrap;
+}
+
+/* ---------- 故事過場（底部 CTA 不被裁切、無白捲軸） ---------- */
+.story-modal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--s-4);
+    width: 100%;
+    max-width: min(620px, 92vw);
+    max-height: 88dvh;
+    padding: var(--s-5) var(--s-4);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--r-lg);
+    box-shadow: var(--mat-border-light), var(--mat-shadow-2);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-soft) transparent;
+}
+
+.story-modal::-webkit-scrollbar {
+    width: 6px;
+}
+
+.story-modal::-webkit-scrollbar-thumb {
+    background: var(--border-soft);
+    border-radius: var(--r-full);
+}
+
+.story-modal__cta {
+    position: sticky;
+    bottom: 0;
+    flex: 0 0 auto;
+    width: 100%;
+    padding-top: var(--s-2);
+    background: linear-gradient(to top, var(--bg-elevated) 60%, transparent);
+}
+
+/* ---------- 角色選擇：卡片列置中對齊（消除右側留白） ---------- */
+#character-select-overlay .mode-options,
+#mode-select-overlay .mode-options {
+    justify-content: center;
+    justify-items: center;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 200px));
+    max-width: min(900px, 94vw);
+}
+
+#character-select-overlay .mode-option {
+    width: 100%;
+    align-items: center;
+    text-align: center;
+}
+
+/* ---------- 教學：第 3 步按鈕置中對齊、層級清楚 ---------- */
+.tutorial {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--s-3);
+    width: 100%;
+    max-width: min(560px, 92vw);
+    text-align: center;
+}
+
+.tutorial__title {
+    margin: 0;
+    font-size: var(--fs-xl);
+    color: var(--text-primary);
+}
+
+.tutorial__body {
+    margin: 0;
+    font-size: var(--fs-md);
+    color: var(--text-secondary);
+}
+
+.tutorial__hint {
+    margin: 0;
+    font-size: var(--fs-sm);
+    color: var(--text-muted);
+}
+
+.tutorial__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--touch-gap);
+    width: 100%;
+    margin-top: var(--s-2);
+}
+
+.tutorial__actions .level-btn {
+    min-width: min(280px, 80vw);
+}
+
+.tutorial__options {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--touch-gap);
+    width: 100%;
 }

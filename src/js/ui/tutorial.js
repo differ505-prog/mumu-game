@@ -39,7 +39,7 @@ export function createTutorial(root, bundle, locale) {
     /** 各步驟的示範內容。 */
     const CONTENT = {
         listen: {
-            title: en ? "Listen carefully" : "先聽一听",
+            title: en ? "Listen carefully" : "先聽一聽",
             body: en
                 ? "Press the button and the character will play a sound. Listen all the way to the end."
                 : "按下按鈕，角色會播放一個聲音。請完整聽到最後。",

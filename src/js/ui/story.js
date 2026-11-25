@@ -30,13 +30,15 @@ export function showStoryScene(root, scene, onClose) {
     const body = escapeHtml(safeText(scene.body));
 
     root.innerHTML = `
-        <div class="story-scene" data-theme="${theme}">
+        <div class="story-modal" data-theme="${theme}">
             ${art ? `<img class="story-scene__art" src="${escapeHtml(art)}" alt="" />` : ""}
             <div class="story-scene__body">
                 <h2 class="story-scene__title">${title}</h2>
                 ${tagline ? `<p class="story-scene__tagline">${tagline}</p>` : ""}
                 <p class="story-scene__text">${body}</p>
-                <button class="level-btn" id="story-cta" type="button">${speakingLabel}</button>
+                <div class="story-modal__cta">
+                    <button class="level-btn" id="story-cta" type="button">${speakingLabel}</button>
+                </div>
             </div>
         </div>
     `;

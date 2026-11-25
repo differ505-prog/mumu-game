@@ -58,10 +58,13 @@ export function burst(layer, opts = {}) {
             p.x += p.vx;
             p.y += p.vy;
             p.life -= p.decay;
+            // 半徑必須恆正 —— ctx.arc 的半徑 <= 0 會拋 IndexSizeError
+            const radius = p.size * Math.max(0, p.life);
+            if (radius <= 0) continue;
             ctx.globalAlpha = Math.max(0, p.life);
             ctx.fillStyle = `hsl(${p.hue}, 85%, ${60 + p.life * 20}%)`;
             ctx.beginPath();
-            ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+            ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
             ctx.fill();
         }
         ctx.globalAlpha = 1;

@@ -4,7 +4,7 @@
  * 規範：付費章節（4、5 章）節點須顯示「需訂閱」標示並導向付費牆。
  */
 
-import { isChapterFree } from "../core/entitlements.js";
+import { getEntitlement, isChapterFree } from "../core/entitlements.js";
 import { dailyChallenge, isDailyDone } from "../core/daily.js";
 import { todayString } from "../core/progress.js";
 
@@ -243,8 +243,8 @@ export function isLevelLocked(bundle, levelId, progress) {
 
     // 付費章節（第 4、5 章，即 chapter 3、4）需權益
     if (!isChapterFree(level.chapter)) {
-        const { getEntitlement } = /** @type {any} */ (window).__mumuEntitlements;
-        if (getEntitlement?.() !== "premium") return true;
+        // 直接由模組匯入取權益（不得依賴 window 全域 —— 該物件不存在會拋 TypeError）
+        if (getEntitlement() !== "premium") return true;
     }
 
     // 序進：第一關永遠解鎖；其餘以進度為準

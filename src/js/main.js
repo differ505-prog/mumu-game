@@ -687,6 +687,10 @@ async function startGame() {
         progress["story.0"] = 1;
         saveProgress(progress);
 
+        // V4：關閉序章信件後立即清空殘留文字
+        //（朗讀失敗時的語音降級會把長信寫進 HUD），不得滲漏到教學。
+        clearRoundHud();
+
         // 首次啟動才跑教學；之後可從設定重播
         const firstRun = !localStorage.getItem("mumu.tutorial.done");
         if (firstRun) {
@@ -712,9 +716,14 @@ function runTutorial() {
 
     const tutorial = createTutorial(root, bundle, locale);
 
+    // V4：進入教學前清空序章信件殘留的文字（不得滲漏到教學畫面）
+    clearRoundHud();
+
     const finish = () => {
         localStorage.setItem("mumu.tutorial.done", "1");
         root.classList.add("hidden");
+        // V4：教學結束時清空殘留文字（教學文案不得滲漏到後續畫面）
+        clearRoundHud();
         showCharacterSelect();
     };
 
@@ -769,6 +778,8 @@ function showChapterScene(chapter, onClose) {
         // 記錄本章已看過（progress 鍵為 "story.<chapter>"）
         progress["story." + chapter] = 1;
         saveProgress(progress);
+        // V4：關閉故事過場後立即清空殘留文字，避免長信滲漏到關卡 HUD
+        clearRoundHud();
         onClose();
     });
 }
@@ -879,6 +890,10 @@ function showLevelMap() {
     $("level-up-overlay")?.classList.add("hidden");
     $("level-complete-container")?.classList.add("hidden");
 
+    // V3：工具列「回地圖」鈕回到地圖後必須停用（避免重複堆疊遮罩）
+    const mapToolBtn = $("back-to-map-tool-btn");
+    mapToolBtn?.setAttribute("aria-disabled", "true");
+
     const map = renderLevelMap(overlay, bundle, progress, locale);
     map.onSelect((levelId) => {
         overlay.classList.add("hidden");
@@ -921,6 +936,10 @@ function startLevel(levelId) {
     }
 
     $("game-container").classList.remove("hidden");
+    // V3：進入關卡後重新啟用工具列「回地圖」鈕
+    $("back-to-map-tool-btn")?.setAttribute("aria-disabled", "false");
+    // V4：開始新關卡前清空前一回合（故事／教學）的殘留文字
+    clearRoundHud();
     $("mode-indicator").textContent = childVerbLabel(level.verb, locale);
     // 三支柱整合：切換場景時，音樂（playSceneMusic）與場景色票（applyTheme）必須同步
     applySceneAudio(level.scene);
@@ -1208,6 +1227,63 @@ function markSequenceStepLit() {
 /* ---------- 回合 UI ---------- */
 
 /**
+ * 清空回合 HUD 上的殘留文字（V4）。
+ *
+ * 故事過場（信件）朗讀失敗時會觸發 `voice:unavailable`，
+ * 導致長信文字被寫進 `#visual-fallback`；若未清除，
+ * 聖誕老人的長信會滲漏到教學與第 1 關的 HUD。
+ *
+ * 本函式一併清掉：視覺替代提示、氣泡文字、狀態列、字幕屬性。
+ */
+function clearRoundHud() {
+    hideVisualFallback(document.body);
+    hideVisualFallback(document.getElementById("tv-view") || document.body);
+
+    const bubble = $("bubble");
+    const content = $("bubble-content");
+    if (content) {
+        content.textContent = "";
+        content.removeAttribute("data-subtitle");
+    }
+    bubble?.classList.remove("show");
+
+    const status = $("status-text");
+    if (status) status.textContent = "";
+
+    const sr = $("sr-live");
+    if (sr) sr.textContent = "";
+}
+
+/**
+ * 目前回合的示範步驟（視覺替代用的順序大圖卡）。
+ *
+ * 依引擎種類取得：序列／翻牌／拼合皆提供可辨識的步驟描述。
+ * @returns {Array<string|{label?:string,image?:string}>}
+ */
+function currentDemoSteps() {
+    const engine = session?.engine;
+    if (!engine) return [];
+
+    const seq = engine.getSequence?.() || [];
+    if (Array.isArray(seq) && seq.length) {
+        const labels = seq.map((/** @type {any} */ id) => {
+            const opt = (engine.getOptions?.() || []).find((/** @type {any} */ o) => o.id === id);
+            return opt?.label || opt?.image || String(id);
+        });
+        return labels;
+    }
+
+    const options = engine.getOptions?.() || [];
+    if (Array.isArray(options) && options.length) {
+        return options.slice(0, 4).map((/** @type {any} */ o) => ({
+            label: o?.label || "",
+            image: o?.image || ""
+        }));
+    }
+    return [];
+}
+
+/**
  * 語音不可用／靜音／無語音包 → 顯示視覺替代提示（Step 205）。
  * 不識字幼兒僅看圖卡與脈衝即可完成回合。
  */
@@ -1237,6 +1313,27 @@ on("voice:pair", (event) => {
     showVisualFallback(root, {
         pair,
         locale: payload.locale ? String(payload.locale) : locale
+    });
+});
+
+/**
+ * 示範播放（demonstrate）時的視覺替代（V4）。
+ *
+ * 語音不可用／視覺輔助開啟時，於 `#visual-fallback` 呈現**當題的順序大圖卡**
+ * （含醒目序號與高亮節拍），而非只顯示空泛警告字。
+ */
+on("round:demonstrate", (event) => {
+    const payload = /** @type {any} */ (event?.payload || {});
+    const root = document.getElementById("tv-view") || document.body;
+    const steps = currentDemoSteps();
+    if (!steps.length) return;
+
+    showVisualFallback(root, {
+        reason: payload.reason ? String(payload.reason) : "unsupported",
+        locale,
+        sequence: steps,
+        activeIndex: typeof payload.activeIndex === "number" ? payload.activeIndex : -1,
+        beats: typeof payload.beats === "number" ? payload.beats : steps.length
     });
 });
 
@@ -1590,6 +1687,16 @@ function wire() {
         playSfx("ui.listen");
     });
 
+    // 工具列「回地圖」（V3）：關卡進行中隨時可回選關畫面
+    const mapToolBtn = $("back-to-map-tool-btn");
+    mapToolBtn?.addEventListener("click", () => {
+        if (mapToolBtn.getAttribute("aria-disabled") === "true") return;
+        hideVisualFallback(document.body);
+        clearRoundHud();
+        session?.stop?.();
+        showLevelMap();
+    });
+
     const slowBtn = $("slow-mode-btn");
     slowBtn?.addEventListener("click", () => {
         state.slowMode = !state.slowMode;
@@ -1782,7 +1889,8 @@ function wire() {
         root.classList.remove("hidden");
         audioSettings?.reload();
 
-        // 面板內加上面板切換與關閉
+        // 面板內加上面板切換與關閉（V3：集中於卡片底部動作列）
+        const actions = root.querySelector("#settings-card-actions") || root;
         if (!root.querySelector("#settings-a11y")) {
             const toggle = document.createElement("button");
             toggle.id = "settings-a11y";
@@ -1794,7 +1902,7 @@ function wire() {
                 a11yRoot.classList.remove("hidden");
                 preferencesPanel?.applyPreferences();
             });
-            root.appendChild(toggle);
+            actions.appendChild(toggle);
 
             // Step 167：家長可隨時開啟安裝引導
             if (!root.querySelector("#settings-install")) {
@@ -1807,7 +1915,7 @@ function wire() {
                     root.classList.add("hidden");
                     showInstallGuide($("pwa-install-root"), locale);
                 });
-                root.appendChild(installToggle);
+                actions.appendChild(installToggle);
             }
 
             // Step 133／134：家長可隨時開啟同意設定（撤回個別同意）
@@ -1822,24 +1930,38 @@ function wire() {
                     await openConsentSettings($("consent-gate-root"), locale);
                     root.classList.remove("hidden");
                 });
-                root.appendChild(consentToggle);
+                actions.appendChild(consentToggle);
+            }
+
+            // V3：設定卡內的「回到地圖」——家長調整完設定可直接回到選關畫面
+            if (!root.querySelector("#settings-back-to-map")) {
+                const mapToggle = document.createElement("button");
+                mapToggle.id = "settings-back-to-map";
+                mapToggle.className = "level-btn level-btn--secondary";
+                mapToggle.type = "button";
+                mapToggle.textContent = locale === "en-US" ? "Level Map" : "回到地圖";
+                mapToggle.addEventListener("click", () => {
+                    root.classList.add("hidden");
+                    showLevelMap();
+                });
+                actions.appendChild(mapToggle);
             }
 
             const close = document.createElement("button");
             close.id = "settings-close";
-            close.className = "level-btn level-btn--secondary";
+            close.className = "level-btn";
             close.type = "button";
             close.textContent = locale === "en-US" ? "Close" : "關閉";
             close.addEventListener("click", () => root.classList.add("hidden"));
-            root.appendChild(close);
+            actions.appendChild(close);
         }
     });
 
-    // 視窗改變時切換橫向提示
+    // 裝置方向：直向已支援單欄遊玩（responsive.css portrait 規則），
+    // 因此**不再**鎖死畫面要求轉橫；此處僅確保方向遮罩保持關閉。
     const orient = $("orientation-overlay");
     const checkOrientation = () => {
-        const portrait = window.innerHeight > window.innerWidth && window.innerWidth < 500;
-        orient?.classList.toggle("hidden", !portrait || !$("start-overlay").classList.contains("hidden"));
+        orient?.classList.add("hidden");
     };
     window.addEventListener("resize", checkOrientation);
     checkOrientation();

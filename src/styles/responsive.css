@@ -36,6 +36,15 @@
     #toast-layer {
         bottom: calc(env(safe-area-inset-bottom) + 140px);
     }
+
+    /* 直向時工具列為橫向列置中，底部保留安全空間避免遮住答案鈕 */
+    #controls-view {
+        padding-bottom: calc(env(safe-area-inset-bottom) + var(--s-10));
+    }
+
+    .app-footer {
+        position: static;
+    }
 }
 
 /* ---------- 橫向且高度受限：緊湊模式 ---------- */
@@ -63,6 +72,37 @@
 
     .overlay h1 {
         font-size: var(--fs-xl);
+    }
+
+    /*
+     * 橫向（812×375）時，右下角的 #toolbar 為直向工具列，
+     * 會壓住 #controls-view 內最後一排答案鈕 —— 故預留右側安全內距。
+     */
+    #controls-view {
+        padding-right: max(88px, calc(var(--touch-min) + var(--s-6)));
+        padding-bottom: calc(env(safe-area-inset-bottom) + var(--s-2));
+    }
+
+    #toolbar {
+        gap: var(--s-1);
+    }
+
+    .tool-btn {
+        width: max(48px, var(--touch-min));
+        height: max(48px, var(--touch-min));
+    }
+}
+
+/* ---------- 直向細長（375×812 等）：單欄且不產生橫向捲軸 ---------- */
+@media (orientation: portrait) and (max-width: 480px) {
+    #controls-view {
+        padding-right: 0;
+        padding-left: 0;
+    }
+
+    .controls-grid {
+        padding: var(--s-2);
+        gap: var(--touch-gap);
     }
 }
 
