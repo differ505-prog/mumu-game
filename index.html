@@ -3,10 +3,35 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#0a1a3c">
     <meta name="description" content="幼兒聽覺辨識與認知訓練遊戲：六個認知動詞、24 隻恐龍圖鑑與六章故事。">
-    <title>聖誕小幫手 | Santa's Little Helper</title>
+    <meta name="referrer" content="no-referrer">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'">
+    <title>木木遊戲：聖誕小幫手 | Santa's Little Helper</title>
+
+    <!-- Open Graph（Step 168）-->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="木木遊戲">
+    <meta property="og:locale" content="zh_TW">
+    <meta property="og:locale:alternate" content="en_US">
+    <meta property="og:title" content="木木遊戲：聖誕小幫手 | 幼兒語音覺辨與認知訓練">
+    <meta property="og:description" content="六種認知玩法、24 隻恐龍圖鑑，陪伴 3–6 歲幼兒練習語音覺辨、序列記憶與節奏模仿的家長友善學習遊戲。">
+    <meta property="og:image" content="./icon-512.png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:image:alt" content="聖誕小幫手遊戲主視覺">
+    <meta property="og:url" content="./index.html">
+
+    <!-- Twitter Card（Step 168）-->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="木木遊戲：聖誕小幫手 | 幼兒語音覺辨與認知訓練">
+    <meta name="twitter:description" content="六種認知玩法、24 隻恐龍圖鑑，陪伴 3–6 歲幼兒練習語音覺辨、序列記憶與節奏模仿。">
+    <meta name="twitter:image" content="./icon-512.png">
+    <meta name="twitter:image:alt" content="聖誕小幫手遊戲主視覺">
+
+    <!-- Canonical（Step 168）-->
+    <link rel="canonical" href="./index.html">
 
     <link rel="manifest" href="./manifest.json">
     <link rel="icon" href="./icon-192.png" type="image/png">
@@ -37,6 +62,12 @@
         <div class="hud__score"></div>
         <div class="hud__medals"></div>
     </header>
+
+    <!-- PWA 安裝引導（Step 167） -->
+    <div id="pwa-install-root" class="overlay hidden"></div>
+
+    <!-- 首次啟動同意閘（Step 133）：未取得法定代理人家長同意前不得進入遊戲 -->
+    <div id="consent-gate-root" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="consent-gate-title"></div>
 
     <!-- 教學遮罩 -->
     <div id="orientation-overlay" class="overlay hidden">
@@ -120,7 +151,7 @@
                 <path d="M12 3l2.5 5.5L20 9.5l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-1z" />
             </svg>
         </div>
-        <h1 id="level-up-text">Level Up!</h1>
+        <h1 id="level-up-text">過關了！</h1>
     </div>
 
     <!-- 音訊（來源由 Step 27 的 music.json 動態指定） -->
@@ -181,6 +212,23 @@
             <img src="./assets/icons/settings.svg" alt="" width="24" height="24" />
         </button>
     </nav>
+
+    <!-- 頁尾：隱私權／服務條款／版本號／聯絡信箱（Step 168）-->
+    <footer id="app-footer" class="app-footer" aria-label="關於與法律資訊">
+        <nav class="app-footer__links" aria-label="法律與支援">
+            <a class="app-footer__link" id="footer-privacy" href="./content/privacy.zh-TW.md"
+               data-locale-doc="privacy" rel="noopener">隱私權政策</a>
+            <a class="app-footer__link" id="footer-terms" href="./content/terms.zh-TW.md"
+               data-locale-doc="terms" rel="noopener">服務條款</a>
+            <a class="app-footer__link" id="footer-support" href="mailto:support@mumu-game.app"
+               rel="noopener">聯絡我們</a>
+        </nav>
+        <p class="app-footer__meta">
+            <span id="footer-version">版本 3.0.0</span>
+            <span class="app-footer__sep" aria-hidden="true">·</span>
+            <span>資料僅儲存於本機裝置</span>
+        </p>
+    </footer>
 
     <!-- 提示訊息層 -->
     <div id="toast-layer" aria-live="polite" aria-atomic="true"></div>

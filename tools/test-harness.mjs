@@ -534,11 +534,81 @@ function installStubs(w, nowSeconds, onError) {
  * 建立 fetch stub：攔截 `./content/*.json`，直接讀本機磁碟檔案。
  * @param {string} root 專案根目錄
  */
+/**
+ * 離線模式旗標（由 setOffline 切換）。
+ * @type {boolean}
+ */
+let offlineMode = false;
+
+/**
+ * 已快取檔案集合（模擬 SW 快取命中）。
+ * @type {Set<string>}
+ */
+let cachedManifest = new Set();
+
+/**
+ * 模擬離線環境 — 讓 fetch 對所有 ./content/*.json 拋出網路錯誤，
+ * 模擬 Service Worker 快取命中前的第一次載入失敗情境。
+ *
+ * @param {any} env
+ * @param {boolean} boolean
+ */
+export function setOffline(env, boolean) {
+    void env;
+    offlineMode = Boolean(boolean);
+}
+
+/**
+ * 是否處於離線模式。
+ * @returns {boolean}
+ */
+export function isOffline() {
+    return offlineMode;
+}
+
+/**
+ * 讀取 service-worker.js 的 PRECACHE 清單。
+ * @returns {string[]}
+ */
+export function precacheManifest() {
+    const sw = fs.readFileSync(path.join(ROOT, "service-worker.js"), "utf8");
+    const match = /PRECACHE\s*=\s*\[([\s\S]*?)\];/.exec(sw);
+    if (!match) return [];
+    return match[1]
+        .split("\n")
+        .map((l) => l.trim())
+        .filter((l) => l.startsWith('"'))
+        .map((l) => l.replace(/^"|",?$/g, ""));
+}
+
+/**
+ * 模擬 Service Worker 已快取 PRECACHE 清單中的檔案。
+ *
+ * 開啟離線模式時，若該路徑在預快取清單內則由磁碟回應
+ * （等同於 SW 快取命中），否則拋出網路錯誤。
+ *
+ * @param {any} env
+ */
+export function simulatePrecached(env) {
+    void env;
+    cachedManifest = new Set(precacheManifest());
+}
+
 function createFetchStub(root) {
     return async function fetchStub(input) {
         const raw = String(input || "");
         const rel = raw.replace(/^\.\//, "").split("?")[0];
         const file = path.join(root, rel);
+
+        // 離線模式：./content/*.json 若在預快取清單內則視為 SW 快取命中，
+        // 否則拋出網路錯誤（模擬 SW 快取命中前的第一次載入失敗情境）
+        if (offlineMode && rel.startsWith("content/")) {
+            const cached = cachedManifest.has(`./${rel}`);
+            if (!cached) {
+                throw new Error(`[fetch-stub] 離線模式：無法載入 ${raw}`);
+            }
+        }
+
         if (rel.startsWith("content/") && fs.existsSync(file)) {
             const text = fs.readFileSync(file, "utf8");
             return {
@@ -597,11 +667,14 @@ function seedProgress(unlocked) {
 /**
  * 建立一個 jsdom 遊戲環境（尚未啟動）。
  *
- * @param {{ locale?: string, unlockAllLevels?: boolean }} [options]
+ * @param {{ locale?: string, unlockAllLevels?: boolean, consented?: boolean }} [options]
  */
 export function createGameEnv(options = {}) {
     const locale = options.locale || "zh-TW";
     const unlockAllLevels = options.unlockAllLevels !== false;
+    // consented 預設 true：既有流程測試不需要每次都走同意閘；
+    // 同意流程本身的測試請傳 consented: false 以驗證「未同意即阻擋」。
+    const consented = options.consented !== false;
 
     const html = fs.readFileSync(INDEX_HTML, "utf8");
 
@@ -702,6 +775,15 @@ export function createGameEnv(options = {}) {
     try {
         w.localStorage.clear();
         w.localStorage.setItem("mumu.locale", locale);
+        if (consented) {
+            // 已取得法定代理人家長同意（同意流程測試除外）
+            w.localStorage.setItem("mumu.consent", JSON.stringify({
+                analytics: false,
+                personalization: false,
+                marketing: false,
+                updatedAt: "2026-01-01T00:00:00.000Z"
+            }));
+        }
         if (unlockAllLevels) {
             w.localStorage.setItem(SAVE_KEY, JSON.stringify(seedProgress(ALL_LEVELS)));
         }
@@ -958,6 +1040,44 @@ export async function closePrologue(env) {
 }
 
 /**
+ * 同意閘是否開啟中。
+ * @param {any} env
+ * @returns {boolean}
+ */
+export function isConsentGateOpen(env) {
+    const root = env.document.getElementById("consent-gate-root");
+    return Boolean(root) && !root.classList.contains("hidden");
+}
+
+/**
+ * 勾選同意閘的指定項目（不勾選 = 拒絕該項用途）。
+ * @param {any} env
+ * @param {string} key
+ * @param {boolean} checked
+ */
+export async function setConsentCheckbox(env, key, checked) {
+    const input = env.document.querySelector(`#consent-gate-root [data-consent-key="${key}"]`);
+    if (!input) return false;
+    input.checked = checked;
+    input.dispatchEvent(new env.window.Event("change", { bubbles: true }));
+    await flush(6);
+    return true;
+}
+
+/**
+ * 送出同意閘（點擊「繼續」）。
+ * @param {any} env
+ * @returns {Promise<boolean>}
+ */
+export async function submitConsent(env) {
+    const btn = env.document.querySelector("#consent-gate-root #consent-agree");
+    if (!btn) return false;
+    clickElement(env, btn);
+    await flush(20);
+    return true;
+}
+
+/**
  * 關閉章節過場（若正在顯示）。返回是否確實有過場被關掉。
  *
  * @param {any} env
@@ -1082,11 +1202,23 @@ export async function openLevelMap(env) {
  * @param {number} id
  */
 export async function startLevel(env, id) {
-    const btn = env.document.querySelector(`#levelmap-root [data-level="${id}"]`);
-    if (!btn) return false;
-    clickElement(env, btn);
-    await flush(20);
-    return true;
+    const map = env.document.getElementById("levelmap-root");
+    if (!map) return false;
+
+    // Step 149：地圖已分頁（單頁 <= 24 關）→ 逐頁翻找目標關卡
+    for (let guard = 0; guard < 12; guard++) {
+        const btn = map.querySelector(`[data-level="${id}"]`);
+        if (btn) {
+            clickElement(env, btn);
+            await flush(20);
+            return true;
+        }
+        const next = map.querySelector("#levelmap-page-next");
+        if (!next || next.disabled) break;
+        clickElement(env, next);
+        await flush(10);
+    }
+    return false;
 }
 
 /**

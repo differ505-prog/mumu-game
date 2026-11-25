@@ -29,3 +29,37 @@ export function isSupportedWeather(weather) {
 export function weatherKind(weather) {
     return WEATHER_KIND[weather] || "none";
 }
+
+/**
+ * 離線提示（Step 129／130）。
+ *
+ * SW 註冊失敗或瀏覽器離線時，必須以**可理解的 UI** 告知使用者，
+ * 不得讓畫面停在空白或只印一行文字。
+ *
+ * @param {HTMLElement} root
+ * @param {string} locale
+ */
+export function showOfflineNotice(root, locale) {
+    if (!root) return;
+    const en = locale === "en-US";
+    const existing = root.querySelector("[data-offline-notice]");
+    if (existing) return;
+
+    const notice = document.createElement("div");
+    notice.className = "offline-notice";
+    notice.setAttribute("data-offline-notice", "1");
+    notice.setAttribute("role", "status");
+    notice.setAttribute("aria-live", "polite");
+    notice.textContent = en
+        ? "You are offline. The game still works with saved content."
+        : "目前處於離線狀態，已載入的內容仍可繼續遊玩。";
+    root.appendChild(notice);
+}
+
+/**
+ * 隱藏離線提示。
+ * @param {HTMLElement} root
+ */
+export function hideOfflineNotice(root) {
+    root?.querySelector("[data-offline-notice]")?.remove();
+}

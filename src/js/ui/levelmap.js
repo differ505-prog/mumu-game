@@ -9,6 +9,24 @@ import { dailyChallenge, isDailyDone } from "../core/daily.js";
 import { todayString } from "../core/progress.js";
 
 /**
+ * 單次渲染的最大關卡節點數（Step 149：分頁懶載入）。
+ * @type {number}
+ */
+export const LEVELMAP_PAGE_SIZE = 24;
+
+/**
+ * 地圖分頁狀態。
+ * @type {WeakMap<HTMLElement, number>}
+ */
+const mapPages = new WeakMap();
+
+/**
+ * 目前地圖的選關回呼（分頁重繪後仍須有效）。
+ * @type {((levelId:number)=>void)|null}
+ */
+let mapSelect = null;
+
+/**
  * 渲染關卡地圖。
  * @param {HTMLElement} root
  * @param {any} bundle
@@ -19,9 +37,35 @@ export function renderLevelMap(root, bundle, progress, locale) {
     const levels = bundle?.levels || [];
     const en = locale === "en-US";
 
+    // 分頁（單次渲染 <= 24 節點）
+    // 依章節分頁：同一頁可跨章節，但每個「目前頁」內的節點總數 <= 24
+    const totalPages = Math.max(1, Math.ceil(levels.length / LEVELMAP_PAGE_SIZE));
+    const page = Math.min(mapPages.get(root) || 0, totalPages - 1);
+    mapPages.set(root, page);
+
     /** @type {Map<number, any[]>} */
     const byChapter = new Map();
-    for (const l of levels) {
+    for (const l of levels.slice(page * LEVELMAP_PAGE_SIZE, (page + 1) * LEVELMAP_PAGE_SIZE)) {
+        const list = byChapter.get(l.chapter) || [];
+        list.push(l);
+        byChapter.set(l.chapter, list);
+    }
+
+    // 每章的第一關必須永遠可見（章節過場與搭檔由第一章第一關觸發）——
+    // 將各章首關補進當頁，節點上限仍以 LEVELMAP_PAGE_SIZE 為準。
+    /** @type {Set<number>} */
+    const pageIds = new Set();
+    for (const list of byChapter.values()) {
+        for (const l of list) pageIds.add(l.id);
+    }
+    const firstOfEachChapter = levels.filter((/** @type {any} */ l) => {
+        const list = levels.filter((/** @type {any} */ x) => x.chapter === l.chapter);
+        return list.length && list[0].id === l.id;
+    });
+    for (const l of firstOfEachChapter) {
+        if (pageIds.has(l.id)) continue;
+        if (pageIds.size >= LEVELMAP_PAGE_SIZE) break;
+        pageIds.add(l.id);
         const list = byChapter.get(l.chapter) || [];
         list.push(l);
         byChapter.set(l.chapter, list);
@@ -69,7 +113,7 @@ export function renderLevelMap(root, bundle, progress, locale) {
                                             aria-label="${l.name?.[locale] || l.name?.["zh-TW"] || l.id}">
                                         <span class="levelmap__node-no">${l.id}</span>
                                         <span class="levelmap__node-stars" aria-label="${stars}/3">
-                                            ${[1, 2, 3].map((n) => `<img class="levelmap__star ${n <= stars ? "is-on" : ""}" src="./assets/icons/star${n <= stars ? "-filled" : ""}.svg" alt="" width="18" height="18" />`).join("")}
+                                            ${[1, 2, 3].map((n) => `<img class="levelmap__star ${n <= stars ? "is-on" : ""}" src="./assets/icons/star${n <= stars ? "-filled" : ""}.svg" alt="" loading="lazy" decoding="async" width="18" height="18" />`).join("")}
                                         </span>
                                     </button>
                                 `;
@@ -81,14 +125,69 @@ export function renderLevelMap(root, bundle, progress, locale) {
         </div>
     `;
 
+    // 分頁控制
+    if (totalPages > 1) {
+        const nav = document.createElement("div");
+        nav.className = "levelmap__pager";
+        nav.setAttribute("role", "group");
+        nav.setAttribute("aria-label", en ? "Level pages" : "關卡分頁");
+
+        const prev = document.createElement("button");
+        prev.className = "level-btn level-btn--secondary levelmap__pager-btn";
+        prev.type = "button";
+        prev.id = "levelmap-page-prev";
+        prev.textContent = en ? "Previous" : "上一頁";
+        prev.disabled = page <= 0;
+        prev.addEventListener("click", () => {
+            mapPages.set(root, Math.max(0, page - 1));
+            renderLevelMap(root, bundle, progress, locale);
+        });
+
+        const next = document.createElement("button");
+        next.className = "level-btn level-btn--secondary levelmap__pager-btn";
+        next.type = "button";
+        next.id = "levelmap-page-next";
+        next.textContent = en ? "Next" : "下一頁";
+        next.disabled = page >= totalPages - 1;
+        next.addEventListener("click", () => {
+            mapPages.set(root, Math.min(totalPages - 1, page + 1));
+            renderLevelMap(root, bundle, progress, locale);
+        });
+
+        const status = document.createElement("span");
+        status.className = "levelmap__pager-status";
+        status.setAttribute("aria-live", "polite");
+        status.textContent = `${page + 1} / ${totalPages}`;
+
+        nav.appendChild(prev);
+        nav.appendChild(status);
+        nav.appendChild(next);
+        root.querySelector(".levelmap")?.appendChild(nav);
+    }
+
     /**
      * 綁定互動。
+     *
+     * 分頁後每次重繪都會產生新的按鈕節點，因此互動一律以**事件委派**
+     * 掛在 root 上（而非逐一 addEventListener），確保翻頁後仍可操作。
+     *
      * @param {(levelId:number)=>void} cb
      */
     function onSelect(cb) {
-        root.querySelectorAll("[data-level]").forEach((btn) => {
-            btn.addEventListener("click", () => {
-                const id = Number(/** @type {HTMLElement} */ (btn).dataset.level);
+        if (root.dataset.levelmapBound === "1") {
+            mapSelect = cb;
+            return;
+        }
+        root.dataset.levelmapBound = "1";
+        mapSelect = cb;
+
+        root.addEventListener("click", (/** @type {MouseEvent} */ e) => {
+            const target = /** @type {HTMLElement} */ (e.target);
+            if (!target) return;
+
+            const node = target.closest("[data-level]");
+            if (node) {
+                const id = Number(/** @type {HTMLElement} */ (node).dataset.level);
                 const level = levels.find((/** @type {any} */ l) => l.id === id);
                 if (!level) return;
 
@@ -102,20 +201,23 @@ export function renderLevelMap(root, bundle, progress, locale) {
                     }
                     return;
                 }
-                cb(id);
-            });
-        });
+                mapSelect?.(id);
+                return;
+            }
 
-        root.querySelector("[data-dex]")?.addEventListener("click", () => {
-            root.dispatchEvent(new CustomEvent("dex:request", { bubbles: true }));
-        });
+            if (target.closest("[data-dex]")) {
+                root.dispatchEvent(new CustomEvent("dex:request", { bubbles: true }));
+                return;
+            }
 
-        root.querySelector("[data-parent]")?.addEventListener("click", () => {
-            root.dispatchEvent(new CustomEvent("parent:request", { bubbles: true }));
-        });
+            if (target.closest("[data-parent]")) {
+                root.dispatchEvent(new CustomEvent("parent:request", { bubbles: true }));
+                return;
+            }
 
-        root.querySelector("[data-daily]")?.addEventListener("click", () => {
-            if (daily.level) cb(daily.level.id);
+            if (target.closest("[data-daily]")) {
+                if (daily.level) mapSelect?.(daily.level.id);
+            }
         });
     }
 

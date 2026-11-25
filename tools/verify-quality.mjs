@@ -562,6 +562,278 @@ function checkIntegrationSceneSwitch() {
 }
 
 /**
+ * SW 預快取清單必須與磁碟實際檔案完全一致（Step 129）。
+ *
+ * - PRECACHE 中**每個**路徑都必須實際存在於磁碟
+ * - content/ 下**每個** .json 都必須被預快取
+ */
+function checkSwPrecacheValid() {
+    const sw = readSrc("service-worker.js");
+    if (!sw) return { ok: false, msg: "無法讀取 service-worker.js" };
+
+    const m = sw.match(/PRECACHE\s*=\s*\[([\s\S]*?)\];/);
+    if (!m) return { ok: false, msg: "service-worker.js 找不到 PRECACHE 清單" };
+
+    const list = m[1]
+        .split("\n")
+        .map((l) => l.trim())
+        .filter((l) => l.startsWith('"'))
+        .map((l) => l.replace(/^"|",?$/g, ""));
+
+    if (!list.length) return { ok: false, msg: "PRECACHE 清單為空" };
+
+    // 每條路徑都必須存在於磁碟
+    const missing = list.filter((p) => {
+        if (p === "./") return false;
+        return !existsSync(join(root, p.replace(/^\.\//, "")));
+    });
+    if (missing.length) {
+        return { ok: false, msg: `預快取指向不存在檔案：${missing.slice(0, 5).join(", ")}${missing.length > 5 ? ` 等 ${missing.length} 個` : ""}` };
+    }
+
+    // content/ 下每個 .json 都必須被預快取
+    const contentFiles = readdirSync(join(root, "content"))
+        .filter((f) => f.endsWith(".json"))
+        .map((f) => `./content/${f}`);
+    const notCached = contentFiles.filter((f) => !list.includes(f));
+    if (notCached.length) {
+        return { ok: false, msg: `未預快取的 content 檔：${notCached.join(", ")}` };
+    }
+
+    // 不得重複
+    const dup = list.filter((p, i) => list.indexOf(p) !== i);
+    if (dup.length) {
+        return { ok: false, msg: `PRECACHE 有重複項目：${[...new Set(dup)].slice(0, 5).join(", ")}` };
+    }
+
+    // CACHE_NAME 必須是遞增版本（mumu-v3 → mumu-v4）
+    const cacheName = /CACHE_NAME\s*=\s*["']([^"']+)["']/.exec(sw);
+    if (!cacheName) return { ok: false, msg: "service-worker.js 缺少 CACHE_NAME" };
+
+    return { ok: true, msg: `預快取清單與磁碟一致，共 ${list.length} 項（${cacheName[1]}）` };
+}
+
+/**
+ * SW 註冊失敗不得阻塞 boot()（Step 129／130）。
+ */function checkSwGracefulDegrade() {
+    const main = readSrc("src/js/main.js");
+    if (!main) return { ok: false, msg: "無法讀取 main.js" };
+
+    if (!/registerServiceWorker/.test(main)) {
+        return { ok: false, msg: "main.js 未註冊 Service Worker（離線冷啟動會失敗）" };
+    }
+    // 註冊失敗必須被 catch（不得拋錯中斷 boot）
+    const fn = main.match(/function registerServiceWorker[\s\S]*?\n\}/);
+    if (!fn) return { ok: false, msg: "main.js 找不到 registerServiceWorker 函式" };
+    if (!/\.catch\s*\(/.test(fn[0])) {
+        return { ok: false, msg: "registerServiceWorker 未處理註冊失敗（會阻塞 boot）" };
+    }
+    // 離線提示必須是 UI 呈現
+    const weather = readSrc("src/js/ui/weather.js");
+    if (!weather || !/showOfflineNotice/.test(weather)) {
+        return { ok: false, msg: "weather.js 缺少 showOfflineNotice（離線無提示）" };
+    }
+    return { ok: true, msg: "SW 註冊失敗不阻塞 boot()，離線提示已接線" };
+}
+
+/**
+ * 遙測外送管線（Step 143）。
+ *
+ * - telemetry.js 不得是空實作（`void 0;`）
+ * - 必須含 sendBeacon／flush／fetch
+ * - 必須含指數退避與失敗上限
+ * - 事件字典必須補齊關鍵事件
+ */
+function checkTelemetryPipeline() {
+    const t = readSrc("src/js/core/telemetry.js");
+    if (!t) return { ok: false, msg: "無法讀取 telemetry.js" };
+
+    if (/void 0;/.test(t)) {
+        return { ok: false, msg: "telemetry.js 仍是空實作（事件永遠離不開瀏覽器）" };
+    }
+    for (const k of ["sendBeacon", "flush", "fetch"]) {
+        if (!t.includes(k)) {
+            return { ok: false, msg: `telemetry.js 缺少：${k}` };
+        }
+    }
+    // 指數退避
+    if (!/Math\.pow\(2/.test(t)) {
+        return { ok: false, msg: "telemetry.js 缺指數退避（Math.pow(2, n)）" };
+    }
+    // 失敗上限（不得無限重試）
+    if (!/maxRetries/.test(t)) {
+        return { ok: false, msg: "telemetry.js 缺失敗上限（可能無限重試）" };
+    }
+    // 不得使用 setInterval 輪詢
+    if (/setInterval\s*\(/.test(t)) {
+        return { ok: false, msg: "telemetry.js 使用 setInterval 輪詢（應改用 visibilitychange + flush）" };
+    }
+    // 事件字典
+    const dict = readJson("content/telemetry.json");
+    if (!dict) return { ok: false, msg: "無法讀取 content/telemetry.json" };
+    const names = Object.keys(dict.events || dict);
+    const need = ["first_interaction", "level_fail", "purchase_success", "vitals", "crash", "session_end"];
+    const missing = need.filter((k) => !names.includes(k));
+    if (missing.length) {
+        return { ok: false, msg: `遙測事件缺少：${missing.join(", ")}` };
+    }
+    // 每個事件需有 description 與 params
+    const events = dict.events || {};
+    const noDesc = Object.keys(events).filter((k) => !events[k]?.description);
+    if (noDesc.length) {
+        return { ok: false, msg: `遙測事件缺 description：${noDesc.slice(0, 5).join(", ")}` };
+    }
+    return { ok: true, msg: `遙測外送與事件字典齊備，事件數 ${names.length}` };
+}
+
+/**
+ * 遙測不得外送可識別資訊（Step 143）。
+ *
+ * 阻擋清單必須涵蓋 email／name／ip／deviceId／token／secret。
+ */
+function checkTelemetryNoPii() {
+    const t = readSrc("src/js/core/telemetry.js");
+    if (!t) return { ok: false, msg: "無法讀取 telemetry.js" };
+
+    const blockedMatch = /blocked\s*=\s*\[([^\]]*)\]/.exec(t);
+    if (!blockedMatch) return { ok: false, msg: "telemetry.js 找不到阻擋清單（blocked）" };
+
+    const blocked = blockedMatch[1].split(",").map((s) => s.trim().replace(/^["']|["']$/g, ""));
+    const need = ["email", "name", "ip", "deviceId", "token", "secret"];
+    const missing = need.filter((k) => !blocked.includes(k));
+    if (missing.length) {
+        return { ok: false, msg: `PII 阻擋清單缺少：${missing.join(", ")}` };
+    }
+
+    // 未取得同意不得外送
+    if (!/getConsent\(\)\.analytics/.test(t) && !/consent\.analytics/.test(t)) {
+        return { ok: false, msg: "telemetry.js 未檢查同意狀態（可能在未同意時外送）" };
+    }
+    return { ok: true, msg: `PII 阻擋清單齊備（${blocked.length} 項）` };
+}
+
+/**
+ * CSP 安全標頭（Step 153）。
+ *
+ * index.html 必須含 Content-Security-Policy meta，且：
+ *   - script-src 不得含 'unsafe-inline' 或 'unsafe-eval'
+ *   - object-src 必須為 'none'
+ *   - base-uri 必須為 'none'
+ */
+function checkCspBaseline() {
+    const index = readSrc("index.html");
+    if (!index) return { ok: false, msg: "無法讀取 index.html" };
+
+    const m = /http-equiv=["']Content-Security-Policy["'][^>]*content=(["'])([\s\S]*?)\1/i.exec(index);
+    if (!m) return { ok: false, msg: "index.html 缺少 Content-Security-Policy meta" };
+
+    const csp = m[2];
+
+    const scriptSrc = /script-src\s+([^;]+)/i.exec(csp);
+    if (!scriptSrc) return { ok: false, msg: "CSP 缺少 script-src" };
+    if (/unsafe-inline|unsafe-eval/.test(scriptSrc[1])) {
+        return { ok: false, msg: `CSP script-src 含 unsafe 指令：${scriptSrc[1].trim()}` };
+    }
+
+    const objectSrc = /object-src\s+([^;]+)/i.exec(csp);
+    if (!objectSrc || !/none/.test(objectSrc[1])) {
+        return { ok: false, msg: "CSP object-src 必須為 'none'" };
+    }
+
+    const baseUri = /base-uri\s+([^;]+)/i.exec(csp);
+    if (!baseUri || !/none/.test(baseUri[1])) {
+        return { ok: false, msg: "CSP base-uri 必須為 'none'" };
+    }
+
+    if (!/default-src\s+/.test(csp)) {
+        return { ok: false, msg: "CSP 缺少 default-src" };
+    }
+
+    return { ok: true, msg: `CSP 基線齊備（script-src ${scriptSrc[1].trim()}，object-src/base-uri none）` };
+}
+
+/**
+ * 輸入驗證與 XSS 防護（Step 153）。
+ *
+ * - sanitize-html.js 必須提供 escapeHtml 與 safeText
+ * - input-validate.js 必須提供 URL 白名單與推薦碼驗證
+ * - 已硬化檔案不得再直接注入內容型資料
+ */
+function checkXssHardened() {
+    const sanitize = readSrc("src/js/core/sanitize-html.js");
+    if (!sanitize) return { ok: false, msg: "缺少 src/js/core/sanitize-html.js" };
+    if (!/export function escapeHtml/.test(sanitize)) {
+        return { ok: false, msg: "sanitize-html.js 缺少 escapeHtml" };
+    }
+    if (!/export function safeText/.test(sanitize)) {
+        return { ok: false, msg: "sanitize-html.js 缺少 safeText" };
+    }
+
+    const validate = readSrc("src/js/core/input-validate.js");
+    if (!validate) return { ok: false, msg: "缺少 src/js/core/input-validate.js" };
+    for (const fn of ["safeUrl", "safeReferralCode", "safeString", "safeQueryParam"]) {
+        if (!validate.includes(`export function ${fn}`)) {
+            return { ok: false, msg: `input-validate.js 缺少 ${fn}` };
+        }
+    }
+    // URL 白名單：僅允許 https: 與相對路徑
+    if (!/protocol\s*===\s*"https:"/.test(validate)) {
+        return { ok: false, msg: "input-validate.js 的 URL 驗證未限制為 https:" };
+    }
+
+    // 已硬化檔案必須確實使用 escapeHtml
+    for (const f of ["src/js/ui/story.js", "src/js/ui/dex.js"]) {
+        const src = readSrc(f);
+        if (!src) return { ok: false, msg: `無法讀取 ${f}` };
+        if (!/escapeHtml/.test(src)) {
+            return { ok: false, msg: `${f} 未使用 escapeHtml（XSS 未硬化）` };
+        }
+    }
+
+    return { ok: true, msg: "XSS 防護齊備：escapeHtml／safeText／URL 白名單／推薦碼驗證" };
+}
+
+/**
+ * Web Vitals 量測（Step 131）。
+ *
+ * - vitals.js 必須存在且無 API 時降級為 null（不得拋錯）
+ * - 必須量測 LCP／CLS／INP
+ * - 必須有 trackFirstInteraction()
+ */
+function checkWebVitals() {
+    const v = readSrc("src/js/core/vitals.js");
+    if (!v) return { ok: false, msg: "缺少 src/js/core/vitals.js" };
+
+    for (const k of ["largest-contentful-paint", "layout-shift", "event"]) {
+        if (!v.includes(k)) {
+            return { ok: false, msg: `vitals.js 未量測：${k}` };
+        }
+    }
+    if (!/export function trackFirstInteraction/.test(v)) {
+        return { ok: false, msg: "vitals.js 缺少 trackFirstInteraction()" };
+    }
+    // 無 API 時降級為 null
+    if (!/PerformanceObserver\s*===\s*"undefined"/.test(v)) {
+        return { ok: false, msg: "vitals.js 未處理 PerformanceObserver 缺席（會拋錯）" };
+    }
+    if (!/getVitals/.test(v)) {
+        return { ok: false, msg: "vitals.js 缺少 getVitals()（無法降級為 null）" };
+    }
+    // 不得使用 setInterval 輪詢
+    if (/setInterval\s*\(/.test(v)) {
+        return { ok: false, msg: "vitals.js 使用 setInterval 輪詢（應以事件驅動）" };
+    }
+
+    // main.js 必須接上
+    const main = readSrc("src/js/main.js");
+    if (!/initVitals/.test(main)) {
+        return { ok: false, msg: "main.js 未呼叫 initVitals()（Web Vitals 未啟用）" };
+    }
+
+    return { ok: true, msg: "Web Vitals 量測齊備（LCP／CLS／INP + 第一次互動），無 API 時降級 null" };
+}
+
+/**
  * 5. 程序化場景音樂：每個場景必須有獨立定義，且 (root, tempo) 互不相同。
  */
 function checkMusicSceneDistinct() {
@@ -1105,6 +1377,173 @@ function checkChildSingleLayer() {
 }
 
 /* ------------------------------------------------------------------ *
+ * Round 1 上市紅線（L1–L4）
+ * ------------------------------------------------------------------ */
+
+/**
+ * L1：付費牆不得假成交、不得殘留「敬請期待」、不得不實承諾。
+ */
+function checkPaywallHonest() {
+    const paywall = readSrc("src/js/ui/paywall.js");
+    if (!paywall) return { ok: false, msg: "無法讀取 paywall.js" };
+
+    const cleaned = stripComments(paywall);
+
+    // 不得殘留「敬請期待」
+    if (/敬請期待|coming soon/i.test(cleaned)) {
+        return { ok: false, msg: "paywall.js 仍殘留「敬請期待」假成交文案" };
+    }
+
+    // 不得不實承諾跨裝置同步
+    if (/跨裝置同步|cross-device sync/i.test(cleaned)) {
+        return { ok: false, msg: "paywall.js 含不實「跨裝置同步」承諾" };
+    }
+
+    // 必須使用 escapeHtml
+    if (!/escapeHtml\s*\(/.test(cleaned)) {
+        return { ok: false, msg: "paywall.js 未使用 escapeHtml（內容型插值未跳脫）" };
+    }
+
+    // 必須有 in-flight lock（防連點）
+    if (!/disabled\s*=\s*true/.test(cleaned)) {
+        return { ok: false, msg: "paywall.js 缺 in-flight lock（防連點）" };
+    }
+
+    // 必須有 Esc 關閉與 Focus Trap
+    if (!/Escape/.test(cleaned)) return { ok: false, msg: "paywall.js 缺 Esc 關閉" };
+    if (!/trapFocus/.test(cleaned)) return { ok: false, msg: "paywall.js 缺 Focus Trap" };
+
+    // 必須有明確回饋與「我知道了」按鈕
+    if (!/我知道了|Got it/.test(cleaned)) {
+        return { ok: false, msg: "paywall.js 缺明確回饋與確認按鈕" };
+    }
+
+    // main.js 的付費牆文案不得含不實承諾
+    const main = readSrc("src/js/main.js");
+    if (main && /跨裝置同步/.test(stripComments(main))) {
+        return { ok: false, msg: "main.js 付費牆文案仍含不實「跨裝置同步」" };
+    }
+
+    return { ok: true, msg: "付費牆已移除假成交與不實承諾，含 escapeHtml／防連點／Esc／Focus Trap" };
+}
+
+/**
+ * L2：boot() 載入失敗必須顯示可見的錯誤恢復面板（含重試鈕）。
+ */
+function checkBootErrorRecovery() {
+    const main = readSrc("src/js/main.js");
+    if (!main) return { ok: false, msg: "無法讀取 main.js" };
+
+    const cleaned = stripComments(main);
+
+    if (!/showBootError/.test(cleaned)) {
+        return { ok: false, msg: "main.js 缺 boot() 失敗的錯誤恢復面板" };
+    }
+
+    // 必須隱藏 start-overlay（否則面板被遮蔽 → 白屏）
+    const fn = cleaned.match(/function showBootError[\s\S]*?\n\}/);
+    if (!fn) return { ok: false, msg: "main.js 找不到 showBootError 函式" };
+    if (!/start-overlay/.test(fn[0])) {
+        return { ok: false, msg: "showBootError 未隱藏 #start-overlay（面板會被遮蔽）" };
+    }
+    if (!/role["']?,\s*["']alert["']/.test(fn[0]) && !/setAttribute\(\s*["']role["']\s*,\s*["']alert["']/.test(fn[0])) {
+        return { ok: false, msg: "showBootError 未設定 role=\"alert\"" };
+    }
+
+    // 必須有重試鈕與 in-flight lock
+    if (!/boot-retry-btn/.test(fn[0])) return { ok: false, msg: "showBootError 缺重試按鈕" };
+    if (!/disabled\s*=\s*true/.test(fn[0])) {
+        return { ok: false, msg: "showBootError 缺 in-flight lock（防連點）" };
+    }
+
+    // 必須有離線／網路提示
+    if (!/網路|connection|offline|連線/i.test(fn[0])) {
+        return { ok: false, msg: "showBootError 缺離線／網路檢查提示" };
+    }
+
+    return { ok: true, msg: "boot() 失敗已有可見錯誤恢復面板（role=alert／重試鈕／防連點／離線提示）" };
+}
+
+/**
+ * L3：頁尾條款必須在應用內開啟可捲動面板（含載入失敗重試）。
+ */
+function checkLegalPanelInApp() {
+    const main = readSrc("src/js/main.js");
+    const gate = readSrc("src/js/ui/consent-gate.js");
+    if (!main || !gate) return { ok: false, msg: "無法讀取 main.js 或 consent-gate.js" };
+
+    // main.js 必須攔截頁尾條款點擊
+    if (!/openLegalDocument/.test(stripComments(main))) {
+        return { ok: false, msg: "main.js 未接上應用內條款面板" };
+    }
+    if (!/preventDefault/.test(stripComments(main))) {
+        return { ok: false, msg: "main.js 頁尾條款未 preventDefault（會跳出獨立模式）" };
+    }
+    if (!/bindLegalLink\s*\(/.test(stripComments(main))) {
+        return { ok: false, msg: "main.js 未綁定頁尾條款的應用內條款面板" };
+    }
+    for (const kind of ["privacy", "terms"]) {
+        if (!new RegExp(`bindLegalLink\\([^)]*["']${kind}["']`).test(stripComments(main))) {
+            return { ok: false, msg: `main.js 未綁定「${kind}」條款的應用內條款面板` };
+        }
+    }
+
+    const cleaned = stripComments(gate);
+    if (!/export function openLegalDocument/.test(cleaned)) {
+        return { ok: false, msg: "consent-gate.js 未匯出 openLegalDocument" };
+    }
+    // 載入失敗重試
+    if (!/legal-retry/.test(cleaned)) return { ok: false, msg: "條款面板缺載入失敗重試按鈕" };
+    // 可捲動
+    if (!/consent-policy__body/.test(cleaned)) return { ok: false, msg: "條款面板缺可捲動容器" };
+    // Focus Trap + Esc
+    if (!/trapFocus/.test(cleaned)) return { ok: false, msg: "條款面板缺 Focus Trap" };
+    if (!/Escape/.test(cleaned)) return { ok: false, msg: "條款面板缺 Esc 關閉" };
+
+    return { ok: true, msg: "頁尾隱私權／服務條款已改為應用內可捲動面板（骨架／重試／Focus Trap／Esc）" };
+}
+
+/**
+ * L4：無障礙縮放合規與中英品牌標題統一。
+ */
+function checkBrandAndViewport() {
+    const index = readSrc("index.html");
+    const manifest = readJson("manifest.json");
+    if (!index || !manifest) return { ok: false, msg: "無法讀取 index.html 或 manifest.json" };
+
+    // 不得 user-scalable=no（WCAG 縮放違規）
+    if (/user-scalable\s*=\s*no/i.test(index)) {
+        return { ok: false, msg: "index.html 仍含 user-scalable=no（違反 WCAG 縮放規範）" };
+    }
+    if (!/name=["']viewport["']/.test(index)) {
+        return { ok: false, msg: "index.html 缺 viewport meta" };
+    }
+
+    // 品牌標題統一
+    const title = /<title>([^<]*)<\/title>/.exec(index);
+    if (!title) return { ok: false, msg: "index.html 缺 <title>" };
+    if (!/木木遊戲/.test(title[1]) || !/聖誕小幫手/.test(title[1])) {
+        return { ok: false, msg: `index.html <title> 未統一為「木木遊戲：聖誕小幫手」：${title[1]}` };
+    }
+    if (!/木木遊戲/.test(String(manifest.name || ""))) {
+        return { ok: false, msg: `manifest.json name 未統一為木木遊戲：${manifest.name}` };
+    }
+    if (!/木木遊戲/.test(String(manifest.short_name || ""))) {
+        return { ok: false, msg: `manifest.json short_name 未統一為木木遊戲：${manifest.short_name}` };
+    }
+
+    // 過關微文案不得殘留英文預設 "Level Up!"
+    if (/Level Up!/i.test(index)) {
+        return { ok: false, msg: "index.html 過關微文案仍為英文「Level Up!」" };
+    }
+    if (!/過關了/.test(index)) {
+        return { ok: false, msg: "index.html 過關微文案未改為中文預設「過關了！」" };
+    }
+
+    return { ok: true, msg: "viewport 縮放合規、品牌標題統一、過關微文案已中文化" };
+}
+
+/* ------------------------------------------------------------------ *
  * 工具
  * ------------------------------------------------------------------ */
 
@@ -1138,6 +1577,13 @@ const CHECKS = [
     { id: "scenes-no-emoji", phase: "scenes", fn: checkScenesNoEmoji },
     { id: "scenes-chapter-continuity", phase: "scenes", fn: checkScenesChapterContinuity },
     { id: "integration-scene-switch", phase: "integration", fn: checkIntegrationSceneSwitch },
+    { id: "sw-precache-valid", phase: "integration", fn: checkSwPrecacheValid },
+    { id: "sw-graceful-degrade", phase: "integration", fn: checkSwGracefulDegrade },
+    { id: "telemetry-pipeline", phase: "integration", fn: checkTelemetryPipeline },
+    { id: "telemetry-no-pii", phase: "security", fn: checkTelemetryNoPii },
+    { id: "csp-baseline", phase: "security", fn: checkCspBaseline },
+    { id: "xss-hardened", phase: "security", fn: checkXssHardened },
+    { id: "web-vitals", phase: "integration", fn: checkWebVitals },
     { id: "child-no-jargon", phase: "child", fn: checkChildNoJargon },
     { id: "child-no-eval-widget", phase: "child", fn: checkChildNoEvalWidget },
     { id: "child-voice-complete", phase: "child", fn: checkChildVoiceComplete },
@@ -1147,7 +1593,11 @@ const CHECKS = [
     { id: "child-single-layer", phase: "child", fn: checkChildSingleLayer },
     { id: "parent-view-untouched", phase: "child", fn: checkParentViewUntouched },
     { id: "child-no-eval-widget-final", phase: "child", fn: checkChildNoEvalWidgetFinal },
-    { id: "parent-view-intact", phase: "child", fn: checkParentViewIntact }
+    { id: "parent-view-intact", phase: "child", fn: checkParentViewIntact },
+    { id: "paywall-honest", phase: "compliance", fn: checkPaywallHonest },
+    { id: "boot-error-recovery", phase: "resilience", fn: checkBootErrorRecovery },
+    { id: "legal-panel-in-app", phase: "compliance", fn: checkLegalPanelInApp },
+    { id: "brand-viewport-a11y", phase: "compliance", fn: checkBrandAndViewport }
 ];
 
 const args = process.argv.slice(2);

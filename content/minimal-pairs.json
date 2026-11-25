@@ -1,43 +1,600 @@
 {
   "zh-TW": [
-    { "id": "ba-ba", "pair": ["八", "爸"], "feature": "initial", "distractor": "八／爸／巴" },
-    { "id": "bu-fu", "pair": ["ㄅㄨ", "ㄈㄨ"], "feature": "initial", "distractor": "ㄅㄨ／ㄈㄨ／ㄅㄤ" },
-    { "id": "si-shi", "pair": ["四", "是"], "feature": "initial", "distractor": "四／是／西" },
-    { "id": "zhong-qin", "pair": ["中", "親"], "feature": "initial", "distractor": "中／親／真" },
-    { "id": "gu-gu", "pair": ["姑", "菇"], "feature": "initial", "distractor": "姑／菇／鴿" },
-    { "id": "ma-mi", "pair": ["媽", "咪"], "feature": "initial", "distractor": "媽／咪／咩" },
-    { "id": "shan-sang", "pair": ["山", "桑"], "feature": "initial", "distractor": "山／桑／傘" },
-    { "id": "gou-gou", "pair": ["狗", "購"], "feature": "initial", "distractor": "狗／購／夠" },
-    { "id": "tu-tu", "pair": ["兔", "土"], "feature": "initial", "distractor": "兔／土／圖" },
-    { "id": "mao-niu", "pair": ["貓", "牛"], "feature": "initial", "distractor": "貓／牛／毛" },
-    { "id": "hu-hu", "pair": ["虎", "狐"], "feature": "initial", "distractor": "虎／狐／唬" },
-    { "id": "long-nong", "pair": ["龍", "農"], "feature": "initial", "distractor": "龍／農／弄" },
-    { "id": "ping-ping", "pair": ["蘋", "瓶"], "feature": "initial", "distractor": "蘋／瓶／屏" },
-    { "id": "xing-xing", "pair": ["星", "猩"], "feature": "initial", "distractor": "星／猩／興" }
+    {
+      "id": "ba-ba",
+      "pair": [
+        "八",
+        "爸"
+      ],
+      "feature": "initial",
+      "distractor": "八／爸／巴"
+    },
+    {
+      "id": "bu-fu",
+      "pair": [
+        "ㄅㄨ",
+        "ㄈㄨ"
+      ],
+      "feature": "initial",
+      "distractor": "ㄅㄨ／ㄈㄨ／ㄅㄤ"
+    },
+    {
+      "id": "si-shi",
+      "pair": [
+        "四",
+        "是"
+      ],
+      "feature": "initial",
+      "distractor": "四／是／西"
+    },
+    {
+      "id": "zhong-qin",
+      "pair": [
+        "中",
+        "親"
+      ],
+      "feature": "initial",
+      "distractor": "中／親／真"
+    },
+    {
+      "id": "gu-gu",
+      "pair": [
+        "姑",
+        "菇"
+      ],
+      "feature": "initial",
+      "distractor": "姑／菇／鴿"
+    },
+    {
+      "id": "ma-mi",
+      "pair": [
+        "媽",
+        "咪"
+      ],
+      "feature": "initial",
+      "distractor": "媽／咪／咩"
+    },
+    {
+      "id": "shan-sang",
+      "pair": [
+        "山",
+        "桑"
+      ],
+      "feature": "initial",
+      "distractor": "山／桑／傘"
+    },
+    {
+      "id": "gou-gou",
+      "pair": [
+        "狗",
+        "購"
+      ],
+      "feature": "initial",
+      "distractor": "狗／購／夠"
+    },
+    {
+      "id": "tu-tu",
+      "pair": [
+        "兔",
+        "土"
+      ],
+      "feature": "initial",
+      "distractor": "兔／土／圖"
+    },
+    {
+      "id": "mao-niu",
+      "pair": [
+        "貓",
+        "牛"
+      ],
+      "feature": "initial",
+      "distractor": "貓／牛／毛"
+    },
+    {
+      "id": "hu-hu",
+      "pair": [
+        "虎",
+        "狐"
+      ],
+      "feature": "initial",
+      "distractor": "虎／狐／唬"
+    },
+    {
+      "id": "long-nong",
+      "pair": [
+        "龍",
+        "農"
+      ],
+      "feature": "initial",
+      "distractor": "龍／農／弄"
+    },
+    {
+      "id": "ping-ping",
+      "pair": [
+        "蘋",
+        "瓶"
+      ],
+      "feature": "initial",
+      "distractor": "蘋／瓶／屏"
+    },
+    {
+      "id": "xing-xing",
+      "pair": [
+        "星",
+        "猩"
+      ],
+      "feature": "initial",
+      "distractor": "星／猩／興"
+    },
+    {
+      "id": "guang-guang",
+      "pair": [
+        "光",
+        "廣"
+      ],
+      "feature": "initial",
+      "distractor": "光／廣／逛"
+    },
+    {
+      "id": "ban-ban",
+      "pair": [
+        "班",
+        "斑"
+      ],
+      "feature": "initial",
+      "distractor": "班／斑／搬"
+    },
+    {
+      "id": "da-da",
+      "pair": [
+        "大",
+        "打"
+      ],
+      "feature": "initial",
+      "distractor": "大／打／搭"
+    },
+    {
+      "id": "tu-tu-2",
+      "pair": [
+        "土",
+        "兔"
+      ],
+      "feature": "initial",
+      "distractor": "土／兔／吐"
+    },
+    {
+      "id": "shu-shu",
+      "pair": [
+        "書",
+        "樹"
+      ],
+      "feature": "initial",
+      "distractor": "書／樹／數"
+    },
+    {
+      "id": "gu-gu-2",
+      "pair": [
+        "姑",
+        "古"
+      ],
+      "feature": "initial",
+      "distractor": "姑／古／谷"
+    },
+    {
+      "id": "mao-mao",
+      "pair": [
+        "毛",
+        "貓"
+      ],
+      "feature": "initial",
+      "distractor": "毛／貓／矛"
+    },
+    {
+      "id": "feng-feng",
+      "pair": [
+        "風",
+        "封"
+      ],
+      "feature": "initial",
+      "distractor": "風／封／峰"
+    },
+    {
+      "id": "li-li",
+      "pair": [
+        "梨",
+        "里"
+      ],
+      "feature": "initial",
+      "distractor": "梨／里／理"
+    },
+    {
+      "id": "niao-niao",
+      "pair": [
+        "鳥",
+        "尿"
+      ],
+      "feature": "vowel",
+      "distractor": "鳥／尿／扭"
+    },
+    {
+      "id": "lai-lai",
+      "pair": [
+        "來",
+        "萊"
+      ],
+      "feature": "vowel",
+      "distractor": "來／萊／徠"
+    },
+    {
+      "id": "he-he",
+      "pair": [
+        "喝",
+        "和"
+      ],
+      "feature": "vowel",
+      "distractor": "喝／和／禾"
+    },
+    {
+      "id": "tu-tu-3",
+      "pair": [
+        "兔",
+        "凸"
+      ],
+      "feature": "vowel",
+      "distractor": "兔／凸／突"
+    },
+    {
+      "id": "xi-xi",
+      "pair": [
+        "西",
+        "洗"
+      ],
+      "feature": "vowel",
+      "distractor": "西／洗／喜"
+    },
+    {
+      "id": "dan-dan",
+      "pair": [
+        "單",
+        "蛋"
+      ],
+      "feature": "vowel",
+      "distractor": "單／蛋／擔"
+    }
   ],
   "en-US": [
-    { "id": "ship-sheep", "pair": ["ship", "sheep"], "feature": "vowel", "distractor": "ship／sheep／slip" },
-    { "id": "fish-fist", "pair": ["fish", "fist"], "feature": "onset", "distractor": "fish／fist／miss" },
-    { "id": "bed-pet", "pair": ["bed", "pet"], "feature": "onset", "distractor": "bed／pet／red" },
-    { "id": "boat-goat", "pair": ["boat", "goat"], "feature": "onset", "distractor": "boat／goat／boat" },
-    { "id": "cat-cap", "pair": ["cat", "cap"], "feature": "onset", "distractor": "cat／cap／can" },
-    { "id": "sun-son", "pair": ["sun", "son"], "feature": "vowel", "distractor": "sun／son／sin" },
-    { "id": "pin-bin", "pair": ["pin", "bin"], "feature": "onset", "distractor": "pin／bin／pen" },
-    { "id": "sip-tip", "pair": ["sip", "tip"], "feature": "onset", "distractor": "sip／tip／zip" },
-    { "id": "park-puck", "pair": ["park", "puck"], "feature": "onset", "distractor": "park／puck／pack" },
-    { "id": "rice-lice", "pair": ["rice", "lice"], "feature": "onset", "distractor": "rice／lice／ride" },
-    { "id": "four-for", "pair": ["four", "for"], "feature": "vowel", "distractor": "four／for／fur" },
-    { "id": "wet-vet", "pair": ["wet", "vet"], "feature": "vowel", "distractor": "wet／vet／net" },
-    { "id": "hat-hut", "pair": ["hat", "hut"], "feature": "onset", "distractor": "hat／hut／hit" }
+    {
+      "id": "ship-sheep",
+      "pair": [
+        "ship",
+        "sheep"
+      ],
+      "feature": "vowel",
+      "distractor": "ship／sheep／slip"
+    },
+    {
+      "id": "fish-fist",
+      "pair": [
+        "fish",
+        "fist"
+      ],
+      "feature": "onset",
+      "distractor": "fish／fist／miss"
+    },
+    {
+      "id": "bed-pet",
+      "pair": [
+        "bed",
+        "pet"
+      ],
+      "feature": "onset",
+      "distractor": "bed／pet／red"
+    },
+    {
+      "id": "boat-goat",
+      "pair": [
+        "boat",
+        "goat"
+      ],
+      "feature": "onset",
+      "distractor": "boat／goat／boat"
+    },
+    {
+      "id": "cat-cap",
+      "pair": [
+        "cat",
+        "cap"
+      ],
+      "feature": "onset",
+      "distractor": "cat／cap／can"
+    },
+    {
+      "id": "sun-son",
+      "pair": [
+        "sun",
+        "son"
+      ],
+      "feature": "vowel",
+      "distractor": "sun／son／sin"
+    },
+    {
+      "id": "pin-bin",
+      "pair": [
+        "pin",
+        "bin"
+      ],
+      "feature": "onset",
+      "distractor": "pin／bin／pen"
+    },
+    {
+      "id": "sip-tip",
+      "pair": [
+        "sip",
+        "tip"
+      ],
+      "feature": "onset",
+      "distractor": "sip／tip／zip"
+    },
+    {
+      "id": "park-puck",
+      "pair": [
+        "park",
+        "puck"
+      ],
+      "feature": "onset",
+      "distractor": "park／puck／pack"
+    },
+    {
+      "id": "rice-lice",
+      "pair": [
+        "rice",
+        "lice"
+      ],
+      "feature": "onset",
+      "distractor": "rice／lice／ride"
+    },
+    {
+      "id": "four-for",
+      "pair": [
+        "four",
+        "for"
+      ],
+      "feature": "vowel",
+      "distractor": "four／for／fur"
+    },
+    {
+      "id": "wet-vet",
+      "pair": [
+        "wet",
+        "vet"
+      ],
+      "feature": "vowel",
+      "distractor": "wet／vet／net"
+    },
+    {
+      "id": "hat-hut",
+      "pair": [
+        "hat",
+        "hut"
+      ],
+      "feature": "onset",
+      "distractor": "hat／hut／hit"
+    },
+    {
+      "id": "bee-bee",
+      "pair": [
+        "bee",
+        "bead"
+      ],
+      "feature": "vowel",
+      "distractor": "bee／bead／bed"
+    },
+    {
+      "id": "cat-hat",
+      "pair": [
+        "cat",
+        "hat"
+      ],
+      "feature": "vowel",
+      "distractor": "cat／hat／had"
+    },
+    {
+      "id": "pin-pen",
+      "pair": [
+        "pin",
+        "pen"
+      ],
+      "feature": "vowel",
+      "distractor": "pin／pen／pan"
+    },
+    {
+      "id": "cup-cup",
+      "pair": [
+        "cup",
+        "pup"
+      ],
+      "feature": "onset",
+      "distractor": "cup／pup／cap"
+    },
+    {
+      "id": "jam-ham",
+      "pair": [
+        "jam",
+        "ham"
+      ],
+      "feature": "onset",
+      "distractor": "jam／ham／hug"
+    },
+    {
+      "id": "leaf-leaf",
+      "pair": [
+        "leaf",
+        "leak"
+      ],
+      "feature": "vowel",
+      "distractor": "leaf／leak／lief"
+    },
+    {
+      "id": "bike-bike",
+      "pair": [
+        "bike",
+        "pike"
+      ],
+      "feature": "onset",
+      "distractor": "bike／pike／pike"
+    },
+    {
+      "id": "goat-boat-2",
+      "pair": [
+        "goat",
+        "boat"
+      ],
+      "feature": "onset",
+      "distractor": "goat／boat／coat"
+    },
+    {
+      "id": "rain-rain",
+      "pair": [
+        "rain",
+        "ramp"
+      ],
+      "feature": "vowel",
+      "distractor": "rain／ramp／ram"
+    },
+    {
+      "id": "sheep-ship-2",
+      "pair": [
+        "sheep",
+        "ship"
+      ],
+      "feature": "vowel",
+      "distractor": "sheep／ship／slip"
+    },
+    {
+      "id": "sock-sock",
+      "pair": [
+        "sock",
+        "suck"
+      ],
+      "feature": "vowel",
+      "distractor": "sock／suck／sick"
+    },
+    {
+      "id": "moon-moo",
+      "pair": [
+        "moon",
+        "moo"
+      ],
+      "feature": "vowel",
+      "distractor": "moon／moo／moan"
+    },
+    {
+      "id": "bear-bare",
+      "pair": [
+        "bear",
+        "bare"
+      ],
+      "feature": "vowel",
+      "distractor": "bear／bare／bar"
+    },
+    {
+      "id": "nine-nine",
+      "pair": [
+        "nine",
+        "none"
+      ],
+      "feature": "vowel",
+      "distractor": "nine／none／nun"
+    },
+    {
+      "id": "bat-bad",
+      "pair": [
+        "bat",
+        "bad"
+      ],
+      "feature": "initial",
+      "distractor": "bat／bad／ban"
+    },
+    {
+      "id": "cap-cab",
+      "pair": [
+        "cap",
+        "cab"
+      ],
+      "feature": "initial",
+      "distractor": "cap／cab／can"
+    },
+    {
+      "id": "dog-dug",
+      "pair": [
+        "dog",
+        "dug"
+      ],
+      "feature": "initial",
+      "distractor": "dog／dug／dud"
+    },
+    {
+      "id": "hat-had",
+      "pair": [
+        "hat",
+        "had"
+      ],
+      "feature": "initial",
+      "distractor": "hat／had／hud"
+    },
+    {
+      "id": "map-mad",
+      "pair": [
+        "map",
+        "mad"
+      ],
+      "feature": "initial",
+      "distractor": "map／mad／mop"
+    },
+    {
+      "id": "pen-pin-2",
+      "pair": [
+        "pen",
+        "pin"
+      ],
+      "feature": "initial",
+      "distractor": "pen／pin／pan"
+    }
   ],
   "levels": [
-    { "level": 1, "feature": "initial", "distractors": 0, "note": "只比較兩個音，無干擾項" },
-    { "level": 2, "feature": "initial", "distractors": 1, "note": "加入一個語音相似的干擾音" },
-    { "level": 3, "feature": "vowel", "distractors": 2, "note": "升級為元音差異（最難），加入兩個干擾音" },
-    { "level": 4, "feature": "vowel", "distractors": 3, "note": "元音差異 + 三個干擾音，頂階難度" }
+    {
+      "level": 1,
+      "feature": "initial",
+      "distractors": 0,
+      "note": "只比較兩個音，無干擾項"
+    },
+    {
+      "level": 2,
+      "feature": "initial",
+      "distractors": 1,
+      "note": "加入一個語音相似的干擾音"
+    },
+    {
+      "level": 3,
+      "feature": "vowel",
+      "distractors": 2,
+      "note": "升級為元音差異（最難），加入兩個干擾音"
+    },
+    {
+      "level": 4,
+      "feature": "vowel",
+      "distractors": 3,
+      "note": "元音差異 + 三個干擾音，頂階難度"
+    }
   ],
   "answers": [
-    { "zh-TW": "一樣", "en-US": "same" },
-    { "zh-TW": "不一樣", "en-US": "different" }
+    {
+      "zh-TW": "一樣",
+      "en-US": "same"
+    },
+    {
+      "zh-TW": "不一樣",
+      "en-US": "different"
+    }
   ]
 }

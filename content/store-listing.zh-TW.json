@@ -106,6 +106,31 @@
       "通訊紀錄",
       "廣告 ID"
     ],
-    "notes": "所有學習資料僅存於裝置本機。遙測為選擇性加入，預設關閉，且不含任何可識別資訊。不接入第三方廣告 SDK，不使用廣告 ID。"
+    "notes": "所有學習資料僅存於裝置本機。遙測為選擇性加入，預設關閉，且不含任何可識別資訊。不接入第三方廣告 SDK，不使用廣告 ID。",
+    "localStorageOnly": true,
+    "thirdPartySDKs": []
+  },
+  "support": {
+    "supportUrl": "mailto:support@mumu-game.app",
+    "supportEmail": "support@mumu-game.app",
+    "privacyPolicyUrl": "./content/privacy.zh-TW.md",
+    "termsOfServiceUrl": "./content/terms.zh-TW.md",
+    "version": "3.0.0"
+  },
+  "website": {
+    "canonicalUrl": "./index.html",
+    "ogImage": "./icon-512.png",
+    "twitterCard": "summary_large_image"
+  },
+  "manifest": {
+    "id": "/mumu-santas-little-helper",
+    "display": "standalone",
+    "hasShortcuts": true,
+    "hasMaskableIcon": true,
+    "iconSizes": [
+      "192x192",
+      "512x512",
+      "1024x1024"
+    ]
   }
 }

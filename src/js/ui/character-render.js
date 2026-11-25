@@ -14,7 +14,7 @@
 import { burst } from "./particles.js";
 
 /**
- * @typedef {"idle"|"listen"|"happy"|"sad"|"hint"|"roar"|"walk"|"hatch"} CharacterMood
+ * @typedef {"idle"|"listen"|"happy"|"step"|"hint"|"roar"|"walk"|"hatch"} CharacterMood
  */
 
 /**

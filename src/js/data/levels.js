@@ -1,3 +1,4 @@
+import { pickUnseen, safeFallbackItems } from "../data/items.js";
 /**
  * 關卡存取層。
  */
@@ -71,11 +72,25 @@ export function pickItems(bundle, verb, count, excludeName = "") {
         return id !== excludeName;
     });
 
+    // Step 162／163：滑動視窗去重抽題
+    // - 同回合內以 splice 保證不重複
+    // - 跨回合以 pickUnseen 的滑動視窗避免短期重複
     const picked = [];
     const working = [...candidates];
-    for (let i = 0; i < count && working.length; i++) {
-        const idx = Math.floor(Math.random() * working.length);
-        picked.push(working.splice(idx, 1)[0]);
+    for (let i = 0; i < count; i++) {
+        const seen = new Set(picked.map((it) => it.id ?? String(it.value)));
+        const fresh = working.filter((it) => !seen.has(it.id ?? String(it.value)));
+        if (!fresh.length) break;
+        const next = pickUnseen(fresh, `items:${verb}`);
+        if (!next) break;
+        picked.push(next);
+        const idx = working.findIndex((it) => (it.id ?? String(it.value)) === (next.id ?? String(next.value)));
+        if (idx >= 0) working.splice(idx, 1);
+    }
+
+    // 題庫異常／不足時回退安全預設題（不得回傳空陣列）
+    if (!picked.length) {
+        return safeFallbackItems(count);
     }
     return picked;
 }

@@ -5,6 +5,7 @@
  */
 
 import { readJson, writeJson } from "../core/storage.js";
+import { safeText } from "../core/sanitize-html.js";
 
 const SETTINGS_KEY = "mumu.a11y";
 
@@ -18,7 +19,11 @@ export function getPreferences() {
         colorBlind: Boolean(saved.colorBlind),
         reducedMotion: Boolean(saved.reducedMotion),
         haptics: saved.haptics !== false,
-        speech: saved.speech !== false
+        speech: saved.speech !== false,
+        // Step 205：視覺輔助（無聲可玩）—— 語音不可用時以視覺替代完成回合
+        visualAssist: saved.visualAssist === true,
+        // Step 206：單手大目標 —— 放大觸控目標
+        largeTargets: saved.largeTargets === true
     };
 }
 
@@ -120,6 +125,134 @@ export function applyPreferences(root) {
     setColorBlindMode(root, prefs.colorBlind);
     setReducedMotion(root, prefs.reducedMotion);
     setHapticsEnabled(root, prefs.haptics);
+    setVisualAssistMode(root, prefs.visualAssist);
+    setLargeTargets(root, prefs.largeTargets);
+}
+
+/**
+ * 視覺輔助（無聲可玩）開關。
+ *
+ * 開啟後：即使瀏覽器無語音輸出，幼兒仍可僅靠大字動作卡與節奏脈衝完成回合。
+ *
+ * @param {HTMLElement} root
+ * @param {boolean} enabled
+ */
+export function setVisualAssistMode(root, enabled) {
+    if (!root) return;
+    root.dataset.visualAssist = enabled ? "on" : "off";
+    root.classList.toggle("visual-assist", enabled);
+    setPreferences({ visualAssist: enabled });
+}
+
+/**
+ * 單手大目標開關。
+ * @param {HTMLElement} root
+ * @param {boolean} enabled
+ */
+export function setLargeTargets(root, enabled) {
+    if (!root) return;
+    root.dataset.largeTargets = enabled ? "on" : "off";
+    root.classList.toggle("large-targets", enabled);
+    setPreferences({ largeTargets: enabled });
+}
+
+/**
+ * 視覺替代提示的容器（不存在則建立）。
+ * @param {HTMLElement} root
+ * @returns {HTMLElement|null}
+ */
+function fallbackHost(root) {
+    if (!root) return null;
+    let host = root.querySelector("#visual-fallback");
+    if (host) return /** @type {HTMLElement} */ (host);
+    host = document.createElement("div");
+    host.id = "visual-fallback";
+    host.className = "visual-fallback";
+    host.setAttribute("role", "group");
+    host.setAttribute("aria-live", "polite");
+    host.setAttribute("aria-label", root.getAttribute("data-locale") === "en-US"
+        ? "Visual sound guide"
+        : "視覺聲音提示");
+    root.appendChild(host);
+    return /** @type {HTMLElement} */ (host);
+}
+
+/**
+ * 節奏脈衝圖示（純 CSS／SVG，禁 emoji）。
+ * @param {number} count
+ * @returns {string}
+ */
+function pulseMarkup(count) {
+    const n = Math.max(1, Math.min(count, 12));
+    let out = '<div class="visual-fallback__pulses" aria-hidden="true">';
+    for (let i = 0; i < n; i++) {
+        out += '<span class="visual-fallback__pulse"></span>';
+    }
+    out += "</div>";
+    return out;
+}
+
+/**
+ * 顯示視覺替代提示（語音不可用／靜音／無語音包時）。
+ *
+ * - 文字內容一律以 textContent 寫入（禁 innerHTML 注入）
+ * - 最小對以兩張並列大字卡呈現，供幼兒「看」出兩個音
+ *
+ * @param {HTMLElement} root
+ * @param {{ text?: string, pair?: string[], reason?: string, beats?: number, locale?: string }} payload
+ */
+export function showVisualFallback(root, payload = {}) {
+    const host = fallbackHost(root);
+    if (!host) return;
+
+    host.textContent = "";
+    host.classList.remove("hidden");
+    host.dataset.reason = payload.reason || "unsupported";
+
+    const en = payload.locale === "en-US";
+    const hint = document.createElement("p");
+    hint.className = "visual-fallback__hint";
+    hint.textContent = payload.reason === "muted"
+        ? (en ? "Voice is off. Use the cards." : "語音已關閉，請看圖卡作答")
+        : (en ? "Voice is unavailable. Use the cards." : "語音無法使用，請看圖卡作答");
+    host.appendChild(hint);
+
+    if (Array.isArray(payload.pair) && payload.pair.length >= 2) {
+        const row = document.createElement("div");
+        row.className = "visual-fallback__cards";
+        for (const word of payload.pair.slice(0, 4)) {
+            const card = document.createElement("div");
+            card.className = "visual-fallback__card";
+            card.textContent = safeText(String(word));
+            row.appendChild(card);
+        }
+        host.appendChild(row);
+    }
+
+    if (typeof payload.text === "string" && payload.text) {
+        const text = document.createElement("p");
+        text.className = "visual-fallback__text";
+        text.textContent = safeText(payload.text);
+        host.appendChild(text);
+    }
+
+    if (typeof payload.beats === "number" && payload.beats > 0) {
+        const wrap = document.createElement("div");
+        wrap.className = "visual-fallback__beat";
+        wrap.innerHTML = pulseMarkup(payload.beats);
+        host.appendChild(wrap);
+    }
+}
+
+/**
+ * 隱藏視覺替代提示。
+ * @param {HTMLElement} root
+ */
+export function hideVisualFallback(root) {
+    const host = root?.querySelector("#visual-fallback");
+    if (!host) return;
+    host.textContent = "";
+    host.classList.add("hidden");
 }
 
 /**
@@ -150,6 +283,14 @@ export function createPreferencesPanel(root, locale) {
                 <span class="settings__label">${en ? "Spoken prompts" : "語音提示"}</span>
                 <input type="checkbox" data-pref="speech" ${prefs.speech ? "checked" : ""} />
             </label>
+            <label class="settings__row">
+                <span class="settings__label">${en ? "Visual assist (play without sound)" : "視覺輔助（無聲可玩）"}</span>
+                <input type="checkbox" data-pref="visualAssist" ${prefs.visualAssist ? "checked" : ""} />
+            </label>
+            <label class="settings__row">
+                <span class="settings__label">${en ? "Large one-hand targets" : "單手大目標"}</span>
+                <input type="checkbox" data-pref="largeTargets" ${prefs.largeTargets ? "checked" : ""} />
+            </label>
         </div>
     `;
 
@@ -162,6 +303,8 @@ export function createPreferencesPanel(root, locale) {
             if (key === "reducedMotion") setReducedMotion(root, value);
             if (key === "colorBlind") setColorBlindMode(root, value);
             if (key === "haptics") setHapticsEnabled(root, value);
+            if (key === "visualAssist") setVisualAssistMode(root, value);
+            if (key === "largeTargets") setLargeTargets(root, value);
         });
     });
 

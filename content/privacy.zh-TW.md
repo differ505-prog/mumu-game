@@ -2,7 +2,7 @@
 
 **適用範圍：** 木木遊戲（Santa's Little Helper）及其所有版本
 **生效日期：** 2026 年 1 月 1 日
-**聯絡方式：** privacy@mumu-game.example（範例聯絡信箱，實際發佈前須替換為正式信箱）
+**聯絡方式：** privacy@mumu-game.app
 
 ---
 
@@ -112,7 +112,7 @@
 
 若您對本政策或子女資料有任何疑問，請聯絡我們：
 
-- 信箱：privacy@mumu-game.example
+- 信箱：privacy@mumu-game.app
 - 收件時間：週一至週五 10:00–18:00（台灣時間）
 
 我們將於 7 個工作日內回覆。

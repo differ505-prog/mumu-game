@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "paramNaming": {
     "verb": "玩法 id（sequence／minimal-pair／rhythm／interference／puzzle／memory）",
     "axis": "技能軸 id（minimalPairCorrect／sequenceCorrect／rhythmCorrect／interferenceCorrect／pitchCorrect／puzzleCorrect／memoryCorrect）",
@@ -15,78 +15,289 @@
   "events": {
     "session_start": {
       "name": "session_start",
-      "params": ["chapter", "sessionMs"],
+      "description": "App 啟動且載入內容完成",
+      "params": [
+        "chapter",
+        "sessionMs"
+      ],
       "trigger": "App 啟動且載入內容完成"
     },
     "first_session_complete": {
       "name": "first_session_complete",
-      "params": ["levelId", "chapter", "sessionMs"],
+      "description": "首次完成任一關卡",
+      "params": [
+        "levelId",
+        "chapter",
+        "sessionMs"
+      ],
       "trigger": "首次完成任一關卡"
     },
     "round_start": {
       "name": "round_start",
-      "params": ["verb", "axis", "levelId", "chapter"],
+      "description": "每回合題目生成後",
+      "params": [
+        "verb",
+        "axis",
+        "levelId",
+        "chapter"
+      ],
       "trigger": "每回合題目生成後"
     },
     "round_result": {
       "name": "round_result",
-      "params": ["verb", "axis", "levelId", "chapter", "correct", "hintsUsed", "reactionMs"],
+      "description": "每次作答判定後",
+      "params": [
+        "verb",
+        "axis",
+        "levelId",
+        "chapter",
+        "correct",
+        "hintsUsed",
+        "reactionMs"
+      ],
       "trigger": "每次作答判定後"
     },
     "hint_used": {
       "name": "hint_used",
-      "params": ["verb", "levelId", "hintsUsed"],
+      "description": "三段式提示任一段觸發",
+      "params": [
+        "verb",
+        "levelId",
+        "hintsUsed"
+      ],
       "trigger": "三段式提示任一段觸發"
     },
     "level_complete": {
       "name": "level_complete",
-      "params": ["levelId", "chapter", "correct", "hintsUsed", "sessionMs"],
+      "description": "關卡結算",
+      "params": [
+        "levelId",
+        "chapter",
+        "correct",
+        "hintsUsed",
+        "sessionMs"
+      ],
       "trigger": "關卡結算"
     },
     "chapter_start": {
       "name": "chapter_start",
-      "params": ["chapter", "levelId"],
+      "description": "首次進入某章節",
+      "params": [
+        "chapter",
+        "levelId"
+      ],
       "trigger": "首次進入某章節"
     },
     "dex_unlock": {
       "name": "dex_unlock",
-      "params": ["dinoId", "chapter"],
+      "description": "新恐龍解鎖",
+      "params": [
+        "dinoId",
+        "chapter"
+      ],
       "trigger": "新恐龍解鎖"
     },
     "share_click": {
       "name": "share_click",
-      "params": ["cardKind", "channel", "referralCode"],
+      "description": "點擊分享按鈕",
+      "params": [
+        "cardKind",
+        "channel",
+        "referralCode"
+      ],
       "trigger": "點擊分享按鈕"
     },
     "share_install": {
       "name": "share_install",
-      "params": ["referralCode"],
+      "description": "經推薦連結首次啟動",
+      "params": [
+        "referralCode"
+      ],
       "trigger": "經推薦連結首次啟動"
     },
     "level_map_view": {
       "name": "level_map_view",
-      "params": ["chapter"],
+      "description": "開啟關卡地圖",
+      "params": [
+        "chapter"
+      ],
       "trigger": "開啟關卡地圖"
     },
     "parent_report_view": {
       "name": "parent_report_view",
+      "description": "開啟家長報告",
       "params": [],
       "trigger": "開啟家長報告"
     },
     "paywall_view": {
       "name": "paywall_view",
-      "params": ["feature"],
+      "description": "顯示付費牆",
+      "params": [
+        "feature"
+      ],
       "trigger": "顯示付費牆"
     },
     "purchase": {
       "name": "purchase",
-      "params": ["plan", "amount"],
+      "description": "訂閱完成",
+      "params": [
+        "plan",
+        "amount"
+      ],
       "trigger": "訂閱完成"
     },
     "referral_install": {
       "name": "referral_install",
-      "params": ["referralCode"],
+      "description": "推薦安裝歸因",
+      "params": [
+        "referralCode"
+      ],
       "trigger": "推薦安裝歸因"
+    },
+    "first_interaction": {
+      "name": "first_interaction",
+      "description": "玩家首次與遊戲互動",
+      "params": [
+        "verb"
+      ],
+      "trigger": "第一次作答或點擊"
+    },
+    "level_start": {
+      "name": "level_start",
+      "description": "進入關卡",
+      "params": [
+        "levelId",
+        "chapter",
+        "verb"
+      ],
+      "trigger": "關卡開始"
+    },
+    "level_fail": {
+      "name": "level_fail",
+      "description": "關卡未達滿星",
+      "params": [
+        "levelId",
+        "chapter",
+        "correct",
+        "hintsUsed"
+      ],
+      "trigger": "關卡結算未全對"
+    },
+    "tutorial_step": {
+      "name": "tutorial_step",
+      "description": "教學前進到某一步",
+      "params": [
+        "step"
+      ],
+      "trigger": "教學步驟切換"
+    },
+    "tutorial_complete": {
+      "name": "tutorial_complete",
+      "description": "完成教學",
+      "params": [],
+      "trigger": "教學結束"
+    },
+    "tutorial_skip": {
+      "name": "tutorial_skip",
+      "description": "跳過教學",
+      "params": [],
+      "trigger": "玩家跳過教學"
+    },
+    "hint_shown": {
+      "name": "hint_shown",
+      "description": "提示顯示但未使用",
+      "params": [
+        "verb",
+        "levelId"
+      ],
+      "trigger": "提示被顯示"
+    },
+    "scene_entered": {
+      "name": "scene_entered",
+      "description": "進入某個場景",
+      "params": [
+        "scene",
+        "chapter"
+      ],
+      "trigger": "場景切換"
+    },
+    "paywall_cta": {
+      "name": "paywall_cta",
+      "description": "點擊付費牆行動按鈕",
+      "params": [
+        "feature",
+        "plan"
+      ],
+      "trigger": "點擊訂閱鈕"
+    },
+    "purchase_attempt": {
+      "name": "purchase_attempt",
+      "description": "嘗試購買",
+      "params": [
+        "plan",
+        "amount"
+      ],
+      "trigger": "發起購買"
+    },
+    "purchase_success": {
+      "name": "purchase_success",
+      "description": "購買成功",
+      "params": [
+        "plan",
+        "amount"
+      ],
+      "trigger": "訂閱驗證通過"
+    },
+    "purchase_fail": {
+      "name": "purchase_fail",
+      "description": "購買失敗",
+      "params": [
+        "plan",
+        "reason"
+      ],
+      "trigger": "訂閱失敗或逾時"
+    },
+    "restore_started": {
+      "name": "restore_started",
+      "description": "開始恢復購買",
+      "params": [],
+      "trigger": "點擊恢復購買"
+    },
+    "team_viewed": {
+      "name": "team_viewed",
+      "description": "查看隊伍列",
+      "params": [
+        "count"
+      ],
+      "trigger": "隊伍列渲染"
+    },
+    "session_end": {
+      "name": "session_end",
+      "description": "session 結束（頁面離開或隱藏）",
+      "params": [
+        "chapter",
+        "sessionMs"
+      ],
+      "trigger": "pagehide／visibilitychange"
+    },
+    "crash": {
+      "name": "crash",
+      "description": "未捕捉例外或 Promise 拒絕",
+      "params": [
+        "kind",
+        "where"
+      ],
+      "trigger": "全域錯誤攔截"
+    },
+    "vitals": {
+      "name": "vitals",
+      "description": "Web Vitals 量測值",
+      "params": [
+        "inp",
+        "cls",
+        "fcp"
+      ],
+      "trigger": "效能量測回報"
     }
   }
 }

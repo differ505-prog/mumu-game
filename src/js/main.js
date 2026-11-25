@@ -13,10 +13,10 @@ import { state, setState } from "./core/state.js";
 import { on } from "./core/events.js";
 import { setTimeline, play as playTimeline } from "./core/timeline.js";
 import { ensureAudio } from "./audio/mixer.js";
-import { speak, setVoiceProfile } from "./audio/voice.js";
+import { speak, setVoiceProfile, getVoiceState, setSpeechEnabled } from "./audio/voice.js";
 import { playSfx, playDinoRoar, setSfxMap } from "./audio/sfx.js";
 import { createHud } from "./ui/hud.js";
-import { renderCharacter, setMood, playRoar, playHatch, playUnlock, playComplete, lookAt } from "./ui/character-render.js";
+import { renderCharacter, playRoar, playHatch, playUnlock, playComplete, lookAt } from "./ui/character-render.js";
 import { haptic } from "./ui/haptics.js";
 import { burst, startAmbientSnow, startAmbientWeather } from "./ui/particles.js";
 import { animate } from "./ui/motion.js";
@@ -26,8 +26,9 @@ import { renderLevelMap } from "./ui/levelmap.js";
 import { renderDex } from "./ui/dex.js";
 import { renderTeamDock } from "./ui/team-dock.js";
 import { renderParentReport } from "./ui/parent-report.js";
+import { runAssessment, nextPhase } from "./ui/assessment-ui.js";
 import { createAudioSettings } from "./ui/settings-audio.js";
-import { createPreferencesPanel, applyPreferences } from "./ui/a11y.js";
+import { createPreferencesPanel, applyPreferences, showVisualFallback, hideVisualFallback, getPreferences } from "./ui/a11y.js";
 import { createTutorial } from "./ui/tutorial.js";
 import { showLetter as showLetterScene, showStoryScene } from "./ui/story.js";
 import { showPaywall } from "./ui/paywall.js";
@@ -35,11 +36,23 @@ import { buildShareCard, shareToLine } from "./ui/share-card.js";
 import { loadProgress, saveProgress, recordLevelResult, unlockDex, updateStreak, todayString } from "./core/progress.js";
 import { recordLearningSample, checkDexUnlock, setChildVoice, childVoice } from "./core/dex.js";
 import { requireParentalGate } from "./core/parental-gate.js";
-import { track, trackShare } from "./core/telemetry.js";
+import { requireConsent, openConsentSettings, openLegalDocument } from "./ui/consent-gate.js";
+import { track, trackShare, flush as flushTelemetry } from "./core/telemetry.js";
 import { referralCode, consumeReferral } from "./core/referral.js";
 import { createMasteryEntry, updateMastery } from "./core/mastery.js";
 import { buildScene, setParallax, applyTheme, setScenePalettes } from "./ui/parallax.js";
 import { setMusicMap, playMusic, stopMusic, playSceneMusic, stopSceneMusic, hasSceneMusic } from "./audio/music.js";
+import { showOfflineNotice, hideOfflineNotice } from "./ui/weather.js";
+import {
+    feedbackCorrect,
+    feedbackStep,
+    feedbackWrong,
+    feedbackLevelComplete
+} from "./ui/round-feedback.js";
+import { safeText } from "./core/sanitize-html.js";
+import { safeReferralCode } from "./core/input-validate.js";
+import { initVitals, trackFirstInteraction, reportVitals } from "./core/vitals.js";
+import { initPwaInstall, showInstallGuide } from "./ui/pwa-install.js";
 
 /** @type {any} */
 let bundle = null;
@@ -61,6 +74,12 @@ let started = false;
  * @type {string[]}
  */
 const overlayStack = [];
+
+/**
+ * 家長閘門是否已於本次 session 通過。
+ * @type {boolean}
+ */
+let parentGatePassed = false;
 
 /**
  * 推入一層遮罩（記錄來源）。
@@ -125,14 +144,134 @@ let preferencesPanel = null;
 const $ = (/** @type {string} */ id) => document.getElementById(id);
 
 /* ---------- 啟動 ---------- */
+/** boot() 是否正在執行中（避免重試時重入）。 @type {boolean} */
+let booting = false;
+
+/**
+ * 顯示啟動失敗的錯誤恢復面板。
+ *
+ * 規範（Round 1 紅線 #2）：
+ *   - 必須**覆蓋／隱藏** `#start-overlay`，否則使用者只會看到空白畫面
+ *   - 必須是 `role="alert"` 的可見面板（不得只寫進 status 列）
+ *   - 必須提供離線檢查提示與「重新載入」按鈕
+ *   - 重新載入鈕必須有 in-flight lock（防連點）
+ *
+ * @param {unknown} err
+ */
+function showBootError(err) {
+    const en = locale === "en-US";
+    console.error("[main] 內容載入失敗", err);
+
+    // 隱藏開始畫面（否則會遮蔽錯誤面板 → 白屏）
+    $("start-overlay")?.classList.add("hidden");
+    $("consent-gate-root")?.classList.add("hidden");
+
+    // 移除舊面板（重試時不得疊加）
+    document.getElementById("boot-error-root")?.remove();
+
+    const panel = document.createElement("div");
+    panel.id = "boot-error-root";
+    panel.className = "boot-error-overlay";
+    panel.setAttribute("role", "alert");
+    panel.setAttribute("aria-live", "assertive");
+
+    const title = document.createElement("h1");
+    title.className = "boot-error__title";
+    title.textContent = en ? "Could not start the game" : "遊戲暫時無法開始";
+
+    const desc = document.createElement("p");
+    desc.className = "boot-error__desc";
+    desc.textContent = en
+        ? "Some game content could not be loaded. This is usually a temporary network problem."
+        : "部分遊戲內容沒有載入成功，通常是暫時性的網路問題。";
+
+    const hint = document.createElement("p");
+    hint.className = "boot-error__hint";
+    hint.textContent = en
+        ? "Please check your internet connection, then try again. Once the game has been opened with a connection, offline mode also works."
+        : "請先確認網路連線後再試一次；若先前已用網路成功開啟過，之後也能離線遊玩。";
+
+    const actions = document.createElement("div");
+    actions.className = "boot-error__actions";
+
+    const retryBtn = document.createElement("button");
+    retryBtn.className = "level-btn";
+    retryBtn.id = "boot-retry-btn";
+    retryBtn.type = "button";
+    retryBtn.textContent = en ? "Try again" : "重新載入";
+
+    const refreshBtn = document.createElement("button");
+    refreshBtn.className = "level-btn level-btn--secondary";
+    refreshBtn.id = "boot-refresh-btn";
+    refreshBtn.type = "button";
+    refreshBtn.textContent = en ? "Refresh page" : "重新整理頁面";
+
+    actions.append(retryBtn, refreshBtn);
+
+    const status = document.createElement("p");
+    status.className = "boot-error__status";
+    status.setAttribute("role", "status");
+    status.textContent = en ? "Ready to retry." : "已準備好重新載入。";
+
+    panel.append(title, desc, hint, actions, status);
+    document.body.appendChild(panel);
+
+    // 防連點：進行中鎖定按鈕
+    const lock = (/** @type {HTMLButtonElement} */ btn) => {
+        btn.disabled = true;
+        btn.dataset.busy = "1";
+    };
+    const unlock = (/** @type {HTMLButtonElement} */ btn) => {
+        btn.disabled = false;
+        delete btn.dataset.busy;
+    };
+
+    retryBtn.addEventListener("click", async () => {
+        if (retryBtn.dataset.busy) return;
+        lock(retryBtn);
+        status.textContent = en ? "Loading…" : "載入中…";
+        try {
+            await boot();
+            if (!document.getElementById("boot-error-root")) return;
+        } catch (err2) {
+            console.error("[main] 重新載入失敗", err2);
+        }
+        unlock(retryBtn);
+        status.textContent = en
+            ? "Still cannot load. Please refresh the page."
+            : "仍然無法載入，請改用「重新整理頁面」。";
+    });
+
+    refreshBtn.addEventListener("click", () => {
+        if (refreshBtn.dataset.busy) return;
+        lock(refreshBtn);
+        status.textContent = en ? "Refreshing…" : "重新整理中…";
+        try {
+            location.reload();
+        } catch (err2) {
+            console.warn("[main] 無法自動重新整理", err2);
+            unlock(refreshBtn);
+            status.textContent = en ? "Please refresh the page manually." : "請手動重新整理頁面。";
+        }
+    });
+
+    // 焦點移至重試鈕（鍵盤使用者可立即操作）
+    retryBtn.focus();
+}
+
 async function boot() {
+    if (booting) return;
+    booting = true;
     locale = detectLocale();
 
     try {
         bundle = await loadContent(locale);
     } catch (err) {
-        console.error("[main] 內容載入失敗", err);
-        setStatus("內容載入失敗，請重新整理頁面");
+        booting = false;
+        showBootError(err);
+        setStatus(locale === "en-US"
+            ? "Content could not be loaded. Please reload the page."
+            : "內容載入失敗，請重新載入頁面。");
         return;
     }
 
@@ -142,7 +281,7 @@ async function boot() {
         progress.referralCode = referralCode();
         saveProgress(progress);
     }
-    const ref = new URLSearchParams(location.search).get("ref");
+    const ref = safeReferralCode(new URLSearchParams(location.search).get("ref"));
     if (ref) {
         const consumed = consumeReferral(ref);
         if (consumed) track("share_install", { referralCode: consumed });
@@ -156,21 +295,78 @@ async function boot() {
     await loadMusic();
     await loadChildVoice();
     await loadScenes();
+    await loadAssessmentData();
     await loadPerformances();
 
     // 場景與偏好
     buildScene($("scene"));
     applyPreferences(document.body);
+    setupFooter();
+
+    // Step 205：語音偏好 → 語音層降級狀態（靜音時直接走視覺替代）
+    const prefs = getPreferences();
+    setSpeechEnabled(prefs.speech !== false);
+    const voiceState = getVoiceState();
+    if (voiceState.reason && !prefs.speech) {
+        showVisualFallback(document.body, { reason: "muted", locale });
+    }
     audioSettings = createAudioSettings($("audio-settings-root"));
     preferencesPanel = createPreferencesPanel($("a11y-root"), locale);
 
     wire();
     startAmbientSnow($("snow-container"));
 
+    // Step 131：Web Vitals 量測（無 API 時靜默降級，不得拋錯）
+    initVitals();
+    const firstInteraction = () => {
+        trackFirstInteraction();
+        window.removeEventListener("pointerdown", firstInteraction);
+        window.removeEventListener("keydown", firstInteraction);
+    };
+    window.addEventListener("pointerdown", firstInteraction, { once: true });
+    window.addEventListener("keydown", firstInteraction, { once: true });
+
+    // Step 129／130：SW 註冊失敗**不得**阻塞 boot()（改走離線降級）
+    registerServiceWorker();
+
+    // Step 143：頁面離開時 flush 遙測佇列（不得遺失已排入的事件）
+    window.addEventListener("pagehide", () => {
+        track("session_end", { chapter: 1, sessionMs: 0 });
+        reportVitals();
+        void flushTelemetry();
+    });
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") {
+            track("session_end", { chapter: 1, sessionMs: 0 });
+            void flushTelemetry();
+        }
+    });
+
     // Step 124：隊伍列在遊戲中隨時可見
     renderTeamDock($("team-dock"), bundle, progress, locale);
 
     track("session_start", { chapter: 1, sessionMs: 0 });
+
+    // Step 133：未取得法定代理人家長同意前，**不得** showStart()
+    // 同意閘期間先收起開始畫面（否則兩個遮罩會疊在一起）
+    $("start-overlay")?.classList.add("hidden");
+    const consentRoot = $("consent-gate-root");
+    const consented = await requireConsent(consentRoot, locale);
+    if (!consented) {
+        booting = false;
+        setStatus(locale === "en-US"
+            ? "A parent or guardian must agree before playing."
+            : "需由法定代理人家長同意後才能開始。");
+        return;
+    }
+
+    // Step 167：PWA 安裝引導（已在 standalone 或冷卻期內時自動略過）
+    initPwaInstall($("pwa-install-root"), locale);
+
+    // 啟動成功：移除錯誤恢復面板（若曾出現）
+    document.getElementById("boot-error-root")?.remove();
+    booting = false;
+
     showStart();
 }
 
@@ -274,6 +470,25 @@ function childVerbLabel(verb, locale) {
 /**
  * 載入場景設定（色票）。
  */
+/**
+ * 載入成效評量題庫（content/assessment.json）。
+ *
+ * 載入失敗時不得影響遊戲（bundle.assessment 保持 undefined，評量入口顯示 Empty 引導）。
+ */
+async function loadAssessmentData() {
+    try {
+        const res = await fetch("./content/assessment.json", { cache: "no-cache" });
+        if (res.ok) {
+            const data = await res.json();
+            if (bundle) {
+                bundle.assessment = data;
+            }
+        }
+    } catch (err) {
+        console.warn("[main] 評量題庫載入失敗", err);
+    }
+}
+
 async function loadScenes() {
     try {
         const res = await fetch("./content/scenes.json", { cache: "no-cache" });
@@ -304,6 +519,69 @@ async function loadPerformances() {
 }
 
 /**
+ * 綁定頁尾條款連結：於應用內開啟可捲動條款面板。
+ *
+ * 規範（Round 1 L3）：
+ *   - 攔截 click 以避免跳出獨立模式直接看原始 `.md`
+ *   - 保留 `href` 作為降級（例如 JS 失效時仍可下載文件）
+ *
+ * @param {HTMLElement} link
+ * @param {"privacy"|"terms"} kind
+ */
+function bindLegalLink(link, kind) {
+    link.addEventListener("click", (event) => {
+        event.preventDefault();
+        // 掛在 body 上（頁尾有 z-index stacking context，會限制面板層級）
+        openLegalDocument(document.body, kind, locale, () => {
+            link.focus();
+        });
+    });
+}
+
+/**
+ * 設定頁尾（Step 168）：隱私權、服務條款、版本號與聯絡信箱。
+ *
+ * 語系切換時更換條款文件路徑；缺欄位時降級為安全預設文案。
+ */
+function setupFooter() {
+    const footer = document.getElementById("app-footer");
+    if (!footer) return;
+
+    const en = locale === "en-US";
+
+    // 版本號（以建置常數為準，缺值時降級）
+    const versionEl = document.getElementById("footer-version");
+    if (versionEl) {
+        versionEl.textContent = en
+            ? `Version ${APP.version || "—"}`
+            : `版本 ${APP.version || "—"}`;
+    }
+
+    // 條款文件（雙語路徑）
+    const privacy = document.getElementById("footer-privacy");
+    if (privacy) {
+        privacy.setAttribute("href", en ? "./content/privacy.en-US.md" : "./content/privacy.zh-TW.md");
+        privacy.textContent = en ? "Privacy" : "隱私權政策";
+        bindLegalLink(privacy, "privacy");
+    }
+
+    const terms = document.getElementById("footer-terms");
+    if (terms) {
+        terms.setAttribute("href", en ? "./content/terms.en-US.md" : "./content/terms.zh-TW.md");
+        terms.textContent = en ? "Terms of Service" : "服務條款";
+        bindLegalLink(terms, "terms");
+    }
+
+    const support = document.getElementById("footer-support");
+    if (support) {
+        support.setAttribute("href", "mailto:support@mumu-game.app");
+        support.textContent = en ? "Contact" : "聯絡我們";
+    }
+
+    footer.setAttribute("aria-label", en ? "About and legal" : "關於與法律資訊");
+}
+
+/**
  * 判斷語系。
  * @returns {string}
  */
@@ -323,6 +601,38 @@ async function loadTimeline() {
         if (res.ok) setTimeline(await res.json());
     } catch (err) {
         console.warn("[main] 時間軸載入失敗，改用預設回饋", err);
+    }
+}
+
+/* ---------- 離線與 Service Worker ---------- */
+
+/**
+ * 註冊 Service Worker。
+ *
+ * 規範（Step 129／130）：
+ *   - 註冊失敗或**不被支援**時**不得**阻塞 boot()（遊戲仍可上網玩）
+ *   - 離線時顯示可理解的離線提示
+ *   - 配額不足時靜默降級（不得拋錯）
+ */
+function registerServiceWorker() {
+    if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) {
+        return;
+    }
+    try {
+        navigator.serviceWorker.register("./service-worker.js").catch((err) => {
+            console.warn("[main] Service Worker 註冊失敗，改為線上模式", err);
+        });
+    } catch (err) {
+        console.warn("[main] Service Worker 註冊失敗，改為線上模式", err);
+    }
+
+    const onOffline = () => showOfflineNotice(document.body, locale);
+    const onOnline = () => hideOfflineNotice(document.body);
+
+    window.addEventListener("offline", onOffline);
+    window.addEventListener("online", onOnline);
+    if (typeof navigator.onLine === "boolean" && !navigator.onLine) {
+        onOffline();
     }
 }
 
@@ -866,21 +1176,6 @@ function currentCompanion() {
     }
 }
 
-/**
- * 取得角色相對於粒子層的座標原點。
- * @param {HTMLElement} mount
- * @returns {{ x: number, y: number }}
- */
-function characterOrigin(mount) {
-    const layer = $("snow-container");
-    if (!mount || !layer) return { x: 0, y: 0 };
-    const rect = mount.getBoundingClientRect();
-    const layerRect = layer.getBoundingClientRect();
-    return {
-        x: rect.left - layerRect.left + rect.width / 2,
-        y: rect.top - layerRect.top + rect.height * 0.4
-    };
-}
 
 /**
  * 標記序列玩法中「已答對的項」（持久化的視覺標記）。
@@ -911,6 +1206,40 @@ function markSequenceStepLit() {
 }
 
 /* ---------- 回合 UI ---------- */
+
+/**
+ * 語音不可用／靜音／無語音包 → 顯示視覺替代提示（Step 205）。
+ * 不識字幼兒僅看圖卡與脈衝即可完成回合。
+ */
+on("voice:unavailable", (event) => {
+    const payload = /** @type {any} */ (event?.payload || {});
+    const root = document.getElementById("tv-view") || document.body;
+    showVisualFallback(root, {
+        text: payload.text ? String(payload.text) : "",
+        reason: payload.reason ? String(payload.reason) : "unsupported",
+        locale: payload.locale ? String(payload.locale) : locale
+    });
+    const live = document.getElementById("sr-live");
+    if (live) {
+        live.textContent = locale === "en-US"
+            ? "Voice unavailable. Use the visual cards to answer."
+            : "語音無法使用，請看視覺圖卡作答";
+    }
+});
+
+/**
+ * 最小對的視覺替代：兩個音並列成大字卡。
+ */
+on("voice:pair", (event) => {
+    const payload = /** @type {any} */ (event?.payload || {});
+    const root = document.getElementById("tv-view") || document.body;
+    const pair = Array.isArray(payload.pair) ? payload.pair.map((/** @type {any} */ w) => String(w)) : [];
+    showVisualFallback(root, {
+        pair,
+        locale: payload.locale ? String(payload.locale) : locale
+    });
+});
+
 on("round:listen", () => {
     setStatus(locale === "en-US" ? "Listen..." : "聽一聽…");
     $("turn-signal").classList.remove("on");
@@ -923,26 +1252,14 @@ on("round:input-ready", () => {
 });
 
 on("round:correct", () => {
-    haptic("correct");
-    playSfx("glass.chime");
+    // Step 126／128：回合回饋三重奏統一由 round-feedback.js 負責
+    feedbackCorrect();
+    hideVisualFallback(document.body);
 
-    // ① 角色表情：切到 happy mood
-    setMood($("santa-container"), "happy");
-
-    // ② 角色專屬的慶祝音效（content/characters.json 的 traits.celebrate）
+    // 角色專屬的慶祝音效（content/characters.json 的 traits.celebrate）
     playCompanionSfx("celebrate");
 
-    // ③ 粒子於角色位置
-    const mount = $("santa-container");
-    if (mount) {
-        burst($("snow-container"), {
-            kind: "sparkle",
-            count: 16,
-            origin: characterOrigin(mount)
-        });
-    }
-
-    // ④ 選項按鈕的成功動畫（放大回彈 + 綠色描邊）
+    // 選項按鈕的成功動畫（放大回彈 + 綠色描邊）
     const btn = document.querySelector(".control-btn--chosen") || document.querySelector(".control-btn");
     if (btn) {
         btn.classList.add("control-btn--correct");
@@ -954,21 +1271,8 @@ on("round:correct", () => {
 });
 
 on("round:wrong", () => {
-    haptic("wrong");
-    playSfx("ui.soft-low");
-
-    // 角色切到 **hint** mood（友善）—— 不得使用 sad（幼兒產品原則：錯了不懲罰）
-    setMood($("santa-container"), "hint");
-
-    // 角色搖頭動畫（既有 char-wiggle）
-    const mount = $("santa-container");
-    if (mount) {
-        const art = /** @type {HTMLElement|null} */ (mount.querySelector(".char__art"));
-        art?.classList.remove("anim-wiggle");
-        void art?.offsetWidth;
-        art?.classList.add("anim-wiggle");
-        window.setTimeout(() => art?.classList.remove("anim-wiggle"), 900);
-    }
+    // Step 128：友善提示（hint mood，**不得** sad、不得負面音效）
+    feedbackWrong();
 
     // 不得有倒數、扣分、負面音效
     setStatus(locale === "en-US" ? "Try again!" : "再試一次！");
@@ -988,19 +1292,15 @@ on("round:progress", () => {
 on("round:step", () => {
     // Step 126：序列玩法的中間步驟（答對一項但回合未完成）必須有**獨立的回饋**
     //  - 該項點亮（持久化的視覺標記）
-    //  - 角色給一個小反應（char-bounce）
+    //  - 角色給一個小反應（獨立於答對回饋）
     //  - 不得顯示「答錯」、不得扣分
-    haptic("tap");
     markSequenceStepLit();
-    // 小反應（char-bounce）後自動還原為 listen；
-    // 若期間發生其他回饋，setMood 會取消這個還原計時器（不得覆蓋新 mood）
-    setMood($("santa-container"), "happy", { revertAfter: 900, revertTo: "listen" });
-
+    feedbackStep();
     updateSequenceProgress();
 });
 
 on("level:complete", () => {
-    haptic("celebrate");
+    feedbackLevelComplete();
 });
 
 /**
@@ -1179,7 +1479,14 @@ function renderPuzzleBoard(controls, engine) {
             if (result.correct) {
                 // 正確：吸附進目標區 ＋ 粒子回饋
                 const piece = pieces.find((/** @type {any} */ p) => p.index === pieceIndex);
-                slot.innerHTML = piece?.dataUrl ? `<img src="${piece.dataUrl}" alt="" />` : "";
+                // 圖片以 DOM API 建立（不經 innerHTML 注入內容型資料）
+                slot.textContent = "";
+                if (piece?.dataUrl) {
+                    const img = document.createElement("img");
+                    img.src = piece.dataUrl;
+                    img.alt = "";
+                    slot.appendChild(img);
+                }
                 slot.classList.add("is-filled");
                 tray?.querySelector(`[data-piece-index="${pieceIndex}"]`)?.remove();
                 haptic("correct");
@@ -1208,7 +1515,7 @@ function renderMemoryBoard(controls, engine) {
     const cards = engine.getCards() || [];
 
     controls.innerHTML = `<div class="memory-grid">${cards.map((/** @type {any} */ c) => `
-        <div class="dex-card dex-card--memory" data-slot="${c.slot}" role="button" tabindex="0"
+        <div class="dex-card dex-card--memory" data-slot="${Number(c.slot) || 0}" role="button" tabindex="0"
              aria-label="${locale === "en-US" ? "Footprint card" : "恐龍足跡卡"}">
             <div class="memory-face memory-face--back">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f7fbff"
@@ -1218,10 +1525,16 @@ function renderMemoryBoard(controls, engine) {
                 </svg>
             </div>
             <div class="memory-face memory-face--front">
-                <span class="control-btn__label">${c.shape}</span>
+                <span class="control-btn__label"></span>
             </div>
         </div>
     `).join("")}</div>`;
+
+    // 內容型資料（卡面圖樣）以 textContent 注入，不經 innerHTML
+    controls.querySelectorAll(".dex-card--memory").forEach((card, i) => {
+        const label = card.querySelector(".control-btn__label");
+        if (label) label.textContent = safeText(cards[i]?.shape);
+    });
 
     const handleFlip = (/** @type {HTMLElement} */ card) => {
         if (state.locked) return;
@@ -1336,12 +1649,27 @@ function wire() {
     });
 
     document.addEventListener("parent:request", async () => {
-        // 家長端必須通過家長閘門（算術題或長按 3 秒），避免幼兒誤入評量介面
+        await openParentReportView();
+    });
+
+    /**
+     * 開啟家長報告。
+     *
+     * 家長端**必須**通過家長閘門（算術題或長按 3 秒），避免幼兒誤入評量介面。
+     * 同一 session 已通過閘門者不重複詢問（評量完成後回填報告時使用）。
+     *
+     * @param {boolean} [forceGate] 強制重新詢問閘門
+     * @returns {Promise<boolean>}
+     */
+    async function openParentReportView(forceGate = false) {
         const gateRoot = $("parent-report-root");
-        const passed = await requireParentalGate(gateRoot, {
-            reason: locale === "en-US" ? "Parent verification" : "請家長先驗證"
-        });
-        if (!passed) return;
+        if (forceGate || !parentGatePassed) {
+            const passed = await requireParentalGate(gateRoot, {
+                reason: locale === "en-US" ? "Parent verification" : "請家長先驗證"
+            });
+            if (!passed) return false;
+            parentGatePassed = true;
+        }
 
         const root = $("parent-report-root");
         renderParentReport(root, progress, bundle, locale);
@@ -1359,6 +1687,44 @@ function wire() {
         root.classList.remove("hidden");
         pushOverlay("parent-report");
         track("parent_report_view", {});
+
+        // 成效評量入口
+        root.querySelector("#parent-assessment-start")?.addEventListener("click", () => {
+            root.dispatchEvent(new CustomEvent("assessment:request", { bubbles: true }));
+        });
+        return true;
+    }
+
+    /**
+     * 成效評量入口（Step 157）：經家長閘門驗證後方可進入前／後測。
+     *
+     * 評量結果寫入獨立儲存鍵，不得汙染兒童遊戲進度。
+     */
+    document.addEventListener("assessment:request", async () => {
+        const gateRoot = $("parent-report-root");
+        const passed = await requireParentalGate(gateRoot, {
+            reason: locale === "en-US" ? "Parent verification" : "請家長先驗證"
+        });
+        if (!passed) return;
+
+        const phase = nextPhase();
+        if (!phase) return;
+
+        const root = $("assessment-root");
+        $("parent-report-root").classList.add("hidden");
+
+        root.innerHTML = "";
+        root.classList.remove("hidden");
+        pushOverlay("assessment");
+
+        runAssessment(root, bundle, locale, phase, (summary) => {
+            track("assessment_complete", { phase, correctRate: summary?.correctRate ?? 0 });
+            // 完成後回到家長報告以檢視閉環結果
+            root.classList.add("hidden");
+            const idx = overlayStack.indexOf("assessment");
+            if (idx >= 0) overlayStack.splice(idx, 1);
+            void openParentReportView();
+        });
     });
 
     document.addEventListener("paywall:request", (/** @type {CustomEvent} */ e) => {
@@ -1367,8 +1733,8 @@ function wire() {
             id: feature,
             title: locale === "en-US" ? "Unlock the full journey" : "解鎖完整旅程",
             body: locale === "en-US"
-                ? "Chapters 4 and 5, the dinosaur valley theme pack, the full parent report and cross-device sync."
-                : "第 4–5 章、恐龍谷主題包、家長報告完整版與跨裝置同步。",
+                ? "Chapters 4 and 5, the dinosaur valley theme pack and the full parent report. Your data stays on this device; nothing is uploaded to a server."
+                : "第 4–5 章、恐龍谷主題包與家長報告完整版。所有資料僅儲存於本機裝置，不會上傳到伺服器。",
             cta: locale === "en-US" ? "Subscribe annually" : "訂閱年方案",
             price: "NT$790 / 年",
             features: []
@@ -1429,6 +1795,35 @@ function wire() {
                 preferencesPanel?.applyPreferences();
             });
             root.appendChild(toggle);
+
+            // Step 167：家長可隨時開啟安裝引導
+            if (!root.querySelector("#settings-install")) {
+                const installToggle = document.createElement("button");
+                installToggle.id = "settings-install";
+                installToggle.className = "level-btn level-btn--secondary";
+                installToggle.type = "button";
+                installToggle.textContent = locale === "en-US" ? "Add to Home Screen" : "加入主畫面";
+                installToggle.addEventListener("click", () => {
+                    root.classList.add("hidden");
+                    showInstallGuide($("pwa-install-root"), locale);
+                });
+                root.appendChild(installToggle);
+            }
+
+            // Step 133／134：家長可隨時開啟同意設定（撤回個別同意）
+            if (!root.querySelector("#settings-consent")) {
+                const consentToggle = document.createElement("button");
+                consentToggle.id = "settings-consent";
+                consentToggle.className = "level-btn level-btn--secondary";
+                consentToggle.type = "button";
+                consentToggle.textContent = locale === "en-US" ? "Privacy consent" : "隱私權同意";
+                consentToggle.addEventListener("click", async () => {
+                    root.classList.add("hidden");
+                    await openConsentSettings($("consent-gate-root"), locale);
+                    root.classList.remove("hidden");
+                });
+                root.appendChild(consentToggle);
+            }
 
             const close = document.createElement("button");
             close.id = "settings-close";

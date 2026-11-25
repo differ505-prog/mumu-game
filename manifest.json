@@ -1,7 +1,7 @@
 {
-  "name": "Santa's Little Helper",
-  "short_name": "Santa Helper",
-  "description": "幼兒聽覺辨識與認知訓練遊戲：六個認知動詞、24 隻恐龍圖鑑與六章故事。",
+  "name": "木木遊戲：聖誕小幫手",
+  "short_name": "木木遊戲",
+  "description": "幼兒聽覺辨識與認知訓練遊戲：六個認知動詞、24 隻恐龍圖鑑與六章故事。資料僅儲存於本機裝置。",
   "lang": "zh-TW",
   "start_url": "./index.html",
   "scope": "./",
@@ -9,7 +9,11 @@
   "orientation": "any",
   "background_color": "#0a1a3c",
   "theme_color": "#0a1a3c",
-  "categories": ["education", "games", "kids"],
+  "categories": [
+    "education",
+    "games",
+    "kids"
+  ],
   "icons": [
     {
       "src": "icon-192.png",
@@ -28,6 +32,41 @@
       "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "id": "/mumu-santas-little-helper",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "開始遊戲",
+      "short_name": "開始",
+      "url": "./index.html",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "恐龍圖鑑",
+      "short_name": "圖鑑",
+      "url": "./index.html#dex",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }

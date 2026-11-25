@@ -158,6 +158,61 @@ for (const file of codeFiles) {
     }
 }
 
+/* --- 5b. OG／SEO Meta 與 Manifest（Step 168）--- */
+{
+    const html = readFileSync(join(root, "index.html"), "utf8");
+
+    // Open Graph 必備欄位
+    for (const prop of ["og:title", "og:description", "og:image", "og:url", "og:type"]) {
+        if (!html.includes(`property="${prop}"`)) {
+            problems.push(`index.html 缺少 Open Graph meta: ${prop}`);
+        }
+    }
+
+    // Twitter Card 必備欄位
+    for (const name of ["twitter:card", "twitter:title", "twitter:description", "twitter:image"]) {
+        if (!html.includes(`name="${name}"`)) {
+            problems.push(`index.html 缺少 Twitter Card meta: ${name}`);
+        }
+    }
+
+    // Canonical
+    if (!/<link[^>]+rel="canonical"/.test(html)) {
+        problems.push("index.html 缺少 canonical link");
+    }
+
+    // og:image 必須指向存在的圖檔
+    const ogMatch = html.match(/property="og:image"\s+content="([^"]+)"/);
+    if (ogMatch) {
+        const ref = ogMatch[1].replace(/^\.\//, "");
+        if (!existsSync(join(root, ref))) {
+            problems.push(`og:image 檔案不存在: ${ogMatch[1]}`);
+        }
+    }
+
+    // 頁尾條款入口
+    for (const id of ["app-footer", "footer-privacy", "footer-terms", "footer-support", "footer-version"]) {
+        if (!html.includes(`id="${id}"`)) {
+            problems.push(`index.html 缺少頁尾元素: #${id}`);
+        }
+    }
+    if (/example\.com|TODO/.test(html)) {
+        problems.push("index.html 含 example.com 或 TODO 佔位字樣");
+    }
+
+    // manifest 必備欄位
+    if (!manifest.id) {
+        problems.push("manifest.json 缺少 id");
+    }
+    if (!Array.isArray(manifest.shortcuts) || !manifest.shortcuts.length) {
+        problems.push("manifest.json 缺少 shortcuts");
+    }
+    const maskable = (manifest.icons || []).some((i) => String(i.purpose || "").includes("maskable"));
+    if (!maskable) {
+        problems.push("manifest.json 缺少 maskable icon");
+    }
+}
+
 /* --- 6. 體積報告 --- */
 function dirSize(dir) {
     if (!existsSync(dir)) return 0;

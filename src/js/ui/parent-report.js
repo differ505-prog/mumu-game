@@ -9,6 +9,7 @@
 
 import { masteryPercent } from "../core/mastery.js";
 import { totalStars } from "../core/progress.js";
+import { loadAssessmentRuns, nextPhase } from "./assessment-ui.js";
 
 /**
  * 雷達圖軸定義。
@@ -34,7 +35,8 @@ export function renderParentReport(root, progress, bundle, locale) {
     const en = locale === "en-US";
     const mastery = progress.mastery || {};
 
-    const radar = buildRadar(mastery, en);
+    // buildRadar() 僅以數值與靜態常數組成 SVG，無任何使用者內容 → 安全片段
+    const radarSafe = buildRadar(mastery, en);
     const weakest = findWeakest(mastery);
     const suggestions = buildSuggestions(mastery, weakest, en);
     const stars = totalStars(progress);
@@ -42,7 +44,30 @@ export function renderParentReport(root, progress, bundle, locale) {
     const dexTotal = bundle?.dex?.length || 24;
     const weekly = weeklyMinutes(progress);
 
-    const assessment = assessmentComparison(progress, en);
+    // 成效評量讀取**獨立**儲存鍵（Step 157：不得依賴兒童進度物件）
+    const assessmentSafe = assessmentComparison(progress, en, loadAssessmentRuns());
+
+    // 評量入口（家長端，經閘門驗證後方可進入）
+    const pending = nextPhase();
+    const assessmentEntry = `
+        <section class="parent-report__section parent-report__assessment-entry">
+            <h3>${en ? "Progress Assessment" : "成效評估"}</h3>
+            <p class="parent-report__hint">
+                ${pending === "pre"
+                    ? (en ? "Start the first measurement so we can track growth." : "開始第一次測量，以便追蹤孩子的學習成長。")
+                    : pending === "post"
+                        ? (en ? "The follow-up measurement is ready." : "後測已準備好，可以開始第二次測量。")
+                        : (en ? "Both measurements are complete. Results are shown above." : "前後測皆已完成，結果顯示於上方。")}
+            </p>
+            <button class="level-btn" id="parent-assessment-start" type="button" ${pending ? "" : "disabled"}>
+                ${pending === "pre"
+                    ? (en ? "Start pre-test" : "開始前測")
+                    : pending === "post"
+                        ? (en ? "Start follow-up" : "開始後測")
+                        : (en ? "Completed" : "已完成")}
+            </button>
+        </section>
+    `;
 
     root.innerHTML = `
         <div class="parent-report">
@@ -50,7 +75,7 @@ export function renderParentReport(root, progress, bundle, locale) {
 
             <section class="parent-report__section">
                 <h3>${en ? "Skill Mastery" : "技能掌握度"}</h3>
-                ${radar}
+                ${radarSafe}
                 <div class="parent-report__legend">
                     ${AXES.map((a) => {
                         const entry = mastery[a.key];
@@ -64,9 +89,7 @@ export function renderParentReport(root, progress, bundle, locale) {
 
             <section class="parent-report__section">
                 <h3>${en ? "This Week's Focus" : "本週建議"}</h3>
-                <ul class="parent-report__suggestions">
-                    ${suggestions.map((s) => `<li>${s}</li>`).join("")}
-                </ul>
+                <ul class="parent-report__suggestions"></ul>
             </section>
 
             <section class="parent-report__section parent-report__stats">
@@ -88,7 +111,8 @@ export function renderParentReport(root, progress, bundle, locale) {
                 </div>
             </section>
 
-            ${assessment}
+            ${assessmentSafe}
+            ${assessmentEntry}
 
             <section class="parent-report__section">
                 <h3>${en ? "Encyclopedia Progress" : "圖鑑進度"}</h3>
@@ -125,9 +149,9 @@ export function renderParentReport(root, progress, bundle, locale) {
             en ? "This week's focus:" : "本週建議：",
             ...suggestions.map((s) => `  - ${s}`)
         ];
-        if (assessment) {
+        if (assessmentSafe) {
             lines.push("", en ? "Assessment comparison" : "成效前後測對照");
-            lines.push(assessment.replace(/<[^>]+>/g, " "));
+            lines.push(assessmentSafe.replace(/<[^>]+>/g, " "));
         }
         return lines.join("\n");
     }
@@ -279,8 +303,10 @@ function weeklyMinutes(progress) {
  * @param {boolean} en
  * @returns {string}
  */
-function assessmentComparison(progress, en) {
-    const runs = progress.assessmentRuns || [];
+function assessmentComparison(progress, en, storedRuns) {
+    const runs = Array.isArray(storedRuns) && storedRuns.length
+        ? storedRuns
+        : (progress?.assessmentRuns || []);
     const pre = runs.find((/** @type {any} */ r) => r.phase === "pre");
     const post = runs.find((/** @type {any} */ r) => r.phase === "post");
 
@@ -297,8 +323,10 @@ function assessmentComparison(progress, en) {
         `;
     }
 
-    const preRate = Math.round(pre.summary.correctRate * 100);
-    const postRate = Math.round(post.summary.correctRate * 100);
+    const preSummary = pre.summary || pre.data?.summary || { correctRate: 0, total: 0 };
+    const postSummary = post.summary || post.data?.summary || { correctRate: 0, total: 0 };
+    const preRate = Math.round(Number(preSummary.correctRate || 0) * 100);
+    const postRate = Math.round(Number(postSummary.correctRate || 0) * 100);
     const delta = postRate - preRate;
 
     return `
@@ -320,8 +348,8 @@ function assessmentComparison(progress, en) {
             </div>
             <p class="parent-report__hint">
                 ${en
-                    ? `The follow-up measurement was taken with parallel but different items, so it reflects learning rather than memorised answers. Sample size: ${post.summary.total} responses.`
-                    : `後測採相同認知目標、不同題面進行，因此反映的是學習成果而非記憶答案。樣本數：${post.summary.total} 題。`}
+                    ? `The follow-up measurement was taken with parallel but different items, so it reflects learning rather than memorised answers. Sample size: ${postSummary.total} responses.`
+                    : `後測採相同認知目標、不同題面進行，因此反映的是學習成果而非記憶答案。樣本數：${postSummary.total} 題。`}
             </p>
         </section>
     `;

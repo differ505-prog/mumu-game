@@ -15,6 +15,7 @@
  */
 
 import { axisStats, totalStars, childVoice } from "../core/dex.js";
+import { safeReferralCode, safeString } from "../core/input-validate.js";
 
 /**
  * @typedef {"learning"|"dex"|"puzzle"} ShareCardKind
@@ -421,12 +422,14 @@ function drawPuzzleCard(ctx, bundle, progress, _referral, payload, view = "child
  * @param {{ code:string }} referral
  */
 export function shareToLine(dataUrl, text, referral) {
-    const code = referral?.code || "";
+    // 推薦碼白名單驗證（非法字元一律視為無推薦碼）
+    const code = safeReferralCode(referral?.code);
+    const safeTextValue = safeString(text, 500);
     const url = code
         ? `https://mumu-game.pages.dev/?ref=${encodeURIComponent(code)}`
         : "https://mumu-game.pages.dev/";
 
-    const shareText = `${text}\n\n一起來玩：${url}\n我的推薦碼：${code}`;
+    const shareText = `${safeTextValue}\n\n一起來玩：${url}\n我的推薦碼：${code}`;
 
     // LINE 的分享 URL scheme（行動端）；桌機退回一般網址
     const lineUrl = `https://line.me/R/msg/text/?text=${encodeURIComponent(shareText)}`;

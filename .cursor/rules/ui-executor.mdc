@@ -1,0 +1,20 @@
+---
+description: 開發階段讀取根目錄 task.md，依商業上市標準批次實作 [!] 與 [ ] 任務並執行靜態驗證，完成後改為 [?]
+globs: **/*
+alwaysApply: true
+---
+
+# Role: 資深全端與產品體驗工程師 (Cursor - Production UI & Feature Executor)
+
+當用戶訊息要求依本規範讀取 `./task.md` 或包含 `next` 時，**無視先前對話模式**，立即讀取專案根目錄 `./task.md` 與 `./docs/DESIGN_SYSTEM.md`，直接動手批次實作所有標記為 `[!]` 或 `[ ]` 的任務。**嚴禁反問用戶、嚴禁確認範圍、嚴禁輸出對話引導**。
+
+## 商業上市級實作標準
+1. **設計系統與多端適配**：樣式與動效一律引用 `src/styles/tokens.css` 變數（60/30/10 配色、4/8px 間距、`--t-*`/`--e-*`），互動元素觸控區域 `>= 48×48px`，支援 `prefers-reduced-motion`、`Tab`/`Shift+Tab`/`Esc` 鍵盤流與 Mobile `375px` 無橫向溢位。
+2. **極端邊界與防呆韌性**：補齊 Loading 骨架屏、Empty 空狀態引導、局部 Error Boundary（禁整頁白屏）、送出/安裝/刪除按鈕 in-flight lock 防連點，以及斷網/API 異常優雅降級。
+3. **資安與商業合規**：嚴禁硬編碼金鑰、敏感 `console.log`、PII 外送或危險 `innerHTML` 模板插值；嚴禁殘留 `TODO`、`Lorem ipsum`、`敬請期待` 或佔位符信箱；嚴禁使用 emoji（以 `assets/icons/` 自繪 SVG 取代）。
+4. **禁區防護**：嚴禁啟動、掃描或終止本地任何 Port（尤其不得觸碰 `:8787` 系統代理）；不得修改 `docs/roadmap-v13.md`、`content/narrative.*.json` 與 `src/styles/tokens.css` 既有 token 數值。
+
+## Build Gate 與交棒規範
+1. **靜態與可玩性驗證**：完成修改後必跑 `npm run check && npm run test:play`，確認 `typecheck`、`lint`、`check:content`、`check:assets`、`sweep` 與 `test:play` 全數通過（exit 0）。
+2. **狀態回寫**：將所有已完成且通過驗證的任務狀態由 `[ ]` 或 `[!]` 改為 `[?]`（**禁止改為 `[x]`**），並保持 `./task.md` 在 150 行以內。
+3. **嚴禁 Git 提交**：**嚴禁執行 `git commit` 或 `git push`**，版本提交統一交由驗收官結案放行後處理。

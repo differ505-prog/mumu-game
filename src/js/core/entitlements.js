@@ -2,7 +2,7 @@
  * 權益控管 — 免費公測邊界。
  *
  * 免費＝序章＋第 1–3 章（共 12 關）
- * 付費＝第 4–5 章、恐龍谷主題包、家長報告完整版、跨裝置同步
+ * 付費＝第 4–5 章、恐龍谷主題包、家長報告完整版、本機資料備份與還原
  *
  * 規範：**不提供月訂閱選項**，只推年訂閱（台港 NT$790，另測 NT$990）。
  */
@@ -23,7 +23,7 @@ export const FREE_CHAPTERS = [0, 1, 2, 3];
 
 /**
  * 可控管的功能。
- * @typedef {"chapter4"|"chapter5"|"dinoTheme"|"parentReportFull"|"sync"|"extraPack"} Feature
+ * @typedef {"chapter4"|"chapter5"|"dinoTheme"|"parentReportFull"|"localBackup"|"extraPack"} Feature
  */
 
 /**
@@ -63,7 +63,7 @@ export function canAccess(feature, current = getEntitlement()) {
             return false;
         case "parentReportFull":
             return false;
-        case "sync":
+        case "localBackup":
             return false;
         case "extraPack":
             return false;
@@ -91,7 +91,7 @@ export const PLANS = [
         titleEn: "Annual",
         price: "NT$790 / 年",
         priceEn: "NT$790 / year",
-        features: ["第 4–5 章完整內容", "恐龍谷主題包", "家長報告完整版", "跨裝置同步"]
+        features: ["第 4–5 章完整內容", "恐龍谷主題包", "家長報告完整版", "本機資料備份與還原"]
     },
     {
         id: "family",

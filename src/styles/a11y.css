@@ -143,3 +143,131 @@ input[type="checkbox"]:focus-visible {
         font-style: italic;
     }
 }
+
+/* ---------- 視覺輔助（無聲可玩）Step 205 ---------- */
+.visual-fallback {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--s-2);
+    padding: var(--s-2);
+    margin: 0 auto var(--s-2);
+    max-width: 640px;
+    border-radius: var(--r-md);
+    background: rgba(10, 26, 60, 0.72);
+    border: 2px solid var(--accent-warm);
+}
+
+.visual-fallback.hidden {
+    display: none;
+}
+
+.visual-fallback__hint {
+    margin: 0;
+    font-size: 1rem;
+    color: #f7fbff;
+    text-align: center;
+}
+
+.visual-fallback__text {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #f7fbff;
+    text-align: center;
+}
+
+/* 最小對：兩張並列大字卡（供不識字幼兒比較） */
+.visual-fallback__cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    justify-content: center;
+}
+
+.visual-fallback__card {
+    min-width: 96px;
+    min-height: 96px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--s-2) var(--s-1);
+    font-size: 2rem;
+    font-weight: 800;
+    color: #16294f;
+    background: #f7fbff;
+    border-radius: var(--r-md);
+    border: 3px solid var(--accent-warm);
+}
+
+/* 節奏脈衝圖示（純 CSS，禁 emoji） */
+.visual-fallback__pulses {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1);
+    justify-content: center;
+}
+
+.visual-fallback__pulse {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--accent-warm);
+    animation: visual-pulse 1.2s ease-in-out infinite;
+}
+
+.visual-fallback__pulse:nth-child(2n) {
+    animation-delay: 0.3s;
+}
+
+.visual-fallback__pulse:nth-child(3n) {
+    animation-delay: 0.6s;
+}
+
+@keyframes visual-pulse {
+    0%, 100% {
+        transform: scale(0.8);
+        opacity: 0.55;
+    }
+
+    50% {
+        transform: scale(1.15);
+        opacity: 1;
+    }
+}
+
+[data-reduced-motion="on"] .visual-fallback__pulse,
+.reduced-motion .visual-fallback__pulse {
+    animation: none;
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* ---------- 單手大目標（Step 206） ---------- */
+[data-large-targets="on"] .control-btn,
+.large-targets .control-btn {
+    min-width: 72px;
+    min-height: 72px;
+    font-size: 1.5rem;
+}
+
+[data-large-targets="on"] .mode-option,
+.large-targets .mode-option {
+    min-height: 72px;
+}
+
+[data-large-targets="on"] .visual-fallback__card,
+.large-targets .visual-fallback__card {
+    min-width: 120px;
+    min-height: 120px;
+    font-size: 2.5rem;
+}
+
+/* ---------- 視覺輔助模式：控制區加大對比 ---------- */
+[data-visual-assist="on"] .controls-grid {
+    gap: var(--s-2);
+}
+
+[data-visual-assist="on"] .control-btn {
+    border-width: 3px;
+}

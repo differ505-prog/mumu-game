@@ -4,6 +4,7 @@
 
 import { applyTheme } from "./parallax.js";
 import { speak } from "../audio/voice.js";
+import { escapeHtml, safeText } from "../core/sanitize-html.js";
 
 /**
  * 顯示全屏過場。
@@ -21,13 +22,20 @@ export function showStoryScene(root, scene, onClose) {
     const speakingLabel = en ? "Speaking\u2026" : "正在說\u2026";
     const ctaLabel = scene.cta || (en ? "Continue" : "繼續");
 
+    // 內容型資料一律 escape（不得以模板字串直接注入）
+    const theme = escapeHtml(safeText(scene.theme));
+    const art = safeText(scene.art);
+    const title = escapeHtml(safeText(scene.title));
+    const tagline = escapeHtml(safeText(scene.tagline));
+    const body = escapeHtml(safeText(scene.body));
+
     root.innerHTML = `
-        <div class="story-scene" data-theme="${scene.theme || ""}">
-            ${scene.art ? `<img class="story-scene__art" src="${scene.art}" alt="" />` : ""}
+        <div class="story-scene" data-theme="${theme}">
+            ${art ? `<img class="story-scene__art" src="${escapeHtml(art)}" alt="" />` : ""}
             <div class="story-scene__body">
-                <h2 class="story-scene__title">${scene.title}</h2>
-                ${scene.tagline ? `<p class="story-scene__tagline">${scene.tagline}</p>` : ""}
-                <p class="story-scene__text">${scene.body}</p>
+                <h2 class="story-scene__title">${title}</h2>
+                ${tagline ? `<p class="story-scene__tagline">${tagline}</p>` : ""}
+                <p class="story-scene__text">${body}</p>
                 <button class="level-btn" id="story-cta" type="button">${speakingLabel}</button>
             </div>
         </div>
@@ -83,12 +91,17 @@ export function showLetter(root, letter, signature = "", onClose, title = "") {
     const speakingLabel = en ? "Speaking…" : "正在說…";
     const closeLabel = en ? "Close" : "關上";
 
+    // 內容型資料一律 escape（信件為長文字，必須完整顯示不得截斷）
+    const safeTitle = escapeHtml(safeText(title));
+    const safeLetter = escapeHtml(safeText(letter));
+    const safeSignature = escapeHtml(safeText(signature));
+
     root.innerHTML = `
         <div class="letter-wrap">
             <article class="letter" id="print-letter">
-                ${title ? `<h2 class="letter__title">${title}</h2>` : ""}
-                <div class="letter__body">${letter}</div>
-                ${signature ? `<div class="letter__signature">${signature}</div>` : ""}
+                ${safeTitle ? `<h2 class="letter__title">${safeTitle}</h2>` : ""}
+                <div class="letter__body">${safeLetter}</div>
+                ${safeSignature ? `<div class="letter__signature">${safeSignature}</div>` : ""}
                 <button class="level-btn letter__close" id="letter-close" type="button">
                     ${speakingLabel}
                 </button>

@@ -12,6 +12,66 @@ import { emit } from "../core/events.js";
 let voiceProfile = { pitch: 1.0, rate: 0.85 };
 
 /**
+ * 語音輸出是否被使用者關閉（視覺輔助模式）。
+ * @type {boolean}
+ */
+let speechEnabled = true;
+
+/**
+ * 降級原因。
+ * @typedef {"unsupported"|"muted"|"no-voice"|"error"} VoiceDegradeReason
+ */
+
+/**
+ * 設定語音輸出開關（關閉後改由視覺替代提示接手）。
+ * @param {boolean} enabled
+ */
+export function setSpeechEnabled(enabled) {
+    speechEnabled = enabled !== false;
+    if (!speechEnabled) {
+        stopSpeaking();
+    }
+}
+
+/**
+ * 語音輸出是否開啟。
+ * @returns {boolean}
+ */
+export function speechEnabledNow() {
+    return speechEnabled;
+}
+
+/**
+ * 取得可觀測的語音降級狀態（Step 205／206）。
+ *
+ * @returns {{ supported: boolean, muted: boolean, hasVoice: boolean, reason: VoiceDegradeReason|null }}
+ */
+export function getVoiceState() {
+    const supported = typeof window !== "undefined" && Boolean(window.speechSynthesis);
+    if (!supported) {
+        return { supported: false, muted: false, hasVoice: false, reason: "unsupported" };
+    }
+    if (!speechEnabled) {
+        return { supported: true, muted: true, hasVoice: false, reason: "muted" };
+    }
+    // 語音清單尚未載入（getVoices() 為空）→ 視為尚未就緒但不得誤判為降級
+    let voices = [];
+    try {
+        voices = window.speechSynthesis.getVoices() || [];
+    } catch {
+        voices = [];
+    }
+    if (!voices.length) {
+        return { supported: true, muted: false, hasVoice: true, reason: null };
+    }
+    const hasVoice = Boolean(pickVoice("zh-TW"));
+    if (!hasVoice) {
+        return { supported: true, muted: false, hasVoice: false, reason: "no-voice" };
+    }
+    return { supported: true, muted: false, hasVoice: true, reason: null };
+}
+
+/**
  * 設定語音設定檔。
  * @param {string} locale
  * @param {{ pitch: number, rate: number }} voice
@@ -46,8 +106,14 @@ export function pickVoice(locale) {
  */
 export function speak(text, opts = {}) {
     if (!text) return;
-    if (!window.speechSynthesis) {
-        emit({ type: "voice:unavailable", payload: { text } });
+
+    const state = getVoiceState();
+    if (!state.supported || state.muted || !state.hasVoice) {
+        // 降級：語音不可用／靜音／無語音包 → 交由視覺替代提示接手
+        emit({
+            type: "voice:unavailable",
+            payload: { text, reason: state.reason || "no-voice", locale: opts.locale || "zh-TW" }
+        });
         showSubtitle(text);
         opts.onEnd?.();
         return;
@@ -65,7 +131,10 @@ export function speak(text, opts = {}) {
     if (picked) utter.voice = picked;
 
     utter.onerror = () => {
-        emit({ type: "voice:unavailable", payload: { text } });
+        emit({
+            type: "voice:unavailable",
+            payload: { text, reason: "error", locale: opts.locale || "zh-TW" }
+        });
         showSubtitle(text);
         opts.onEnd?.();
     };
@@ -91,6 +160,9 @@ export function speak(text, opts = {}) {
 export function speakMinimalPair(locale, pairs, gapMs = 900) {
     if (!pairs || pairs.length < 2) return;
     const [a, b] = pairs;
+
+    // 最小對的視覺替代：兩個音以大字卡片並列，供不識字／無聲環境的幼兒比較
+    emit({ type: "voice:pair", payload: { pair: [a, b], locale } });
 
     speak(a, { locale, rate: voiceProfile.rate * 0.92 });
     setTimeout(() => {
@@ -122,6 +194,15 @@ export function stopSpeaking() {
  */
 export function voiceAvailable() {
     return Boolean(window.speechSynthesis);
+}
+
+/**
+ * 語音是否需要視覺替代（不可用／靜音／無語音包）。
+ * @returns {boolean}
+ */
+export function needsVisualFallback() {
+    const state = getVoiceState();
+    return state.reason !== null;
 }
 
 /**

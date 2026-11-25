@@ -39,6 +39,7 @@
       "kind": "none",
       "gainDb": -26
     },
+    "weather": "mist",
     "palette": {
       "sky": "#1d3b2a",
       "glow": "#f7d774",

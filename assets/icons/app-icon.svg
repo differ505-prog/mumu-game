@@ -41,7 +41,8 @@
   <circle cx="256" cy="228" r="82" fill="#f6d9c4"/>
   <circle cx="222" cy="228" r="8" fill="#1b1b1b"/>
   <circle cx="290" cy="228" r="8" fill="#1b1b1b"/>
-  <!--  -->
+  <!-- 
+ -->
   <ellipse cx="256" cy="272" rx="54" ry="30" fill="#ffffff"/>
   <path d="M222 252 C 242 240 270 240 290 252" stroke="#f1c40f" stroke-width="6" fill="none" stroke-linecap="round"/>
   <!-- element -->

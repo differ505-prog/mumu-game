@@ -303,6 +303,28 @@ if (assessment) {
     if (total < 60) problems.push(`assessment 題目數 ${total} < 60`);
 }
 
+/* --- 7b. 題庫深度與去重結構（Step 162）--- */
+if (items) {
+    const minDepth = { colors: 18, shapes: 10, animals: 24, numbers: 10, pitches: 5, rhythms: 10, interference: 20 };
+    for (const [axis, min] of Object.entries(minDepth)) {
+        const arr = Array.isArray(items[axis]) ? items[axis] : [];
+        if (arr.length < min) {
+            problems.push(`items.json 的 ${axis} 題量 ${arr.length} < ${min}（Step 162 深度要求）`);
+        }
+        const keys = arr.map((/** @type {any} */ it) => String(it.id ?? it.value));
+        if (new Set(keys).size !== keys.length) {
+            problems.push(`items.json 的 ${axis} 有重複 id`);
+        }
+        // 每筆皆須雙語齊備（numbers 以 value 為鍵；rhythms 無語系欄位故豁免）
+        for (const it of (axis === "rhythms" ? [] : arr)) {
+            const key = it.id ?? String(it.value);
+            if (!it["zh-TW"] || !it["en-US"]) {
+                problems.push(`items.json ${axis}/${key} 雙語不全`);
+            }
+        }
+    }
+}
+
 /* --- 8. minimal pairs --- */
 if (minimalPairs) {
     if (!Array.isArray(minimalPairs["zh-TW"]) || minimalPairs["zh-TW"].length < 12) {
@@ -310,6 +332,64 @@ if (minimalPairs) {
     }
     if (!Array.isArray(minimalPairs["en-US"]) || minimalPairs["en-US"].length < 10) {
         problems.push("minimal-pairs.json 的 en-US 應至少 10 組");
+    }
+    // Step 162：深度要求 + id 唯一 + 每組雙語齊備
+    for (const [locale, min] of [["zh-TW", 24], ["en-US", 24]]) {
+        const pool = minimalPairs[locale] || [];
+        if (pool.length < min) {
+            problems.push(`minimal-pairs.json 的 ${locale} 題量 ${pool.length} < ${min}（Step 162 深度要求）`);
+        }
+        const ids = pool.map((/** @type {any} */ p) => p.id);
+        if (new Set(ids).size !== ids.length) {
+            problems.push(`minimal-pairs.json 的 ${locale} 有重複 id`);
+        }
+        for (const pair of pool) {
+            if (!Array.isArray(pair.pair) || pair.pair.length !== 2) {
+                problems.push(`minimal-pairs.json ${locale}/${pair.id} 的 pair 必須為兩項`);
+            }
+            if (!pair.distractor) {
+                problems.push(`minimal-pairs.json ${locale}/${pair.id} 缺少 distractor`);
+            }
+        }
+    }
+    // zh-TW 與 en-US 皆須覆蓋 initial 與 vowel 兩種特徵
+    for (const locale of ["zh-TW", "en-US"]) {
+        const feats = new Set((minimalPairs[locale] || []).map((/** @type {any} */ p) => p.feature));
+        for (const f of ["initial", "vowel"]) {
+            if (!feats.has(f)) {
+                problems.push(`minimal-pairs.json 的 ${locale} 缺少 ${f} 特徵題`);
+            }
+        }
+    }
+}
+
+/* --- 9. 條款文件與商店上架資料（Step 168）--- */
+{
+    for (const rel of ["content/privacy.zh-TW.md", "content/privacy.en-US.md",
+        "content/terms.zh-TW.md", "content/terms.en-US.md"]) {
+        if (!existsSync(join(root, rel))) {
+            problems.push(`缺少條款文件: ${rel}`);
+            continue;
+        }
+        const text = readFileSync(join(root, rel), "utf8");
+        if (text.length < 1200) {
+            problems.push(`${rel} 內容過短（${text.length} 字元 < 1200）`);
+        }
+        if (/example\.com|TODO/.test(text)) {
+            problems.push(`${rel} 含 example.com 或 TODO 佔位字樣`);
+        }
+    }
+
+    const listing = readJson("content/store-listing.zh-TW.json");
+    if (listing) {
+        for (const key of ["support", "website", "manifest"]) {
+            if (!listing[key]) {
+                problems.push(`store-listing.zh-TW.json 缺少 ${key}`);
+            }
+        }
+        if (listing.support?.supportEmail && /example\.com/.test(listing.support.supportEmail)) {
+            problems.push("store-listing.zh-TW.json 的 supportEmail 為佔位信箱");
+        }
     }
 }
 

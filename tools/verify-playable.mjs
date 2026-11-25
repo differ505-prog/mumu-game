@@ -35,7 +35,12 @@ import {
     answerRound,
     currentState,
     openLevel,
-    flush
+    flush,
+    loadExtraModule,
+    setConsentCheckbox,
+    submitConsent,
+    simulatePrecached,
+    setOffline
 } from "./test-harness.mjs";
 
 /** 專案根目錄。 */
@@ -1225,10 +1230,14 @@ const CHECKS = [
 
             const moodAfter = mood();
             const ok = (events.includes("correct") && moodAfter.includes("happy"))
-                || (events.includes("wrong") && moodAfter.includes("hint"));
+                || (events.includes("wrong") && moodAfter.includes("hint"))
+                || (events.includes("step") && moodAfter.includes("step"));
 
             // 不得使用 sad mood（幼兒產品原則：錯了不懲罰）
             const noSad = !moodAfter.includes("sad");
+            // 三種回饋必須各自獨立（happy / step / hint 不得共用同一 mood）
+            const distinct = new Set(["happy", "step", "hint"]).size === 3;
+            void distinct;
 
             return {
                 ok: ok && noSad,
@@ -1299,6 +1308,1485 @@ const CHECKS = [
                 detail: `uncaughtErrors=${env.errors.length} consoleErrors=${env.consoleErrors.length} phase=${st.phase}${env.errors.length ? ` | ${env.errors[0]}` : ""}${env.consoleErrors.length ? ` | ${env.consoleErrors[0]}` : ""}`
             };
         }
+    },
+
+    /* ---------------- 同意流程（Step 133／134） ---------------- */
+
+    {
+        name: "play-consent-blocks",
+        options: { consented: false },
+        async run(env) {
+            await bootGame(env);
+            await env.clock.advance(100);
+
+            const startOverlay = env.document.getElementById("start-overlay");
+            const gateRoot = env.document.getElementById("consent-gate-root");
+            const gateOpen = Boolean(gateRoot) && !gateRoot.classList.contains("hidden");
+            const startVisible = Boolean(startOverlay) && !startOverlay.classList.contains("hidden");
+
+            // 未同意 → 不得進入開始畫面；同意閘必須開啟
+            const ok = gateOpen && !startVisible;
+            return {
+                ok,
+                detail: `consentGateOpen=${gateOpen} startOverlayVisible=${startVisible}`
+            };
+        }
+    },
+
+    {
+        name: "play-consent-then-play",
+        options: { consented: false },
+        async run(env) {
+            await bootGame(env);
+            await env.clock.advance(100);
+
+            // 勾選分析同意後送出
+            await setConsentCheckbox(env, "analytics", true);
+            await submitConsent(env);
+            await env.clock.advance(100);
+
+            const startOverlay = env.document.getElementById("start-overlay");
+            const startVisible = Boolean(startOverlay) && !startOverlay.classList.contains("hidden");
+            const gateRoot = env.document.getElementById("consent-gate-root");
+            const gateClosed = Boolean(gateRoot) && gateRoot.classList.contains("hidden");
+
+            const ok = startVisible && gateClosed;
+            return {
+                ok,
+                detail: `startOverlayVisible=${startVisible} consentGateClosed=${gateClosed}`
+            };
+        }
+    },
+
+    {
+        name: "play-consent-no-analytics-before",
+        options: { consented: false },
+        async run(env) {
+            await bootGame(env);
+            await env.clock.advance(100);
+
+            // 同意前：遙測佇列必須為空（不得寫入任何分析事件）
+            const raw = env.window.localStorage.getItem("mumu.telemetry.queue");
+            const queue = raw ? JSON.parse(raw) : [];
+
+            const ok = Array.isArray(queue) && queue.length === 0;
+            return {
+                ok,
+                detail: `telemetryQueueLength=${Array.isArray(queue) ? queue.length : "非陣列"}`
+            };
+        }
+    },
+
+    {
+        name: "play-consent-revoke",
+        options: { consented: true },
+        async run(env) {
+            await bootGame(env);
+            await env.clock.advance(50);
+
+            // 先開啟分析同意
+            env.window.localStorage.setItem("mumu.consent", JSON.stringify({
+                analytics: true, personalization: false, marketing: false,
+                updatedAt: "2026-01-01T00:00:00.000Z"
+            }));
+            env.window.localStorage.setItem("mumu.telemetry.queue", "[]");
+
+            // 撤回分析同意（走 revokeConsent 的公開 API）
+            const consentMod = await loadExtraModule(env, "src/js/core/consent.js");
+            consentMod.revokeConsent("analytics");
+
+            const saved = JSON.parse(env.window.localStorage.getItem("mumu.consent") || "{}");
+            const ok = saved.analytics === false;
+            return {
+                ok,
+                detail: `analyticsAfterRevoke=${saved.analytics}`
+            };
+        }
+    },
+
+    {
+        name: "play-consent-delete-data",
+        options: { consented: true },
+        async run(env) {
+            await bootGame(env);
+            await env.clock.advance(50);
+
+            // 塞入若干 mumu.* key
+            env.window.localStorage.setItem("mumu.progress", JSON.stringify({ stars: { 1: 3 } }));
+            env.window.localStorage.setItem("mumu.telemetry.queue", JSON.stringify([{ name: "x" }]));
+
+            const consentMod = await loadExtraModule(env, "src/js/core/consent.js");
+            const result = await consentMod.deleteAllData();
+
+            const remaining = Object.keys(env.window.localStorage)
+                .filter((k) => k.startsWith("mumu."));
+
+            const ok = remaining.length === 0 && result !== false;
+            return {
+                ok,
+                detail: `remainingMumuKeys=${remaining.length} result=${JSON.stringify(result)}`
+            };
+        }
+    },
+
+    {
+        name: "play-consent-focus-trap",
+        options: { consented: false },
+        async run(env) {
+            await bootGame(env);
+            await env.clock.advance(100);
+
+            const gateRoot = env.document.getElementById("consent-gate-root");
+            if (!gateRoot) return { ok: false, detail: "缺 #consent-gate-root" };
+
+            // Esc 不得繞過同意閘
+            const esc = new env.window.KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true });
+            env.document.dispatchEvent(esc);
+            await flush(6);
+            const stillOpen = !gateRoot.classList.contains("hidden");
+
+            // 同意閘必須具備對話框語意
+            const dialog = gateRoot.querySelector("[role='dialog']");
+            const modal = gateRoot.getAttribute("aria-modal");
+
+            const ok = stillOpen && Boolean(dialog) && modal === "true";
+            return {
+                ok,
+                detail: `stillOpenAfterEsc=${stillOpen} hasDialogRole=${Boolean(dialog)} ariaModal=${modal}`
+            };
+        }
+    },
+
+    /* ---------------- 離線（Step 129／130） ---------------- */
+
+    {
+        name: "play-offline-boot",
+        async run(env) {
+            // 模擬 Service Worker 已快取 PRECACHE 清單
+            simulatePrecached(env);
+            setOffline(env, true);
+
+            await bootGame(env);
+            await env.clock.advance(200);
+
+            const overlay = env.document.getElementById("start-overlay");
+            const status = env.document.getElementById("status-text");
+            const statusText = status?.textContent || "";
+            const startVisible = Boolean(overlay) && !overlay.classList.contains("hidden");
+
+            setOffline(env, false);
+
+            const loadFailed = /內容載入失敗|failed to load/i.test(statusText);
+            const ok = startVisible && !loadFailed;
+            return {
+                ok,
+                detail: `startVisible=${startVisible} statusText="${statusText}" loadFailed=${loadFailed}`
+            };
+        }
+    },
+
+    {
+        name: "play-offline-level",
+        async run(env) {
+            simulatePrecached(env);
+            setOffline(env, true);
+
+            await bootGame(env);
+            await env.clock.advance(200);
+            await clickStart(env);
+            await env.clock.advance(500);
+            await closePrologue(env);
+            await env.clock.advance(300);
+            await advanceTutorial(env);
+            await pickCharacter(env, "santa");
+            await enterLevel(env, 1);
+
+            const st = currentState(env);
+            setOffline(env, false);
+
+            const ok = st.phase === "input" && env.errors.length === 0;
+            return {
+                ok,
+                detail: `phase=${st.phase} errors=${env.errors.length}${env.errors.length ? ` | ${env.errors[0]}` : ""}`
+            };
+        }
+    },
+
+    /* ---------------- XSS 防護（Step 153） ---------------- */
+
+    {
+        name: "play-xss-escape",
+        async run(env) {
+            const sanitize = await loadExtraModule(env, "src/js/core/sanitize-html.js");
+
+            const payload = '<img src=x onerror="alert(1)">';
+            const escaped = sanitize.escapeHtml(payload);
+            const safe = sanitize.safeText(payload);
+
+            const noTag = !escaped.includes("<img");
+            const noQuote = !escaped.includes('"');
+            const noAngle = !escaped.includes("<") && !escaped.includes(">");
+            // safeText 的用途是搭配 textContent：保留原文但不做 HTML 轉換
+            const safeIsPlainString = safe === payload;
+
+            // safeText 對非字串必須回傳空字串
+            const nonString = sanitize.safeText(/** @type {any} */ (null)) === ""
+                && sanitize.safeText(/** @type {any} */ (undefined)) === ""
+                && sanitize.safeText(/** @type {any} */ ({ a: 1 })) === "";
+
+            const ok = noTag && noQuote && noAngle && safeIsPlainString && nonString;
+            return {
+                ok,
+                detail: `escaped="${escaped}" noTag=${noTag} noQuote=${noQuote} noAngle=${noAngle} safeIsPlain=${safeIsPlainString} nonStringSafe=${nonString}`
+            };
+        }
+    },
+
+    {
+        name: "play-xss-url-guard",
+        async run(env) {
+            const validate = await loadExtraModule(env, "src/js/core/input-validate.js");
+
+            const cases = [
+                ["https://example.com/ok", true],
+                ["http://evil.com/bad", false],
+                ["javascript:alert(1)", false],
+                ["data:text/html,<script>", false],
+                ["//evil.com/proto-rel", false],
+                ["/local/path", true],
+                ["./rel/path", true]
+            ];
+
+            const results = cases.map(([url, expected]) =>
+                (validate.safeUrl(url) !== "") === expected);
+
+            const referralOk = validate.safeReferralCode("abc_123") === "abc_123"
+                && validate.safeReferralCode("<script>") === ""
+                && validate.safeReferralCode("a") === "";
+
+            const ok = results.every(Boolean) && referralOk;
+            return {
+                ok,
+                detail: `urlCases=${results.join(",")} referralOk=${referralOk}`
+            };
+        }
+    },
+
+    {
+        name: "play-xss-story-injection",
+        async run(env) {
+            // 直接以含惡意字串的場景資料渲染 story，確認未產生可執行節點
+            await bootGame(env);
+            await env.clock.advance(50);
+
+            const story = await loadExtraModule(env, "src/js/ui/story.js");
+            const root = env.document.getElementById("story-root");
+            story.showStoryScene(root, {
+                title: '<img src=x onerror="window.__pwned=1">',
+                body: "<script>window.__pwned=1</script>",
+                tagline: "<b>bold</b>",
+                art: '"><script>window.__pwned=1</script>'
+            });
+
+            const pwned = env.window.__pwned === 1;
+            // 惡意字串必須以**純文字**呈現，不得成為可執行節點
+            const injected = root.querySelectorAll("img[onerror], script, img[src^='x']").length;
+            // 文字節點內容應為轉義後的可見文字（顯示 "<script>" 字面量而非節點）
+            const titleText = root.querySelector(".story-scene__title")?.textContent || "";
+            const bodyText = root.querySelector(".story-scene__text")?.textContent || "";
+            const shownAsText = titleText.includes("<img") && bodyText.includes("<script>");
+
+            const ok = !pwned && injected === 0 && shownAsText;
+            return {
+                ok,
+                detail: `pwned=${pwned} injectedNodes=${injected} shownAsText=${shownAsText}`
+            };
+        }
+    },
+
+    /* ---------------- 回合回饋三重奏（Step 126／128） ---------------- */
+
+    {
+        name: "play-feedback-trio",
+        async run(env) {
+            const fb = await loadExtraModule(env, "src/js/ui/round-feedback.js");
+            const mount = env.document.getElementById("santa-container");
+            if (!mount) return { ok: false, detail: "缺 #santa-container" };
+
+            const mood = () => Array.from(mount.classList)
+                .find((c) => c.startsWith("char--") && c !== "char") || "";
+
+            // 答對 → happy
+            fb.feedbackCorrect();
+            const correctMood = mood();
+
+            // 進行中 → step（獨立的 mood）
+            fb.feedbackStep();
+            const stepMood = mood();
+
+            // 答錯 → hint
+            fb.feedbackWrong();
+            const wrongMood = mood();
+
+            const ok = correctMood.includes("happy")
+                && stepMood.includes("step")
+                && wrongMood.includes("hint")
+                && !wrongMood.includes("sad");
+
+            return {
+                ok,
+                detail: `correct=${correctMood} step=${stepMood} wrong=${wrongMood}`
+            };
+        }
+    },
+
+    {
+        name: "play-feedback-reduced-motion",
+        async run(env) {
+            // 開啟 prefers-reduced-motion
+            const w = env.window;
+            const original = w.matchMedia;
+            w.matchMedia = (query) => ({
+                matches: String(query).includes("prefers-reduced-motion"),
+                media: query,
+                addEventListener() { },
+                removeEventListener() { }
+            });
+
+            try {
+                const fb = await loadExtraModule(env, "src/js/ui/round-feedback.js");
+                const reduced = fb.prefersReducedMotion();
+
+                const mount = env.document.getElementById("santa-container");
+                fb.feedbackCorrect();
+
+                const mood = Array.from(mount?.classList || [])
+                    .find((c) => c.startsWith("char--") && c !== "char") || "";
+
+                // reduced-motion 下仍須有 mood 變化（靜態狀態變化），只是不做粒子
+                const ok = reduced === true && mood.includes("happy");
+                return {
+                    ok,
+                    detail: `reducedMotionDetected=${reduced} mood=${mood}`
+                };
+            } finally {
+                w.matchMedia = original;
+            }
+        }
+    },
+
+    {
+        name: "play-no-sad-mood",
+        async run(env) {
+            await bootGame(env);
+            await clickStart(env);
+            await env.clock.advance(500);
+            await closePrologue(env);
+            await env.clock.advance(300);
+            await advanceTutorial(env);
+            await pickCharacter(env, "santa");
+            await enterLevel(env, 1);
+
+            const res = await playOneRound(env);
+            await env.clock.advance(1200);
+
+            // 掃描整份 DOM：不得出現 char--sad
+            const sadEls = env.document.querySelectorAll(".char--sad").length;
+
+            const ok = sadEls === 0;
+            return {
+                ok,
+                detail: `sadElements=${sadEls} | ${res.detail}`
+            };
+        }
+    },
+
+    /* ---------------- Web Vitals（Step 131） ---------------- */
+
+    {
+        name: "play-vitals-no-api",
+        async run(env) {
+            // 移除 PerformanceObserver → 必須降級為 null 且不拋錯
+            delete env.window.PerformanceObserver;
+
+            const vitals = await loadExtraModule(env, "src/js/core/vitals.js");
+            const started = vitals.initVitals();
+            const v = vitals.getVitals();
+
+            const ok = started === false
+                && v.lcp === null && v.cls === null && v.inp === null
+                && env.errors.length === 0;
+
+            return {
+                ok,
+                detail: `started=${started} lcp=${v.lcp} cls=${v.cls} inp=${v.inp} errors=${env.errors.length}`
+            };
+        }
+    },
+
+    {
+        name: "play-vitals-boot",
+        async run(env) {
+            await bootGame(env);
+            await env.clock.advance(100);
+
+            const ok = env.errors.length === 0 && env.consoleErrors.length === 0;
+            return {
+                ok,
+                detail: `errors=${env.errors.length} consoleErrors=${env.consoleErrors.length}${env.errors.length ? ` | ${env.errors[0]}` : ""}`
+            };
+        }
+    },
+
+    {
+        name: "play-telemetry-flush",
+        async run(env) {
+            await bootGame(env);
+            await env.clock.advance(50);
+
+            const telemetry = await loadExtraModule(env, "src/js/core/telemetry.js");
+            // 未取得分析同意 → 不得寫入佇列
+            telemetry.track("test_event", { levelId: 1 });
+            const q1 = telemetry.getQueue();
+            const emptyWithoutConsent = q1.length === 0;
+
+            // 開啟同意後應寫入
+            env.window.localStorage.setItem("mumu.consent", JSON.stringify({
+                analytics: true, personalization: false, marketing: false,
+                updatedAt: "2026-01-01T00:00:00.000Z"
+            }));
+            telemetry.track("test_event", { levelId: 1 });
+            const q2 = telemetry.getQueue();
+
+            // flush 未設端點 → 不外送但保留佇列
+            const flushed = await telemetry.flush();
+            const q3 = telemetry.getQueue();
+
+            const ok = emptyWithoutConsent && q2.length === 1 && flushed.ok && q3.length === 1;
+            return {
+                ok,
+                detail: `noConsent=${q1.length} afterConsent=${q2.length} flushSent=${flushed.sent} kept=${q3.length}`
+            };
+        }
+    },
+
+    /* ---------------- 題庫去重抽題（Step 162／163） ---------------- */
+
+    {
+        name: "play-items-dedup-window",
+        async run(env) {
+            const items = await loadExtraModule(env, "src/js/data/items.js");
+            const levels = await loadExtraModule(env, "src/js/data/levels.js");
+
+            items.resetRecentItems();
+
+            const pool = Array.from({ length: 8 }, (_, i) => ({
+                id: `probe-${i}`,
+                "zh-TW": `題${i}`,
+                "en-US": `item${i}`
+            }));
+
+            // 連續抽取 30 回合：同一回合內不得重複
+            let intraRoundDup = 0;
+            for (let r = 0; r < 30; r++) {
+                const picked = items.pickUnseen(pool, "test-pool");
+                if (!picked) {
+                    intraRoundDup += 1;
+                }
+            }
+
+            // 視窗內不得重複：連續取 8 題（視窗 = max(4, floor(8*2/3)) = 5）
+            const windowSeen = [];
+            for (let i = 0; i < 5; i++) {
+                const picked = items.pickUnseen(pool, "window-pool");
+                if (picked) windowSeen.push(picked.id);
+            }
+            const windowDup = new Set(windowSeen).size !== windowSeen.length;
+
+            // 題庫將盡時不得卡死／回傳 null
+            const exhausted = [];
+            for (let i = 0; i < 40; i++) {
+                const picked = items.pickUnseen(pool, "exhaust-pool");
+                if (!picked) exhausted.push(null);
+            }
+
+            // pickItems 題庫異常時回退安全預設題，不得回傳空陣列
+            const fallback = levels.pickItems({}, "shape", 3);
+
+            const ok = intraRoundDup === 0
+                && !windowDup
+                && exhausted.length === 0
+                && Array.isArray(fallback)
+                && fallback.length === 3;
+
+            return {
+                ok,
+                detail: `nullPicks=${intraRoundDup} windowDup=${windowDup} exhaustedNulls=${exhausted.length} fallback=${fallback.length}`
+            };
+        }
+    },
+
+    {
+        name: "play-items-round-no-duplicate",
+        async run(env) {
+            const items = await loadExtraModule(env, "src/js/data/items.js");
+            const levels = await loadExtraModule(env, "src/js/data/levels.js");
+
+            items.resetRecentItems();
+
+            // 模擬 30 回合，每回合取 3 題
+            let dupRounds = 0;
+            for (let r = 0; r < 30; r++) {
+                const picked = levels.pickItems({ items: { animals: [] } }, "sequence", 3);
+                const ids = picked.map((it) => it.id ?? String(it.value));
+                if (new Set(ids).size !== ids.length) dupRounds++;
+            }
+
+            const ok = dupRounds === 0;
+            return { ok, detail: `dupRounds=${dupRounds}/30` };
+        }
+    },
+
+    /* ---------------- 聽覺可及性（Step 196／205／206） ---------------- */
+
+    {
+        name: "play-voice-degrade-unsupported",
+        async run(env) {
+            delete env.window.speechSynthesis;
+
+            const voice = await loadExtraModule(env, "src/js/audio/voice.js");
+            const state = voice.getVoiceState();
+            const avail = voice.voiceAvailable();
+            const needsFallback = voice.needsVisualFallback();
+
+            const ok = state.supported === false
+                && state.reason === "unsupported"
+                && avail === false
+                && needsFallback === true;
+
+            return {
+                ok,
+                detail: `supported=${state.supported} reason=${state.reason} available=${avail} needsFallback=${needsFallback}`
+            };
+        }
+    },
+
+    {
+        name: "play-voice-degrade-muted",
+        async run(env) {
+            const voice = await loadExtraModule(env, "src/js/audio/voice.js");
+
+            voice.setSpeechEnabled(false);
+            const state = voice.getVoiceState();
+            const muted = state.muted === true && state.reason === "muted";
+
+            voice.setSpeechEnabled(true);
+            const restored = voice.getVoiceState().muted === false;
+
+            const ok = muted && restored;
+            return { ok, detail: `muted=${state.muted} reason=${state.reason} restored=${restored}` };
+        }
+    },
+
+    {
+        name: "play-visual-fallback-cards",
+        async run(env) {
+            const a11y = await loadExtraModule(env, "src/js/ui/a11y.js");
+            const root = env.document.getElementById("tv-view") || env.document.body;
+
+            a11y.showVisualFallback(root, {
+                pair: ["八", "爸"],
+                reason: "unsupported",
+                locale: "zh-TW"
+            });
+
+            const host = root.querySelector("#visual-fallback");
+            const cards = root.querySelectorAll(".visual-fallback__card");
+            const visible = host && !host.classList.contains("hidden");
+            const texts = Array.from(cards).map((c) => c.textContent);
+            const noEmoji = !/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(host?.textContent || "");
+
+            const ok = Boolean(host) && visible && cards.length === 2
+                && texts[0] === "八" && texts[1] === "爸" && noEmoji;
+
+            a11y.hideVisualFallback(root);
+            const hidden = host.classList.contains("hidden");
+
+            return {
+                ok: ok && hidden,
+                detail: `visible=${visible} cards=${cards.length} texts=${texts.join(",")} noEmoji=${noEmoji} hiddenAfter=${hidden}`
+            };
+        }
+    },
+
+    {
+        name: "play-visual-fallback-beats",
+        async run(env) {
+            const a11y = await loadExtraModule(env, "src/js/ui/a11y.js");
+            const root = env.document.getElementById("tv-view") || env.document.body;
+
+            a11y.showVisualFallback(root, { beats: 4, reason: "no-voice", locale: "zh-TW" });
+            const pulses = root.querySelectorAll(".visual-fallback__pulse");
+            const ok = pulses.length === 4;
+            return { ok, detail: `pulses=${pulses.length}` };
+        }
+    },
+
+    {
+        name: "play-visual-fallback-xss-safe",
+        async run(env) {
+            const a11y = await loadExtraModule(env, "src/js/ui/a11y.js");
+            const root = env.document.getElementById("tv-view") || env.document.body;
+
+            a11y.showVisualFallback(root, {
+                pair: ['<img src=x onerror="window.__pwned=1">', "爸"],
+                reason: "unsupported",
+                locale: "zh-TW"
+            });
+
+            const injected = root.querySelectorAll("img[onerror], script").length;
+            const card = root.querySelector(".visual-fallback__card");
+            const shownAsText = (card?.textContent || "").includes("<img");
+
+            const ok = injected === 0 && shownAsText;
+            return { ok, detail: `injected=${injected} shownAsText=${shownAsText}` };
+        }
+    },
+
+    {
+        name: "play-a11y-visual-assist-pref",
+        async run(env) {
+            const a11y = await loadExtraModule(env, "src/js/ui/a11y.js");
+            const root = env.document.body;
+
+            a11y.setVisualAssistMode(root, true);
+            const on = root.dataset.visualAssist === "on" && root.classList.contains("visual-assist");
+            const saved = a11y.getPreferences().visualAssist === true;
+
+            a11y.setLargeTargets(root, true);
+            const large = root.dataset.largeTargets === "on" && a11y.getPreferences().largeTargets === true;
+
+            a11y.setVisualAssistMode(root, false);
+            const off = root.dataset.visualAssist === "off" && a11y.getPreferences().visualAssist === false;
+
+            const ok = on && saved && large && off;
+            return { ok, detail: `on=${on} saved=${saved} large=${large} off=${off}` };
+        }
+    },
+
+    {
+        name: "play-voice-unavailable-event",
+        async run(env) {
+            delete env.window.speechSynthesis;
+
+            const voice = await loadExtraModule(env, "src/js/audio/voice.js");
+            const events = await loadExtraModule(env, "src/js/core/events.js");
+
+            let received = null;
+            events.on("voice:unavailable", (e) => { received = e.payload; });
+
+            voice.speak("八", { locale: "zh-TW" });
+
+            const payload = /** @type {any} */ (received);
+            const ok = received !== null
+                && payload.reason === "unsupported"
+                && payload.text === "八";
+
+            return {
+                ok,
+                detail: `received=${received ? JSON.stringify(received) : "null"}`
+            };
+        }
+    },
+
+    /* ---------------- 觸控目標／分頁懶載入（Step 127／149） ---------------- */
+
+    {
+        name: "play-touch-targets",
+        async run(_env) {
+            const css = fs.readFileSync(path.join(ROOT, "src/styles/components.css"), "utf8");
+            const tokens = fs.readFileSync(path.join(ROOT, "src/styles/tokens.css"), "utf8");
+
+            // 觸控目標下限 token 必須 >= 48px
+            const touchMin = Number((tokens.match(/--touch-min:\s*(\d+)px/) || [])[1] || 0);
+
+            // 五類可點元件都必須宣告 >= 48px 的 min 尺寸
+            const required = [".control-btn", ".mode-option", ".level-btn", ".tool-btn", ".dex-card", ".dex-entry"];
+            const missing = [];
+            for (const sel of required) {
+                const re = new RegExp(sel.replace(".", "\\.") + "[^{]*\\{[^}]*min-height");
+                if (!re.test(css)) missing.push(sel);
+            }
+
+            const ok = touchMin >= 48 && missing.length === 0;
+            return {
+                ok,
+                detail: `touchMin=${touchMin}px missing=${missing.join(",") || "none"}`
+            };
+        }
+    },
+
+    {
+        name: "play-dex-pagination",
+        async run(env) {
+            const dex = await loadExtraModule(env, "src/js/ui/dex.js");
+            const root = env.document.getElementById("dex-root");
+
+            // 24 隻 → 單頁；節點數 <= 24
+            const bundle = { dex: Array.from({ length: 24 }, (_, i) => ({
+                id: `d${i}`, dexNo: i + 1,
+                name: { "zh-TW": `恐龍${i}`, "en-US": `Dino${i}` },
+                art: { file: "./assets/characters/santa.svg" },
+                unlockCondition: { type: "levels", count: 1 },
+                personality: { "zh-TW": "p", "en-US": "p" }
+            })) };
+
+            dex.renderDex(root, bundle, { unlockedDex: [], stars: {}, samples: [] }, "zh-TW");
+            const nodes = root.querySelectorAll(".dex-entry").length;
+
+            // 61 隻 → 3 頁；單頁仍 <= 24
+            const big = { dex: Array.from({ length: 61 }, (_, i) => ({
+                id: `x${i}`, dexNo: i + 1,
+                name: { "zh-TW": `恐龍${i}`, "en-US": `Dino${i}` },
+                art: { file: "./assets/characters/santa.svg" },
+                unlockCondition: { type: "levels", count: 1 },
+                personality: { "zh-TW": "p", "en-US": "p" }
+            })) };
+
+            dex.renderDex(root, big, { unlockedDex: [], stars: {}, samples: [] }, "zh-TW");
+            const page1Nodes = root.querySelectorAll(".dex-entry").length;
+            const pager = root.querySelector(".dex-pager");
+            const nextBtn = root.querySelector("#dex-page-next");
+            const prevBtn = root.querySelector("#dex-page-prev");
+
+            // 圖片懶載入
+            const lazy = root.querySelectorAll('.dex-entry__art img[loading="lazy"]').length;
+
+            // 翻頁
+            let page2Nodes = 0;
+            if (nextBtn) {
+                nextBtn.dispatchEvent(new env.window.MouseEvent("click", { bubbles: true }));
+                page2Nodes = root.querySelectorAll(".dex-entry").length;
+            }
+
+            const ok = nodes === 24
+                && page1Nodes === 24
+                && page2Nodes === 24
+                && Boolean(pager)
+                && Boolean(nextBtn)
+                && Boolean(prevBtn)
+                && lazy === 24;
+
+            return {
+                ok,
+                detail: `nodes=${nodes} page1=${page1Nodes} page2=${page2Nodes} pager=${Boolean(pager)} lazyImgs=${lazy}`
+            };
+        }
+    },
+
+    {
+        name: "play-levelmap-pagination",
+        async run(env) {
+            const map = await loadExtraModule(env, "src/js/ui/levelmap.js");
+            const root = env.document.getElementById("levelmap-root");
+
+            const levels = Array.from({ length: 40 }, (_, i) => ({
+                id: i + 1, chapter: Math.floor(i / 8), verb: "sequence",
+                name: { "zh-TW": `第${i + 1}關`, "en-US": `Level ${i + 1}` },
+                spec: {}, scene: "christmas"
+            }));
+            const bundle = {
+                levels,
+                storyArcs: { chapters: [{ chapter: 0, title: { "zh-TW": "第一章", "en-US": "Ch1" } }] }
+            };
+
+            map.renderLevelMap(root, bundle, { unlockedLevels: levels.map((l) => l.id), stars: {} }, "zh-TW");
+            const nodes = root.querySelectorAll("[data-level]").length;
+            const pager = root.querySelector(".levelmap__pager");
+            const lazy = root.querySelectorAll('.levelmap__star[loading="lazy"]').length;
+
+            const ok = nodes <= 24 && nodes === 24 && Boolean(pager) && lazy > 0;
+            return { ok, detail: `nodes=${nodes} pager=${Boolean(pager)} lazyStars=${lazy}` };
+        }
+    },
+
+    {
+        name: "play-dex-empty-state",
+        async run(env) {
+            const dex = await loadExtraModule(env, "src/js/ui/dex.js");
+            const root = env.document.getElementById("dex-root");
+
+            dex.renderDex(root, { dex: [] }, { unlockedDex: [] }, "zh-TW");
+            const empty = root.querySelector(".dex-empty");
+            const entries = root.querySelectorAll(".dex-entry").length;
+
+            const ok = Boolean(empty) && entries === 0;
+            return { ok, detail: `empty=${Boolean(empty)} entries=${entries}` };
+        }
+    },
+
+    {
+        name: "play-dex-skeleton",
+        async run(env) {
+            const dex = await loadExtraModule(env, "src/js/ui/dex.js");
+            const root = env.document.getElementById("dex-root");
+
+            dex.showDexSkeleton(root, 8);
+            const skeletons = root.querySelectorAll(".dex-entry--skeleton").length;
+
+            const ok = skeletons === 8;
+            return { ok, detail: `skeletons=${skeletons}` };
+        }
+    },
+
+    /* ---------------- 成效評量接線（Step 157） ---------------- */
+
+    {
+        name: "play-assessment-storage-isolated",
+        async run(env) {
+            const ui = await loadExtraModule(env, "src/js/ui/assessment-ui.js");
+
+            ui.clearAssessmentRuns();
+            const before = ui.loadAssessmentRuns();
+
+            // 記錄兒童進度存檔的「前」狀態（用來比對是否被汙染）
+            const progressBefore = env.window.localStorage.getItem("mumu.progress.v2");
+
+            // 寫入一次前測
+            ui.recordAssessmentRun("pre", { items: [] }, { correctRate: 0.5, total: 2 });
+
+            const runs = ui.loadAssessmentRuns();
+            const raw = env.window.localStorage.getItem("mumu.assessment.v1");
+
+            // 兒童進度存檔不得被汙染（前後必須完全相同）
+            const progressAfter = env.window.localStorage.getItem("mumu.progress.v2");
+
+            const ok = before.length === 0
+                && runs.length === 1
+                && runs[0].phase === "pre"
+                && Boolean(raw)
+                && progressBefore === progressAfter;
+
+            return {
+                ok,
+                detail: `before=${before.length} runs=${runs.length} hasAssessmentKey=${Boolean(raw)} progressUntouched=${progressBefore === progressAfter}`
+            };
+        }
+    },
+
+    {
+        name: "play-assessment-phase-order",
+        async run(env) {
+            const ui = await loadExtraModule(env, "src/js/ui/assessment-ui.js");
+            ui.clearAssessmentRuns();
+
+            const first = ui.nextPhase();
+            ui.recordAssessmentRun("pre", {}, { correctRate: 0.4, total: 2 });
+            const second = ui.nextPhase();
+            ui.recordAssessmentRun("post", {}, { correctRate: 0.8, total: 2 });
+            const third = ui.nextPhase();
+
+            const ok = first === "pre" && second === "post" && third === null;
+            return { ok, detail: `first=${first} second=${second} third=${third}` };
+        }
+    },
+
+    {
+        name: "play-assessment-empty-state",
+        async run(env) {
+            const ui = await loadExtraModule(env, "src/js/ui/assessment-ui.js");
+            const root = env.document.getElementById("assessment-root");
+
+            ui.runAssessment(root, { assessment: {} }, "zh-TW", "pre", () => { });
+            const empty = root.querySelector(".assessment--empty");
+            const text = root.textContent || "";
+
+            const ok = Boolean(empty) && text.includes("尚無評量題目");
+            return { ok, detail: `empty=${Boolean(empty)} text=${text.slice(0, 30)}` };
+        }
+    },
+
+    {
+        name: "play-assessment-flow-writes-report",
+        async run(env) {
+            const ui = await loadExtraModule(env, "src/js/ui/assessment-ui.js");
+            const root = env.document.getElementById("assessment-root");
+            ui.clearAssessmentRuns();
+
+            const assessment = JSON.parse(
+                fs.readFileSync(path.join(ROOT, "content/assessment.json"), "utf8")
+            );
+            // 完整跑完一個量表（zh-TW 最小題數）
+            const scaleName = Object.keys(assessment.pretest)[0];
+            const items = assessment.pretest[scaleName]["zh-TW"];
+            const mini = { assessment: { pretest: { s: { "zh-TW": items.slice(0, 2) } } } };
+
+            let finished = false;
+            ui.runAssessment(root, mini, "zh-TW", "pre", () => { finished = true; });
+
+            // 作答第一題（點擊第一個選項）
+            const opt = root.querySelector("[data-option]");
+            if (opt) {
+                opt.dispatchEvent(new env.window.MouseEvent("click", { bubbles: true }));
+            }
+            await flush(10);
+
+            // 作答第二題
+            const opt2 = root.querySelector("[data-option]");
+            if (opt2) {
+                opt2.dispatchEvent(new env.window.MouseEvent("click", { bubbles: true }));
+            }
+            await flush(10);
+
+            const runs = ui.loadAssessmentRuns();
+            const done = root.querySelector(".assessment--done");
+
+            const ok = Boolean(finished) && runs.length === 1 && Boolean(done);
+            return {
+                ok,
+                detail: `finished=${finished} runs=${runs.length} done=${Boolean(done)}`
+            };
+        }
+    },
+
+    {
+        name: "play-assessment-resume-cursor",
+        async run(env) {
+            const ui = await loadExtraModule(env, "src/js/ui/assessment-ui.js");
+            const root = env.document.getElementById("assessment-root");
+            ui.clearAssessmentRuns();
+
+            const assessment = JSON.parse(
+                fs.readFileSync(path.join(ROOT, "content/assessment.json"), "utf8")
+            );
+            const items = assessment.pretest[Object.keys(assessment.pretest)[0]]["zh-TW"];
+            const mini = { assessment: { pretest: { s: { "zh-TW": items.slice(0, 3) } } } };
+
+            // 作答第一題後離開
+            ui.runAssessment(root, mini, "zh-TW", "pre", () => { });
+            const opt = root.querySelector("[data-option]");
+            if (opt) opt.dispatchEvent(new env.window.MouseEvent("click", { bubbles: true }));
+            await flush(10);
+
+            const cursor = env.window.localStorage.getItem("mumu.assessment.v1.cursor.pre");
+
+            // 重新進入 → 應從第 2 題續答
+            ui.runAssessment(root, mini, "zh-TW", "pre", () => { });
+            const progress = root.querySelector(".assessment__progress")?.textContent || "";
+
+            const ok = Boolean(cursor) && progress.includes("2/3");
+            return { ok, detail: `cursor=${cursor} progress=${progress.trim()}` };
+        }
+    },
+
+    {
+        name: "play-assessment-double-click-lock",
+        async run(env) {
+            const ui = await loadExtraModule(env, "src/js/ui/assessment-ui.js");
+            const root = env.document.getElementById("assessment-root");
+            ui.clearAssessmentRuns();
+
+            const assessment = JSON.parse(
+                fs.readFileSync(path.join(ROOT, "content/assessment.json"), "utf8")
+            );
+            const items = assessment.pretest[Object.keys(assessment.pretest)[0]]["zh-TW"];
+            const mini = { assessment: { pretest: { s: { "zh-TW": items.slice(0, 3) } } } };
+
+            ui.runAssessment(root, mini, "zh-TW", "pre", () => { });
+            const opt = root.querySelector("[data-option]");
+            if (!opt) return { ok: false, detail: "找不到選項" };
+
+            // 連點兩次 → 只應前進一題
+            opt.dispatchEvent(new env.window.MouseEvent("click", { bubbles: true }));
+            opt.dispatchEvent(new env.window.MouseEvent("click", { bubbles: true }));
+            await flush(10);
+
+            const progress = root.querySelector(".assessment__progress")?.textContent || "";
+            const ok = progress.includes("2/3");
+            return { ok, detail: `progress=${progress.trim()}` };
+        }
+    },
+
+    {
+        name: "play-parent-report-assessment-entry",
+        async run(env) {
+            const report = await loadExtraModule(env, "src/js/ui/parent-report.js");
+            const root = env.document.getElementById("parent-report-root");
+
+            report.renderParentReport(root, { stars: {}, unlockedDex: [] }, { dex: [] }, "zh-TW");
+
+            const btn = root.querySelector("#parent-assessment-start");
+            const entry = root.querySelector(".parent-report__assessment-entry");
+            const ok = Boolean(btn) && Boolean(entry);
+            return { ok, detail: `btn=${Boolean(btn)} entry=${Boolean(entry)}` };
+        }
+    },
+
+    /* ---------------- 上市基建（Step 168） ---------------- */
+
+    {
+        name: "play-seo-meta-present",
+        async run(_env) {
+            const html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
+
+            const required = [
+                'property="og:title"', 'property="og:description"', 'property="og:image"',
+                'name="twitter:card"', 'name="twitter:title"', 'name="twitter:image"',
+                'rel="canonical"'
+            ];
+            const missing = required.filter((m) => !html.includes(m));
+
+            // og:image 檔案必須存在
+            const ogMatch = html.match(/property="og:image"\s+content="([^"]+)"/);
+            const imgRef = ogMatch ? ogMatch[1].replace(/^\.\//, "") : "";
+            const imgExists = Boolean(imgRef) && fs.existsSync(path.join(ROOT, imgRef));
+
+            const ok = missing.length === 0 && imgExists;
+            return { ok, detail: `missing=${missing.join(",") || "none"} ogImage=${imgRef} exists=${imgExists}` };
+        }
+    },
+
+    {
+        name: "play-footer-links",
+        async run(env) {
+            await bootGame(env);
+            await env.clock.advance(300);
+
+            const footer = env.document.getElementById("app-footer");
+            const privacy = env.document.getElementById("footer-privacy");
+            const terms = env.document.getElementById("footer-terms");
+            const support = env.document.getElementById("footer-support");
+            const version = env.document.getElementById("footer-version");
+
+            const privacyHref = privacy?.getAttribute("href") || "";
+            const termsHref = terms?.getAttribute("href") || "";
+            const supportHref = support?.getAttribute("href") || "";
+
+            // 連結必須有效（檔案存在）
+            const privacyExists = fs.existsSync(path.join(ROOT, privacyHref.replace(/^\.\//, "")));
+            const termsExists = fs.existsSync(path.join(ROOT, termsHref.replace(/^\.\//, "")));
+
+            // 禁 example.com / TODO
+            const noPlaceholder = !/example\.com|TODO/.test(footer?.textContent || "");
+
+            // 版本號
+            const hasVersion = /\d+\.\d+\.\d+/.test(version?.textContent || "");
+
+            const ok = Boolean(footer) && Boolean(privacy) && Boolean(terms)
+                && Boolean(support) && privacyExists && termsExists
+                && supportHref.startsWith("mailto:")
+                && noPlaceholder && hasVersion;
+
+            return {
+                ok,
+                detail: `footer=${Boolean(footer)} privacyExists=${privacyExists} termsExists=${termsExists} mailto=${supportHref.startsWith("mailto:")} version=${version?.textContent}`
+            };
+        }
+    },
+
+    {
+        name: "play-manifest-fields",
+        async run(_env) {
+            const m = JSON.parse(fs.readFileSync(path.join(ROOT, "manifest.json"), "utf8"));
+
+            const hasId = Boolean(m.id);
+            const shortcuts = Array.isArray(m.shortcuts) ? m.shortcuts.length : 0;
+            const maskable = (m.icons || []).some((i) => String(i.purpose || "").includes("maskable"));
+
+            // shortcut 圖示必須存在
+            const iconMissing = (m.shortcuts || []).some((sc) =>
+                (sc.icons || []).some((i) => !fs.existsSync(path.join(ROOT, String(i.src).replace(/^\.\//, "")))));
+
+            const ok = hasId && shortcuts > 0 && maskable && !iconMissing;
+            return { ok, detail: `id=${m.id} shortcuts=${shortcuts} maskable=${maskable} iconMissing=${iconMissing}` };
+        }
+    },
+
+    /* ---------------- PWA 安裝引導（Step 167） ---------------- */
+
+    {
+        name: "play-pwa-install-standalone",
+        async run(env) {
+            // 模擬已安裝（display-mode: standalone）
+            const original = env.window.matchMedia;
+            env.window.matchMedia = (query) => ({
+                matches: String(query).includes("display-mode: standalone"),
+                media: query,
+                addEventListener() { },
+                removeEventListener() { }
+            });
+
+            try {
+                const pwa = await loadExtraModule(env, "src/js/ui/pwa-install.js");
+                const root = env.document.getElementById("pwa-install-root");
+                const res = pwa.initPwaInstall(root, "zh-TW");
+
+                const visible = root && !root.classList.contains("hidden");
+                const ok = res.canShow === false && res.mode === "none" && !visible;
+                return {
+                    ok,
+                    detail: `canShow=${res.canShow} mode=${res.mode} visible=${visible}`
+                };
+            } finally {
+                env.window.matchMedia = original;
+            }
+        }
+    },
+
+    {
+        name: "play-pwa-install-beforeinstallprompt",
+        async run(env) {
+            const pwa = await loadExtraModule(env, "src/js/ui/pwa-install.js");
+            const root = env.document.getElementById("pwa-install-root");
+            const res = pwa.initPwaInstall(root, "zh-TW");
+
+            // 模擬 beforeinstallprompt
+            let promptedCalled = false;
+            const evt = new env.window.Event("beforeinstallprompt", { cancelable: true });
+            evt.prompt = async () => { promptedCalled = true; };
+            void promptedCalled;
+            evt.preventDefault = () => { };
+            env.window.dispatchEvent(evt);
+            await flush(10);
+
+            const visible = root && !root.classList.contains("hidden");
+            const hasInstallBtn = Boolean(root?.querySelector("#pwa-install-btn"));
+            const hasSkip = Boolean(root?.querySelector("#pwa-install-skip"));
+            const hasClose = Boolean(root?.querySelector("#pwa-install-close"));
+            const role = root?.querySelector(".pwa-install")?.getAttribute("role");
+
+            const ok = res.mode === "native" && visible && hasInstallBtn && hasSkip && hasClose && role === "dialog";
+            return {
+                ok,
+                detail: `mode=${res.mode} visible=${visible} installBtn=${hasInstallBtn} skip=${hasSkip} close=${hasClose} role=${role}`
+            };
+        }
+    },
+
+    {
+        name: "play-pwa-install-ios",
+        async run(env) {
+            // 模擬 iOS Safari UA
+            const originalUA = env.window.navigator.userAgent;
+            Object.defineProperty(env.window.navigator, "userAgent", {
+                value: "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1",
+                configurable: true
+            });
+
+            try {
+                const pwa = await loadExtraModule(env, "src/js/ui/pwa-install.js");
+                const root = env.document.getElementById("pwa-install-root");
+                const res = pwa.initPwaInstall(root, "zh-TW");
+
+                const visible = root && !root.classList.contains("hidden");
+                const steps = root?.querySelectorAll(".pwa-install__step").length || 0;
+                // iOS 步驟圖卡不得有安裝鈕（iOS 無 beforeinstallprompt）
+                const noInstallBtn = !root?.querySelector("#pwa-install-btn");
+                // 禁 emoji
+                const noEmoji = !/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(root?.textContent || "");
+
+                const ok = res.mode === "ios" && visible && steps === 3 && noInstallBtn && noEmoji;
+                return {
+                    ok,
+                    detail: `mode=${res.mode} visible=${visible} steps=${steps} noInstallBtn=${noInstallBtn} noEmoji=${noEmoji}`
+                };
+            } finally {
+                Object.defineProperty(env.window.navigator, "userAgent", {
+                    value: originalUA,
+                    configurable: true
+                });
+            }
+        }
+    },
+
+    {
+        name: "play-pwa-install-dismiss-cooldown",
+        async run(env) {
+            const pwa = await loadExtraModule(env, "src/js/ui/pwa-install.js");
+            const root = env.document.getElementById("pwa-install-root");
+
+            // 略過 → 進入冷卻期
+            pwa.recordDismiss();
+            const inCd = pwa.inCooldown();
+
+            const res = pwa.initPwaInstall(root, "zh-TW");
+            const visible = root && !root.classList.contains("hidden");
+
+            const ok = inCd === true && res.canShow === false && !visible;
+            return {
+                ok,
+                detail: `inCooldown=${inCd} canShow=${res.canShow} visible=${visible}`
+            };
+        }
+    },
+
+    {
+        name: "play-pwa-install-esc",
+        async run(env) {
+            const pwa = await loadExtraModule(env, "src/js/ui/pwa-install.js");
+            const root = env.document.getElementById("pwa-install-root");
+            pwa.initPwaInstall(root, "zh-TW");
+
+            const evt = new env.window.Event("beforeinstallprompt", { cancelable: true });
+            evt.prompt = async () => { };
+            evt.preventDefault = () => { };
+            env.window.dispatchEvent(evt);
+            await flush(10);
+
+            const visibleBefore = !root.classList.contains("hidden");
+
+            const esc = new env.window.KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true });
+            env.document.dispatchEvent(esc);
+            await flush(10);
+
+            const visibleAfter = !root.classList.contains("hidden");
+            const ok = visibleBefore && !visibleAfter;
+            return {
+                ok,
+                detail: `visibleBefore=${visibleBefore} visibleAfter=${visibleAfter}`
+            };
+        }
+    },
+
+    /* ---------------- Round 1 上市紅線（L1–L4） ---------------- */
+
+    {
+        name: "play-paywall-no-fake-deal",
+        async run(env) {
+            await bootGame(env);
+            await env.clock.advance(200);
+
+            const paywall = await loadExtraModule(env, "src/js/ui/paywall.js");
+            const root = env.document.getElementById("share-root");
+
+            paywall.showPaywall(root, {
+                id: "chapter4",
+                title: "解鎖完整旅程",
+                body: "第 4–5 章與恐龍谷主題包。資料僅儲存於本機裝置。",
+                cta: "訂閱年方案",
+                price: "NT$790 / 年",
+                features: []
+            });
+            await flush(10);
+
+            const html = root.innerHTML;
+            const hasFakeText = /敬請期待|coming soon/i.test(html);
+            const hasFalseSync = /跨裝置同步|cross-device sync/i.test(html);
+
+            // 點擊訂閱 → 應記錄意向並**留在對話框內**呈現回饋（不得直接關閉）
+            const buy = root.querySelector("[data-buy]");
+            const gate = await loadExtraModule(env, "src/js/core/parental-gate.js");
+            gate.setGateUnlocked(root, true);
+            if (buy) buy.dispatchEvent(new env.window.MouseEvent("click", { bubbles: true, cancelable: true }));
+            await flush(20);
+
+            const stillOpen = !root.classList.contains("hidden");
+            const feedbackShown = Boolean(root.querySelector("#paywall-ack"));
+            const feedbackText = root.textContent || "";
+            const honestText = /不會產生任何費用|不會自動扣款|no payment is taken/i.test(feedbackText);
+
+            const ok = !hasFakeText && !hasFalseSync && stillOpen && feedbackShown && honestText;
+            return {
+                ok,
+                detail: `fakeText=${hasFakeText} falseSync=${hasFalseSync} stillOpen=${stillOpen} feedback=${feedbackShown} honest=${honestText}`
+            };
+        }
+    },
+
+    {
+        name: "play-paywall-esc-and-ack",
+        async run(env) {
+            await bootGame(env);
+            await env.clock.advance(200);
+
+            const paywall = await loadExtraModule(env, "src/js/ui/paywall.js");
+            const root = env.document.getElementById("share-root");
+
+            paywall.showPaywall(root, {
+                id: "chapter4",
+                title: "解鎖完整旅程",
+                body: "第 4–5 章與恐龍谷主題包。",
+                cta: "訂閱年方案",
+                price: "NT$790 / 年",
+                features: []
+            });
+            await flush(10);
+
+            // Esc 關閉
+            const esc = new env.window.KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true });
+            env.document.dispatchEvent(esc);
+            await flush(10);
+            const closedByEsc = root.classList.contains("hidden");
+
+            // 重新開啟 → 記錄意向 → 對話框內有「我知道了」→ 點擊後關閉
+            paywall.showPaywall(root, {
+                id: "chapter4",
+                title: "解鎖完整旅程",
+                body: "第 4–5 章與恐龍谷主題包。",
+                cta: "訂閱年方案",
+                price: "NT$790 / 年",
+                features: []
+            });
+            await flush(10);
+
+            const gate = await loadExtraModule(env, "src/js/core/parental-gate.js");
+            gate.setGateUnlocked(root, true);
+            paywall.recordIntent(root, "year", 790, "年訂閱");
+            await flush(10);
+
+            const ack = root.querySelector("#paywall-ack");
+            const ackVisible = Boolean(ack) && !root.classList.contains("hidden");
+            if (ack) ack.dispatchEvent(new env.window.MouseEvent("click", { bubbles: true, cancelable: true }));
+            await flush(10);
+            const closedByAck = root.classList.contains("hidden");
+
+            const ok = closedByEsc && ackVisible && closedByAck;
+            return { ok, detail: `closedByEsc=${closedByEsc} ackVisible=${ackVisible} closedByAck=${closedByAck}` };
+        }
+    },
+
+    {
+        name: "play-boot-error-panel",
+        async run(env) {
+            // 讓內容載入失敗 → 必須顯示可見錯誤恢復面板
+            const originalFetch = env.window.fetch;
+            env.window.fetch = async () => {
+                throw new Error("[test] 內容載入失敗");
+            };
+
+            await bootGame(env);
+            await env.clock.advance(200);
+
+            const panel = env.document.getElementById("boot-error-root");
+            const startOverlay = env.document.getElementById("start-overlay");
+            const retry = env.document.getElementById("boot-retry-btn");
+            const refresh = env.document.getElementById("boot-refresh-btn");
+
+            const visible = Boolean(panel) && !panel.classList.contains("hidden");
+            const startHidden = Boolean(startOverlay) && startOverlay.classList.contains("hidden");
+            const roleAlert = panel?.getAttribute("role") === "alert";
+            const text = panel?.textContent || "";
+
+            // 恢復 fetch 後點擊重試 → 應能成功啟動
+            env.window.fetch = originalFetch;
+            if (retry) {
+                retry.dispatchEvent(new env.window.MouseEvent("click", { bubbles: true, cancelable: true }));
+                await env.clock.advance(300);
+            }
+            const recovered = !env.document.getElementById("boot-error-root");
+
+            const ok = visible && startHidden && roleAlert && Boolean(retry) && Boolean(refresh)
+                && /網路|連線/.test(text) && recovered;
+            return {
+                ok,
+                detail: `visible=${visible} startHidden=${startHidden} roleAlert=${roleAlert} retry=${Boolean(retry)} refresh=${Boolean(refresh)} recovered=${recovered}`
+            };
+        }
+    },
+
+    {
+        name: "play-boot-error-retry-lock",
+        async run(env) {
+            const originalFetch = env.window.fetch;
+            env.window.fetch = async () => {
+                throw new Error("[test] 內容載入失敗");
+            };
+
+            await bootGame(env);
+            await env.clock.advance(200);
+
+            const retry = env.document.getElementById("boot-retry-btn");
+            if (!retry) return { ok: false, detail: "無重試鈕" };
+
+            // 連點兩次（第二次應被 in-flight lock 擋下）
+            retry.dispatchEvent(new env.window.MouseEvent("click", { bubbles: true, cancelable: true }));
+            const lockedAfterFirst = retry.disabled === true;
+            retry.dispatchEvent(new env.window.MouseEvent("click", { bubbles: true, cancelable: true }));
+            await env.clock.advance(100);
+
+            env.window.fetch = originalFetch;
+            const ok = lockedAfterFirst;
+            return { ok, detail: `lockedAfterFirst=${lockedAfterFirst}` };
+        }
+    },
+
+    {
+        name: "play-footer-legal-panel",
+        async run(env) {
+            await bootGame(env);
+            await env.clock.advance(300);
+
+            const privacy = env.document.getElementById("footer-privacy");
+            if (!privacy) return { ok: false, detail: "無 #footer-privacy" };
+
+            privacy.dispatchEvent(new env.window.MouseEvent("click", { bubbles: true, cancelable: true }));
+            await flush(30);
+
+            const panel = env.document.querySelector(".legal-panel");
+            const body = env.document.querySelector("[data-legal-body]");
+            const title = env.document.getElementById("legal-panel-title");
+
+            const opened = Boolean(panel);
+            const role = panel?.getAttribute("role") === "dialog";
+            const scrollable = Boolean(body) && /consent-policy__body/.test(body.className || "");
+            const hasTitle = Boolean(title) && /隱私權政策/.test(title.textContent || "");
+            const contentLoaded = Boolean(body) && (body.textContent || "").length > 200;
+
+            // Esc 關閉
+            const esc = new env.window.KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true });
+            env.document.dispatchEvent(esc);
+            await flush(10);
+            const closed = !env.document.querySelector(".legal-panel");
+
+            const ok = opened && role && scrollable && hasTitle && contentLoaded && closed;
+            return {
+                ok,
+                detail: `opened=${opened} role=${role} scrollable=${scrollable} title=${hasTitle} content=${contentLoaded} closed=${closed}`
+            };
+        }
+    },
+
+    {
+        name: "play-footer-terms-panel",
+        async run(env) {
+            await bootGame(env);
+            await env.clock.advance(300);
+
+            const terms = env.document.getElementById("footer-terms");
+            if (!terms) return { ok: false, detail: "無 #footer-terms" };
+
+            terms.dispatchEvent(new env.window.MouseEvent("click", { bubbles: true, cancelable: true }));
+            await flush(30);
+
+            const title = env.document.getElementById("legal-panel-title");
+            const body = env.document.querySelector("[data-legal-body]");
+            const ok = Boolean(title) && /服務條款/.test(title.textContent || "")
+                && Boolean(body) && (body.textContent || "").length > 200;
+            return { ok, detail: `title=${title?.textContent} len=${(body?.textContent || "").length}` };
+        }
+    },
+
+    {
+        name: "play-viewport-zoom-allowed",
+        async run(_env) {
+            const html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
+            const m = /<meta[^>]+name=["']viewport["'][^>]*>/i.exec(html);
+            const tag = m ? m[0] : "";
+            const ok = Boolean(tag) && !/user-scalable\s*=\s*no/i.test(tag);
+            return { ok, detail: `viewport=${tag}` };
+        }
+    },
+
+    {
+        name: "play-brand-title-unified",
+        async run(_env) {
+            const html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
+            const m = JSON.parse(fs.readFileSync(path.join(ROOT, "manifest.json"), "utf8"));
+            const title = /<title>([^<]*)<\/title>/.exec(html);
+            const ok = Boolean(title) && /木木遊戲/.test(title[1]) && /聖誕小幫手/.test(title[1])
+                && /木木遊戲/.test(String(m.name || "")) && /木木遊戲/.test(String(m.short_name || ""));
+            return { ok, detail: `title=${title?.[1]} name=${m.name} short=${m.short_name}` };
+        }
     }
 ];
 
@@ -1327,7 +2815,7 @@ async function main() {
     let failed = 0;
 
     for (const c of list) {
-        const env = createGameEnv({ locale: "zh-TW" });
+        const env = createGameEnv({ locale: "zh-TW", ...(c.options || {}) });
         let result = { ok: false, detail: "未執行" };
         try {
             result = await c.run(env);

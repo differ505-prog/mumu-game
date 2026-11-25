@@ -83,3 +83,79 @@ export function canTargetedAdvertise(consent) {
     void consent;
     return false;
 }
+
+/**
+ * 刪除所有本機資料。
+ *
+ * 規範：
+ *   - **必須**以列舉前綴的方式清除所有 `mumu.*` key（不得硬寫 key 清單）
+ *   - **必須**回報刪除結果（成功／部分失敗）
+ *   - 後端刪除端點需逾時保護（5s）；逾時或失敗時回報部分失敗，
+ *     **不得**中斷 UI（由呼叫端顯示錯誤與重試）
+ *
+ * @returns {Promise<{ ok: boolean, removed: number, failed: string[] }>}
+ */
+export async function deleteAllData() {
+    const failed = [];
+    let removed = 0;
+
+    // ① 本機：列舉前綴清除所有 mumu.* key
+    try {
+        const keys = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith("mumu.")) keys.push(key);
+        }
+        for (const key of keys) {
+            try {
+                localStorage.removeItem(key);
+                removed++;
+            } catch (err) {
+                failed.push(`localStorage:${key}`);
+                console.warn("[consent] 無法刪除本機 key", key, err);
+            }
+        }
+    } catch (err) {
+        failed.push("localStorage:enum");
+        console.warn("[consent] 無法列舉本機資料", err);
+    }
+
+    // ② 後端刪除端點（若已接）；逾時 5s
+    const endpoint = getDeleteEndpoint();
+    if (endpoint) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 5000);
+        try {
+            const res = await fetch(endpoint, {
+                method: "DELETE",
+                signal: controller.signal,
+                keepalive: true
+            });
+            if (!res.ok) failed.push(`backend:${res.status}`);
+        } catch (err) {
+            failed.push("backend:request");
+            console.warn("[consent] 後端刪除請求失敗", err);
+        } finally {
+            clearTimeout(timer);
+        }
+    }
+
+    return { ok: failed.length === 0, removed, failed };
+}
+
+/**
+ * 後端刪除端點（未設定時僅做本機清除）。
+ * @returns {string}
+ */
+function getDeleteEndpoint() {
+    try {
+        const raw = localStorage.getItem("mumu.delete.endpoint");
+        if (!raw) return "";
+        // 僅允許同源相對路徑或 https: 端點
+        if (raw.startsWith("/") || raw.startsWith("./")) return raw;
+        if (/^https:\/\//.test(raw)) return raw;
+        return "";
+    } catch {
+        return "";
+    }
+}
