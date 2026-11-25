@@ -49,7 +49,7 @@ import {
     feedbackWrong,
     feedbackLevelComplete
 } from "./ui/round-feedback.js";
-import { safeText } from "./core/sanitize-html.js";
+import { safeText, escapeHtml } from "./core/sanitize-html.js";
 import { safeReferralCode } from "./core/input-validate.js";
 import { initVitals, trackFirstInteraction, reportVitals } from "./core/vitals.js";
 import { initPwaInstall, showInstallGuide } from "./ui/pwa-install.js";
@@ -119,6 +119,8 @@ function closeTopOverlay(root) {
         // 堆疊不一致（理論上不該發生）；記錄以便診斷
         console.warn("[overlay] 關閉層級與堆疊不一致", { top, source });
     }
+    // W1：關閉遮罩後重新同步頁尾可見性（避免頁尾狀態與畫面不一致）
+    syncAppPhase();
     return source;
 }
 
@@ -140,8 +142,90 @@ let audioSettings = null;
 /** @type {any} */
 let preferencesPanel = null;
 
+/**
+ * 回合選項的自繪 SVG 圖示（W2：零 Emoji 原則）。
+ *
+ * 3–6 歲幼兒不識字，答案鈕必須有**視覺徽章 + 圖形**才辨識得出差異。
+ * 這裡以內嵌 SVG（currentColor）提供 6 種高辨識度剪影，
+ * 依序套用於沒有圖片的選項鈕。
+ *
+ * @type {string[]}
+ */
+const OPTION_GLYPHS = [
+    // ① 恐龍足跡
+    '<svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-3 0-4 3-4 6 0 2 1 3 1 5s1 4-1 6-3 1-4-1"/><path d="M16 5c2 1 2 3 2 5"/><circle cx="6" cy="16" r="1.6"/><circle cx="18" cy="15" r="1.6"/></svg>',
+    // ② 雪花
+    '<svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M4 7l16 10M20 7L4 17"/><path d="M12 6l2.2-2.2M12 6L9.8 3.8M12 18l2.2 2.2M12 18l-2.2 2.2"/></svg>',
+    // ③ 禮物
+    '<svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M3 12h18M12 8v13"/><path d="M12 8S9.5 8 8.5 6.5 10 3.5 12 8Zm0 0s2.5 0 3.5-1.5S14 3.5 12 8Z"/></svg>',
+    // ④ 星星
+    '<svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.4l5.9-.9z"/></svg>',
+    // ⑤ 樹
+    '<svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l5 7h-3l4 6H6l4-6H7z"/><path d="M12 16v5"/></svg>',
+    // ⑥ 波浪（聲音）
+    '<svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h2l2-6 3 12 3-9 2 5 2-3h2"/></svg>'
+];
+
+/**
+ * 將內容型字串轉為可安全置入 HTML 屬性的形式。
+ *
+ * @param {unknown} value
+ * @returns {string}
+ */
+function escapeAttr(value) {
+    return escapeHtml(safeText(value));
+}
+
 /* ---------- DOM 快捷存取 ---------- */
 const $ = (/** @type {string} */ id) => document.getElementById(id);
+
+/**
+ * 應用階段（控制頁尾可見性，W1）。
+ *
+ * "start" → 頁尾可見（開始畫面／同意閘／角色選擇／地圖等非遊玩畫面）
+ * "play"  → 頁尾隱藏（回合進行中），工具列與答案鈕取得完整可視面積
+ *
+ * @typedef {"start"|"play"} AppPhase
+ */
+
+/**
+ * 設定應用階段（同步到 body[data-app-phase]）。
+ *
+ * W1（Round 2 紅線）：頁尾不得遮住工具列。
+ * 遊玩期間（#start-overlay 隱藏時）必須切到 "play"，讓頁尾完全隱藏；
+ * 其餘畫面切回 "start"，並由 CSS 以 --footer-reserve 為工具列預留底部空間。
+ *
+ * @param {AppPhase} phase
+ */
+function setAppPhase(phase) {
+    const body = document.body;
+    if (!body) return;
+    const next = phase === "play" ? "play" : "start";
+    if (body.dataset.appPhase === next) return;
+    body.dataset.appPhase = next;
+}
+
+/**
+ * 依當前畫面推導應用階段。
+ *
+ * 判斷依據：#start-overlay 隱藏且遊戲容器可見 → 遊玩中；否則 → 非遊玩畫面。
+ *
+ * @returns {AppPhase}
+ */
+function detectAppPhase() {
+    const startOverlay = $("start-overlay");
+    const gameContainer = $("game-container");
+    const playing = Boolean(startOverlay && startOverlay.classList.contains("hidden"))
+        && Boolean(gameContainer && !gameContainer.classList.contains("hidden"));
+    return playing ? "play" : "start";
+}
+
+/**
+ * 重新同步應用階段（遮罩切換後呼叫）。
+ */
+function syncAppPhase() {
+    setAppPhase(detectAppPhase());
+}
 
 /* ---------- 啟動 ---------- */
 /** boot() 是否正在執行中（避免重試時重入）。 @type {boolean} */
@@ -302,6 +386,8 @@ async function boot() {
     buildScene($("scene"));
     applyPreferences(document.body);
     setupFooter();
+    // W1：初始為非遊玩畫面（頁尾可見），進入回合時才切到 "play"
+    setAppPhase("start");
 
     // Step 205：語音偏好 → 語音層降級狀態（靜音時直接走視覺替代）
     const prefs = getPreferences();
@@ -647,6 +733,8 @@ function registerServiceWorker() {
 function showStart() {
     const overlay = $("start-overlay");
     overlay.classList.remove("hidden");
+    // W1：開始畫面 → 頁尾可見（法律條款與版本資訊須可讀）
+    setAppPhase("start");
 }
 
 /**
@@ -665,6 +753,8 @@ async function startGame() {
     applyTheme($("scene"), "christmas");
     setParallax($("scene"), 0);
     $("start-overlay").classList.add("hidden");
+    // W1：開始遊玩 → 頁尾隱藏（不得遮住工具列與答案鈕）
+    setAppPhase("play");
 
     // 序章信件：優先取 story-arcs 第 0 章的完整 letter，
     // 缺漏時回退到 narrative.letters.prologue（較短的一段引言）
@@ -875,12 +965,19 @@ function showCharacterSelect() {
 
     overlay.classList.remove("hidden");
     pushOverlay("character-select");
+    // W1：角色選擇為非遊玩畫面 → 頁尾可見
+    setAppPhase("start");
 }
 
 /**
  * 關卡地圖。
  *
  * F8：回到地圖時必須把**遊戲畫面收起來**，否則地圖底下仍殘留回合畫面。
+ *
+ * W3（Round 2 紅線）：「回地圖」不得軟鎖在空白天空 ——
+ *   開啟地圖前必須**關閉所有其他遮罩**（設定／同意閘／家長報告／圖鑑／
+ *   分享／付費牆／教學／故事），並**重新渲染**地圖內容（否則 overlayStack
+ *   與實際 DOM 不一致會導致地圖無法再被開啟）。
  */
 function showLevelMap() {
     const overlay = $("levelmap-root");
@@ -894,6 +991,36 @@ function showLevelMap() {
     const mapToolBtn = $("back-to-map-tool-btn");
     mapToolBtn?.setAttribute("aria-disabled", "true");
 
+    /*
+     * W3：關閉所有其他遮罩，避免疊層殘留造成軟鎖（空白天空）。
+     * 這些遮罩彼此獨立，逐一隱藏並清空內容，確保地圖是唯一可見層。
+     */
+    const otherOverlays = [
+        "audio-settings-root",
+        "a11y-root",
+        "consent-gate-root",
+        "parent-report-root",
+        "assessment-root",
+        "dex-root",
+        "share-root",
+        "tutorial-root",
+        "story-root",
+        "pwa-install-root",
+        "character-select-overlay",
+        "mode-select-overlay",
+        "level-up-overlay"
+    ];
+    for (const id of otherOverlays) {
+        const el = $(id);
+        if (!el) continue;
+        el.classList.add("hidden");
+        if (id !== "level-up-overlay") el.innerHTML = "";
+    }
+
+    // 疊層堆疊重置（避免殘留層級造成 closeTopOverlay 誤判）
+    overlayStack.length = 0;
+
+    // 重新渲染地圖內容（確保回到地圖時不是空白）
     const map = renderLevelMap(overlay, bundle, progress, locale);
     map.onSelect((levelId) => {
         overlay.classList.add("hidden");
@@ -916,6 +1043,8 @@ function showLevelMap() {
 
     overlay.classList.remove("hidden");
     pushOverlay("levelmap");
+    // W1：地圖為非遊玩畫面 → 頁尾可見（工具列回到底部但不被遮住）
+    setAppPhase("start");
 }
 
 /**
@@ -938,6 +1067,8 @@ function startLevel(levelId) {
     $("game-container").classList.remove("hidden");
     // V3：進入關卡後重新啟用工具列「回地圖」鈕
     $("back-to-map-tool-btn")?.setAttribute("aria-disabled", "false");
+    // W1：進入回合 → 頁尾隱藏（工具列與答案鈕完整可點）
+    setAppPhase("play");
     // V4：開始新關卡前清空前一回合（故事／教學）的殘留文字
     clearRoundHud();
     $("mode-indicator").textContent = childVerbLabel(level.verb, locale);
@@ -1284,14 +1415,83 @@ function currentDemoSteps() {
 }
 
 /**
+ * 判斷目前是否處於「回合遊玩狀態」。
+ *
+ * W2：只有在回合進行中（session 存在且有引擎）才允許把文字寫進
+ * `#visual-fallback` —— 故事信件、教學、角色選擇等地畫面**不得**滲入。
+ *
+ * @returns {boolean}
+ */
+function isRoundPlaying() {
+    return Boolean(session?.engine);
+}
+
+/**
+ * 判斷故事過場（信件）目前是否開啟。
+ *
+ * W2：故事信件本來就顯示在畫面上，語音不可用時**不得**再把長信
+ * 複製一份寫進 `#visual-fallback`（會造成長信滲入第 1 關）。
+ *
+ * @returns {boolean}
+ */
+function isStorySceneOpen() {
+    const root = $("story-root");
+    return Boolean(root && !root.classList.contains("hidden"));
+}
+
+/**
+ * 取得當題的結構化選項（回合視覺圖卡，W2）。
+ *
+ * @returns {Array<{label?:string,image?:string,id?:string}>}
+ */
+function currentRoundCards() {
+    const engine = session?.engine;
+    if (!engine) return [];
+
+    const options = engine.getOptions?.() || [];
+    if (!Array.isArray(options) || !options.length) return [];
+
+    return options.slice(0, 6).map((/** @type {any} */ o) => ({
+        id: o?.id ? String(o.id) : "",
+        label: o?.label ? String(o.label) : "",
+        image: o?.image ? String(o.image) : ""
+    }));
+}
+
+/**
  * 語音不可用／靜音／無語音包 → 顯示視覺替代提示（Step 205）。
  * 不識字幼兒僅看圖卡與脈衝即可完成回合。
+ *
+ * W2（Round 2 紅線）：故事長信**不得**滲入 `#visual-fallback`。
+ *   - `#story-root` 開啟時（故事信件本身就在畫面上）→ 完全不寫入。
+ *   - 非回合遊玩狀態（教學／角色選擇／地圖）→ 完全不寫入。
+ *   - 回合進行中 → 改寫入**當題的結構化圖卡**（而非整段文字）。
  */
 on("voice:unavailable", (event) => {
     const payload = /** @type {any} */ (event?.payload || {});
+
+    // W2：故事過場中 → 不得把長信寫進視覺替代區（信件本身已在畫面上）
+    if (isStorySceneOpen()) {
+        hideVisualFallback(document.body);
+        hideVisualFallback(document.getElementById("tv-view") || document.body);
+        return;
+    }
+
+    // W2：非回合遊玩狀態 → 不得寫入視覺替代區（避免污染教學／地圖）
+    if (!isRoundPlaying()) {
+        hideVisualFallback(document.body);
+        hideVisualFallback(document.getElementById("tv-view") || document.body);
+        return;
+    }
+
     const root = document.getElementById("tv-view") || document.body;
+    const cards = currentRoundCards();
     showVisualFallback(root, {
-        text: payload.text ? String(payload.text) : "",
+        // 回合進行中一律只呈現圖卡；文字僅在極短（<= 24 字）時作為提示
+        text: !cards.length && payload.text && String(payload.text).length <= 24
+            ? String(payload.text)
+            : "",
+        cards: cards.length ? cards : undefined,
         reason: payload.reason ? String(payload.reason) : "unsupported",
         locale: payload.locale ? String(payload.locale) : locale
     });
@@ -1305,8 +1505,12 @@ on("voice:unavailable", (event) => {
 
 /**
  * 最小對的視覺替代：兩個音並列成大字卡。
+ *
+ * W2：故事過場中不得呈現（信件本身已在畫面上）。
  */
 on("voice:pair", (event) => {
+    if (isStorySceneOpen() || !isRoundPlaying()) return;
+
     const payload = /** @type {any} */ (event?.payload || {});
     const root = document.getElementById("tv-view") || document.body;
     const pair = Array.isArray(payload.pair) ? payload.pair.map((/** @type {any} */ w) => String(w)) : [];
@@ -1317,21 +1521,30 @@ on("voice:pair", (event) => {
 });
 
 /**
- * 示範播放（demonstrate）時的視覺替代（V4）。
+ * 示範播放（demonstrate）時的視覺替代（V4／W2）。
  *
  * 語音不可用／視覺輔助開啟時，於 `#visual-fallback` 呈現**當題的順序大圖卡**
  * （含醒目序號與高亮節拍），而非只顯示空泛警告字。
+ *
+ * W2：同時傳入當題的**結構化 cards**（當回合無序列時改以圖卡呈現），
+ *     並在非回合狀態下直接略過（不得污染其他畫面）。
  */
 on("round:demonstrate", (event) => {
     const payload = /** @type {any} */ (event?.payload || {});
     const root = document.getElementById("tv-view") || document.body;
+
+    // W2：非回合遊玩狀態 → 不呈現視覺替代（避免污染教學／地圖）
+    if (!isRoundPlaying()) return;
+
     const steps = currentDemoSteps();
-    if (!steps.length) return;
+    const cards = currentRoundCards();
+    if (!steps.length && !cards.length) return;
 
     showVisualFallback(root, {
         reason: payload.reason ? String(payload.reason) : "unsupported",
         locale,
-        sequence: steps,
+        sequence: steps.length ? steps : undefined,
+        cards: steps.length ? undefined : cards,
         activeIndex: typeof payload.activeIndex === "number" ? payload.activeIndex : -1,
         beats: typeof payload.beats === "number" ? payload.beats : steps.length
     });
@@ -1442,10 +1655,14 @@ function renderRound() {
     // 單選與序列：按鈕網格（序列另加進度指示）
     controls.innerHTML = `
         ${kind === "sequence" ? renderSequenceProgress() : ""}
-        <div class="controls-grid grid-3">${options.map((/** @type {any} */ o) => `
-        <button class="control-btn" data-item="${o.id}" type="button">
-            ${o.image ? `<img src="${o.image}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:var(--r-sm);" />` : ""}
-            ${o.label ? `<span class="control-btn__label">${o.label}</span>` : ""}
+        <div class="controls-grid grid-3">${options.map((/** @type {any} */ o, /** @type {number} */ i) => `
+        <button class="control-btn control-btn--badge" data-item="${o.id}" type="button"
+                aria-label="${escapeAttr(o.label || o.id)}">
+            <span class="control-btn__no" aria-hidden="true">${i + 1}</span>
+            ${o.image
+                ? `<img class="control-btn__art" src="${escapeAttr(o.image)}" alt="" />`
+                : `<span class="control-btn__glyph" aria-hidden="true">${OPTION_GLYPHS[i % OPTION_GLYPHS.length]}</span>`}
+            ${o.label ? `<span class="control-btn__label">${escapeAttr(o.label)}</span>` : ""}
         </button>
     `).join("")}</div>
     `;
@@ -1679,6 +1896,26 @@ function wire() {
     const startOverlay = $("start-overlay");
     if (startOverlay) {
         startOverlay.addEventListener("click", startGame, { once: true });
+    }
+
+    /*
+     * W4：開始畫面主 CTA（#start-cta）為真正的按鈕 ——
+     * 明確綁定點擊並把焦點移入遊戲流程，鍵盤 Enter／Space 亦可啟動。
+     * （事件會冒泡到 #start-overlay，但明確綁定可確保語意正確。）
+     */
+    const startCta = $("start-cta");
+    if (startCta) {
+        startCta.addEventListener("click", (event) => {
+            // 阻止冒泡到 #start-overlay（避免重複呼叫；startGame 另有 started 旗標防護）
+            event.stopPropagation();
+            startGame();
+        });
+        // 焦點落在主 CTA 上（鍵盤／螢幕閱讀器使用者可直接 Enter 開始）
+        try {
+            startCta.focus({ preventScroll: true });
+        } catch {
+            startCta.focus();
+        }
     }
 
     const replayBtn = $("replay-btn");
@@ -1942,6 +2179,8 @@ function wire() {
                 mapToggle.textContent = locale === "en-US" ? "Level Map" : "回到地圖";
                 mapToggle.addEventListener("click", () => {
                     root.classList.add("hidden");
+                    // W3：關閉設定後回到地圖不得軟鎖 —— showLevelMap() 會關閉
+                    // 所有其他遮罩並重新渲染地圖內容。
                     showLevelMap();
                 });
                 actions.appendChild(mapToggle);

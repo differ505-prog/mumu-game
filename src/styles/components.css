@@ -36,11 +36,52 @@
     color: var(--text-secondary);
 }
 
+/*
+ * W4：開始畫面主 CTA —— 高對比主按鈕（暖金底 + 深藍粗體字），
+ * 不再是平淡純文字。
+ * 動效限於 hover/active 的輕微縮放，並尊重 prefers-reduced-motion。
+ */
 .overlay-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 52px;
+    min-width: max(48px, var(--touch-min));
     margin-top: var(--s-5);
-    font-size: var(--fs-sm);
-    color: var(--text-muted);
-    animation: pulse var(--t-hold) var(--e-standard) infinite;
+    padding: var(--s-3) var(--s-8);
+    font-size: var(--fs-lg);
+    font-weight: 700;
+    color: var(--c-night-900);
+    background: var(--accent-warm);
+    border: 2px solid transparent;
+    border-radius: var(--r-full);
+    box-shadow: var(--mat-border-light), var(--mat-shadow-2);
+    cursor: pointer;
+    transition: transform var(--t-micro) var(--e-spring),
+                box-shadow var(--t-base) var(--e-standard),
+                filter var(--t-base) var(--e-standard);
+}
+
+.overlay-cta:hover {
+    filter: brightness(1.06);
+    box-shadow: var(--mat-border-light), var(--mat-shadow-2), 0 0 0 4px color-mix(in srgb, var(--accent-warm) 40%, transparent);
+}
+
+.overlay-cta:active {
+    transform: scale(.96);
+}
+
+.overlay-cta:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 3px;
+}
+
+/* 尊重減少動態偏好 */
+@media (prefers-reduced-motion: reduce) {
+
+    .overlay-cta {
+        transition: none;
+    }
 }
 
 .overlay-icon {
@@ -305,6 +346,73 @@
     color: var(--text-secondary);
 }
 
+/*
+ * W2：答案鈕的視覺層級 —— 序號徽章 + 圖像／自繪 SVG 圖示。
+ * 3–6 歲幼兒不識字，必須靠「序號 + 圖形」辨識答案鈕，
+ * 而不是只看小字方塊。
+ */
+.control-btn--badge {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-1);
+    padding: var(--s-4) var(--s-2) var(--s-2);
+    /* 卡片層級：更明顯的邊框與內襯 */
+    background: linear-gradient(180deg, var(--bg-elevated) 0%, var(--bg-panel) 100%);
+    border: 2px solid var(--border-soft);
+    border-radius: var(--r-lg);
+    box-shadow: var(--mat-border-light), var(--mat-shadow-2);
+}
+
+.control-btn__no {
+    position: absolute;
+    top: var(--s-1);
+    left: var(--s-1);
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    font-size: var(--fs-xs);
+    font-weight: 800;
+    color: var(--c-night-900);
+    background: var(--accent-warm);
+    border-radius: var(--r-full);
+    box-shadow: var(--mat-shadow-1);
+}
+
+.control-btn__art {
+    display: block;
+    width: 100%;
+    max-width: 96px;
+    height: 64px;
+    object-fit: contain;
+    border-radius: var(--r-sm);
+}
+
+.control-btn__glyph {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    color: var(--accent-warm);
+}
+
+.control-btn__glyph svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.control-btn--badge .control-btn__label {
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    color: var(--text-primary);
+    text-align: center;
+    line-height: 1.3;
+}
+
 .option-btn {
     display: grid;
     place-items: center;
@@ -315,6 +423,21 @@
     border-radius: var(--r-md);
     box-shadow: var(--mat-border-light), var(--mat-shadow-1);
     transition: transform var(--t-micro) var(--e-standard);
+}
+
+/* W2：答案鈕同樣具備序號徽章與圖示層級 */
+.option-btn--badge {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-1);
+    padding: var(--s-4) var(--s-2) var(--s-2);
+    background: linear-gradient(180deg, var(--bg-elevated) 0%, var(--bg-panel) 100%);
+    border: 2px solid var(--border-soft);
+    border-radius: var(--r-lg);
+    box-shadow: var(--mat-border-light), var(--mat-shadow-2);
 }
 
 .option-btn:active {
@@ -726,6 +849,38 @@
     overflow-wrap: anywhere;
 }
 
+/*
+ * W4：故事／信件內文限制高度並**內部捲動**，
+ * 確保底部主 CTA 在 1280×800 與手機直向都 100% 完整露出不被截切。
+ * 捲軸為細窄暗色樣式（不出現白色捲軸）。
+ */
+.letter__body,
+.story-scene__text {
+    max-height: 46dvh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-soft) transparent;
+    -webkit-overflow-scrolling: touch;
+}
+
+.letter__body::-webkit-scrollbar,
+.story-scene__text::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.letter__body::-webkit-scrollbar-track,
+.story-scene__text::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.letter__body::-webkit-scrollbar-thumb,
+.story-scene__text::-webkit-scrollbar-thumb {
+    background: var(--border-soft);
+    border-radius: var(--r-full);
+}
+
 /* 信件 */
 .letter-wrap {
     display: flex;
@@ -746,7 +901,11 @@
     border: 1px solid var(--border-soft);
     border-radius: var(--r-lg);
     box-shadow: var(--mat-border-light), var(--mat-shadow-1);
-    overflow-y: auto;
+    /*
+     * W4：卡片本身**不捲動**（避免巢狀捲軸）——
+     * 只有 .letter__body 內部捲動，標題與底部 CTA 永遠可見。
+     */
+    overflow: hidden;
 }
 
 .letter__title {
@@ -762,6 +921,9 @@
     color: var(--text-primary);
     white-space: pre-line;
     overflow-wrap: anywhere;
+    /* W4：flex 子項可捲動的必要條件（min-height: 0） */
+    min-height: 0;
+    flex: 0 1 auto;
 }
 
 .letter__signature {
@@ -1390,11 +1552,22 @@
 /*
  * V5：頁尾**穩定貼底**（body 為 flex 欄位，頁尾為最後一個 flex item），
  * 且文字改用高對比淺色（--text-secondary），避免浮在畫面中間遮擋內容。
+ *
+ * W1（Round 2 紅線）：頁尾**不得**遮住 #toolbar。
+ *   頁尾改為 fixed 覆蓋層（不佔用 flex 高度），並以 body[data-app-phase]
+ *   控制可見性：
+ *     - "start"（開始畫面／同意閘／角色選擇／地圖等非遊玩畫面）：頁尾可見，
+ *       且 #toolbar 以 --footer-reserve 預留底部空間，兩者永不重疊。
+ *     - "play"（回合進行中）：頁尾完全隱藏，#toolbar 與 #controls-view
+ *       獲得完整的可視高度（手機直向 375×812 時底部 5 顆工具鈕 100% 可點）。
+ *   實作細節見 src/js/main.js 的 setAppPhase()。
  */
 .app-footer {
-    position: relative;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
     z-index: var(--z-hud);
-    flex: 0 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1404,6 +1577,15 @@
     border-top: 1px solid var(--border-soft);
     box-shadow: var(--mat-shadow-1);
     text-align: center;
+    transition: opacity var(--t-base) var(--e-standard),
+                visibility var(--t-base) var(--e-standard);
+}
+
+/* 遊玩期間頁尾隱藏（不得遮住工具列與答案鈕） */
+body[data-app-phase="play"] .app-footer {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
 }
 
 .app-footer__links {
@@ -1670,6 +1852,8 @@
     flex-direction: column;
     gap: var(--s-4);
     width: min(520px, 92vw);
+    /* W5：卡片置中（置中於遮罩層內，兩側等距） */
+    margin: 0 auto;
     max-height: 88dvh;
     padding: var(--s-6) var(--s-5);
     background: var(--bg-elevated);
@@ -1682,6 +1866,20 @@
     scrollbar-color: var(--border-soft) transparent;
 }
 
+.settings-card::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.settings-card::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.settings-card::-webkit-scrollbar-thumb {
+    background: var(--border-soft);
+    border-radius: var(--r-full);
+}
+
 .settings-card__title {
     margin: 0;
     font-size: var(--fs-xl);
@@ -1689,6 +1887,7 @@
     text-align: center;
 }
 
+/* W5：滑桿區垂直整齊排列 */
 .settings-card__body {
     display: flex;
     flex-direction: column;
@@ -1755,7 +1954,12 @@
     gap: var(--s-4);
     width: 100%;
     max-width: var(--content-max, 1100px);
-    margin: 0 auto;
+    /*
+     * W3：為右上角的「返回」鈕（.overlay__back）預留獨立空間，
+     * 徹底消除「返回」壓到「家長報告」卡片的重疊。
+     * 68px >= 返回鈕高度(var(--touch-min)=64px) + 間距。
+     */
+    padding-top: 68px;
 }
 
 .levelmap__top {
@@ -1763,6 +1967,11 @@
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: var(--s-3);
     width: 100%;
+    /*
+     * W3：右側為「返回」鈕保留獨立空間（避免壓到「家長報告」卡片）。
+     * 與 .levelmap 的 padding-top 共同構成完整的頂部導覽空間。
+     */
+    padding-right: 0;
 }
 
 .levelmap__top .mode-option {
@@ -1858,9 +2067,18 @@
     opacity: .35;
 }
 
+/*
+ * W3：未點亮的星星在深藍底上原本是黑色（<img> 的 currentColor 解析為黑），
+ * 幾乎不可見 —— 統一轉為高對比亮色並保留 45% 透明度。
+ */
+.levelmap__star:not(.is-on) {
+    filter: brightness(0) invert(1);
+    opacity: .45;
+}
+
 .levelmap__star.is-on {
     opacity: 1;
-    filter: drop-shadow(0 0 4px var(--accent-warm));
+    filter: brightness(0) invert(1) drop-shadow(0 0 4px var(--accent-warm));
 }
 
 /* 分頁列置中 */
@@ -1910,16 +2128,29 @@
     background: linear-gradient(to top, var(--bg-elevated) 60%, transparent);
 }
 
-/* ---------- 角色選擇：卡片列置中對齊（消除右側留白） ---------- */
+/*
+ * W4：角色選擇 —— 改用 flex + wrap + justify-content:center，
+ * 讓 5 張角色卡完美置中，消除右側大塊不對稱空白。
+ * （grid 的 auto-fit 會在最後一列留下不對稱的右側留白。）
+ */
 #character-select-overlay .mode-options,
-#mode-select-overlay .mode-options {
+#mode-select-overlay .mode-options,
+#character-options {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
     justify-content: center;
-    justify-items: center;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 200px));
+    gap: var(--s-4);
+    width: 100%;
     max-width: min(900px, 94vw);
+    margin-left: auto;
+    margin-right: auto;
 }
 
-#character-select-overlay .mode-option {
+#character-select-overlay .mode-option,
+#mode-select-overlay .mode-option,
+#character-options .mode-option {
+    flex: 0 1 200px;
     width: 100%;
     align-items: center;
     text-align: center;

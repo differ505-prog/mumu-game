@@ -7,6 +7,7 @@
 import { getEntitlement, isChapterFree } from "../core/entitlements.js";
 import { dailyChallenge, isDailyDone } from "../core/daily.js";
 import { todayString } from "../core/progress.js";
+import { escapeHtml, safeText } from "../core/sanitize-html.js";
 
 /**
  * 單次渲染的最大關卡節點數（Step 149：分頁懶載入）。
@@ -76,6 +77,13 @@ export function renderLevelMap(root, bundle, progress, locale) {
 
     root.innerHTML = `
         <div class="levelmap">
+            <!--
+                W3：獨立導覽列 —— 為右上角的「返回」鈕保留專屬空間，
+                下方卡片（每日挑戰／恐龍圖鑑／家長報告）不再被壓到。
+            -->
+            <div class="levelmap__nav" role="presentation">
+                <span class="levelmap__nav-hint">${en ? "Pick a level" : "選一關開始"}</span>
+            </div>
             <div class="levelmap__top">
                 <button class="mode-option levelmap__daily ${dailyDone ? "is-done" : ""}"
                         data-daily="1" type="button">
@@ -103,14 +111,15 @@ export function renderLevelMap(root, bundle, progress, locale) {
                             ${title}
                             ${free ? "" : `<span class="levelmap__badge">${en ? "Subscription required" : "需訂閱"}</span>`}
                         </h3>
-                        <div class="levelmap__path">
+                            <div class="levelmap__path">
                             ${list.map((/** @type {any} */ l) => {
                                 const locked = isLevelLocked(bundle, l.id, progress);
                                 const stars = progress.stars?.[String(l.id)] || 0;
+                                const nodeName = safeText(l.name?.[locale] || l.name?.["zh-TW"] || String(l.id));
                                 return `
                                     <button class="levelmap__node ${locked ? "is-locked" : ""}"
                                             data-level="${l.id}" type="button"
-                                            aria-label="${l.name?.[locale] || l.name?.["zh-TW"] || l.id}">
+                                            aria-label="${escapeHtml(nodeName)}">
                                         <span class="levelmap__node-no">${l.id}</span>
                                         <span class="levelmap__node-stars" aria-label="${stars}/3">
                                             ${[1, 2, 3].map((n) => `<img class="levelmap__star ${n <= stars ? "is-on" : ""}" src="./assets/icons/star${n <= stars ? "-filled" : ""}.svg" alt="" loading="lazy" decoding="async" width="18" height="18" />`).join("")}

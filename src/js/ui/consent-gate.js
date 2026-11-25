@@ -107,8 +107,8 @@ function buildGate(root, locale) {
             </h2>
             <p class="consent-gate__desc" id="consent-gate-desc">
                 ${en
-                    ? "A parent or guardian must choose which optional data uses to allow. Nothing is sent until you agree."
-                    : "請由法定代理人家長選擇要允許的選項資料用途。未同意前不會傳送任何資料。"}
+                    ? "Please choose which data uses to turn on. Nothing is sent until you agree."
+                    : "請選擇要開啟的資料用途。未同意前不會傳送任何資料。"}
             </p>
             <div class="consent-gate__loading" data-consent-loading>
                 ${en ? "Loading…" : "載入中…"}

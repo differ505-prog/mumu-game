@@ -26,24 +26,29 @@
         --char-max-h: 30dvh;
     }
 
+    /*
+     * W1：直向時工具列改為橫向列置中。
+     * 底部位移必須沿用 --footer-reserve（頁尾可見時往上讓位），
+     * 不得硬寫底距，否則直向時頁尾會再次壓住工具列。
+     */
     #toolbar {
         flex-direction: row;
         right: auto;
         left: 50%;
         transform: translateX(-50%);
+        bottom: calc(env(safe-area-inset-bottom) + var(--s-3) + var(--footer-reserve));
     }
 
     #toast-layer {
         bottom: calc(env(safe-area-inset-bottom) + 140px);
     }
 
-    /* 直向時工具列為橫向列置中，底部保留安全空間避免遮住答案鈕 */
-    #controls-view {
-        padding-bottom: calc(env(safe-area-inset-bottom) + var(--s-10));
-    }
-
+    /*
+     * W1：直向時頁尾保持 fixed 覆蓋層語意（不得回到 static），
+     * 否則會重新佔據 flex 高度並把答案鈕推出畫面。
+     */
     .app-footer {
-        position: static;
+        position: fixed;
     }
 }
 
@@ -85,6 +90,8 @@
 
     #toolbar {
         gap: var(--s-1);
+        /* W1：橫向時頁尾可見 → 工具列整列往上讓位（不得被頁尾切半） */
+        bottom: calc(env(safe-area-inset-bottom) + var(--s-2) + var(--footer-reserve));
     }
 
     .tool-btn {
@@ -103,6 +110,38 @@
     .controls-grid {
         padding: var(--s-2);
         gap: var(--touch-gap);
+    }
+
+    /*
+     * W5：手機直向時，控制區改為**直向堆疊**（進度圓點在上、選項鈕在下），
+     * 且兩者皆水平置中 —— 進度圓點不再擠偏右側、3 顆答案鈕也不被擠歪。
+     */
+    #controls-view {
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        gap: var(--s-2);
+        padding-top: var(--s-3);
+    }
+
+    .seq-progress {
+        flex: 0 0 auto;
+        align-self: center;
+        justify-content: center;
+        width: auto;
+        margin: 0;
+        padding: var(--s-1) var(--s-3);
+    }
+
+    .controls-grid {
+        flex: 0 1 auto;
+        align-self: stretch;
+        width: 100%;
+    }
+
+    .seq-dot {
+        width: 16px;
+        height: 16px;
     }
 }
 

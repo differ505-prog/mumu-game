@@ -247,15 +247,69 @@ function buildSequenceCards(steps, activeIndex) {
 }
 
 /**
+ * 回合視覺圖卡（當題的結構化選項，W2）。
+ *
+ * 每張卡帶**醒目序號**與（若有）圖片／標籤，
+ * 讓 3–6 歲幼兒不識字也能靠序號與圖像作答。
+ *
+ * @param {Array<{label?:string,image?:string,id?:string}>} cards
+ * @returns {HTMLElement}
+ */
+function buildRoundCards(cards) {
+    const row = document.createElement("ol");
+    row.className = "visual-fallback__cards visual-fallback__cards--round";
+    row.setAttribute("aria-label", "回合圖卡");
+
+    cards.forEach((card, i) => {
+        const item = document.createElement("li");
+        item.className = "visual-fallback__round-card";
+
+        const no = document.createElement("span");
+        no.className = "visual-fallback__round-no";
+        no.setAttribute("aria-hidden", "true");
+        no.textContent = String(i + 1);
+        item.appendChild(no);
+
+        const body = document.createElement("span");
+        body.className = "visual-fallback__round-body";
+
+        const image = typeof card?.image === "string" ? card.image : "";
+        const label = typeof card?.label === "string" ? card.label : "";
+
+        if (image) {
+            const img = document.createElement("img");
+            img.className = "visual-fallback__round-art";
+            img.src = image;
+            img.alt = "";
+            img.loading = "lazy";
+            img.decoding = "async";
+            body.appendChild(img);
+        }
+        if (label) {
+            const text = document.createElement("span");
+            text.className = "visual-fallback__round-label";
+            text.textContent = safeText(label);
+            body.appendChild(text);
+        }
+        item.appendChild(body);
+        row.appendChild(item);
+    });
+
+    return row;
+}
+
+/**
  * 顯示視覺替代提示（語音不可用／靜音／無語音包時）。
  *
  * - 文字內容一律以 textContent 寫入（禁 innerHTML 注入）
  * - 最小對以兩張並列大字卡呈現，供幼兒「看」出兩個音
  * - 示範（demonstration）時以**順序大圖卡 + 醒目序號**呈現當題步驟（V4）
+ * - 回合進行中可傳入 `cards`（當題結構化選項）呈現**回合視覺圖卡**（W2）
  *
  * @param {HTMLElement} root
  * @param {{ text?: string, pair?: string[], reason?: string, beats?: number, locale?: string,
- *           sequence?: Array<string|{label?:string,image?:string}>, activeIndex?: number }} payload
+ *           sequence?: Array<string|{label?:string,image?:string}>, activeIndex?: number,
+ *           cards?: Array<{label?:string,image?:string,id?:string}> }} payload
  */
 export function showVisualFallback(root, payload = {}) {
     const host = fallbackHost(root);
@@ -276,6 +330,9 @@ export function showVisualFallback(root, payload = {}) {
     // 順序大圖卡（示範播放時）——優先於最小對並列卡
     if (Array.isArray(payload.sequence) && payload.sequence.length >= 1) {
         host.appendChild(buildSequenceCards(payload.sequence, payload.activeIndex ?? -1));
+    } else if (Array.isArray(payload.cards) && payload.cards.length >= 1) {
+        // W2：回合視覺圖卡（當題的結構化選項 + 醒目序號）
+        host.appendChild(buildRoundCards(payload.cards));
     } else if (Array.isArray(payload.pair) && payload.pair.length >= 2) {
         const row = document.createElement("div");
         row.className = "visual-fallback__cards";
@@ -324,32 +381,34 @@ export function createPreferencesPanel(root, locale) {
     const en = locale === "en-US";
 
     root.innerHTML = `
-        <h2>${en ? "Accessibility" : "無障礙設定"}</h2>
-        <div class="settings">
-            <label class="settings__row">
-                <span class="settings__label">${en ? "Reduce motion" : "減少動畫"}</span>
-                <input type="checkbox" data-pref="reducedMotion" ${prefs.reducedMotion ? "checked" : ""} />
-            </label>
-            <label class="settings__row">
-                <span class="settings__label">${en ? "Color-blind symbols" : "色覺輔助符號"}</span>
-                <input type="checkbox" data-pref="colorBlind" ${prefs.colorBlind ? "checked" : ""} />
-            </label>
-            <label class="settings__row">
-                <span class="settings__label">${en ? "Haptics" : "觸覺回饋"}</span>
-                <input type="checkbox" data-pref="haptics" ${prefs.haptics ? "checked" : ""} />
-            </label>
-            <label class="settings__row">
-                <span class="settings__label">${en ? "Spoken prompts" : "語音提示"}</span>
-                <input type="checkbox" data-pref="speech" ${prefs.speech ? "checked" : ""} />
-            </label>
-            <label class="settings__row">
-                <span class="settings__label">${en ? "Visual assist (play without sound)" : "視覺輔助（無聲可玩）"}</span>
-                <input type="checkbox" data-pref="visualAssist" ${prefs.visualAssist ? "checked" : ""} />
-            </label>
-            <label class="settings__row">
-                <span class="settings__label">${en ? "Large one-hand targets" : "單手大目標"}</span>
-                <input type="checkbox" data-pref="largeTargets" ${prefs.largeTargets ? "checked" : ""} />
-            </label>
+        <div class="settings-card" role="dialog" aria-modal="true" aria-labelledby="a11y-card-title">
+            <h2 class="settings-card__title" id="a11y-card-title">${en ? "Accessibility" : "無障礙設定"}</h2>
+            <div class="settings settings-card__body">
+                <label class="settings__row">
+                    <span class="settings__label">${en ? "Reduce motion" : "減少動畫"}</span>
+                    <input type="checkbox" data-pref="reducedMotion" ${prefs.reducedMotion ? "checked" : ""} />
+                </label>
+                <label class="settings__row">
+                    <span class="settings__label">${en ? "Color-blind symbols" : "色覺輔助符號"}</span>
+                    <input type="checkbox" data-pref="colorBlind" ${prefs.colorBlind ? "checked" : ""} />
+                </label>
+                <label class="settings__row">
+                    <span class="settings__label">${en ? "Haptics" : "觸覺回饋"}</span>
+                    <input type="checkbox" data-pref="haptics" ${prefs.haptics ? "checked" : ""} />
+                </label>
+                <label class="settings__row">
+                    <span class="settings__label">${en ? "Spoken prompts" : "語音提示"}</span>
+                    <input type="checkbox" data-pref="speech" ${prefs.speech ? "checked" : ""} />
+                </label>
+                <label class="settings__row">
+                    <span class="settings__label">${en ? "Visual assist (play without sound)" : "視覺輔助（無聲可玩）"}</span>
+                    <input type="checkbox" data-pref="visualAssist" ${prefs.visualAssist ? "checked" : ""} />
+                </label>
+                <label class="settings__row">
+                    <span class="settings__label">${en ? "Large one-hand targets" : "單手大目標"}</span>
+                    <input type="checkbox" data-pref="largeTargets" ${prefs.largeTargets ? "checked" : ""} />
+                </label>
+            </div>
         </div>
     `;
 

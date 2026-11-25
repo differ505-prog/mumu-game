@@ -451,6 +451,30 @@ body {
     gap: var(--s-2);
 }
 
+/*
+ * W1（Round 2 紅線）：頁尾不得遮住工具列。
+ *
+ * `--footer-reserve` 為「頁尾可見時必須為工具列預留的底部空間」，
+ * 由 body[data-app-phase] 決定：
+ *   - 預設（start 階段）：頁尾可見 → 預留頁尾高度（+ 間距），工具列往上移。
+ *   - play 階段：頁尾隱藏 → reserve 歸零，工具列回到畫面底部、完整可點。
+ *
+ * 頁尾高度以連結列 + meta 列推估，取 92px 保守值，
+ * 確保 375×812 直向時工具列 5 顆鈕不被任何元素覆蓋。
+ */
+:root {
+    --footer-reserve: 92px;
+}
+
+body[data-app-phase="play"] {
+    --footer-reserve: 0px;
+}
+
+/* 工具列底部依 reserve 往上位移（頁尾可見時；遊玩中頁尾隱藏 → 回到畫面底部） */
+#toolbar {
+    bottom: calc(env(safe-area-inset-bottom) + var(--s-3) + var(--footer-reserve));
+}
+
 .tool-btn {
     width: var(--touch-min);
     height: var(--touch-min);
@@ -618,4 +642,12 @@ body {
     align-items: center;
     gap: var(--s-2);
     pointer-events: none;
+}
+
+/*
+ * W1：頁尾可見時（start 階段）提示訊息層同樣往上避讓頁尾，
+ * 避免與頁尾文字重疊；遊玩中（play 階段）reserve 歸零。
+ */
+body:not([data-app-phase="play"]) #toast-layer {
+    bottom: calc(env(safe-area-inset-bottom) + 88px + var(--footer-reserve));
 }

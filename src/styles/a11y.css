@@ -113,8 +113,14 @@ input[type="checkbox"]:focus-visible {
     outline-offset: 2px;
 }
 
+/* W3：與一般模式一致 —— 星星轉為高對比亮色（<img> 的 currentColor 為黑） */
 [data-colorblind="on"] .levelmap__star.is-on {
-    filter: drop-shadow(0 0 3px var(--accent-warm));
+    filter: brightness(0) invert(1) drop-shadow(0 0 3px var(--accent-warm));
+}
+
+[data-colorblind="on"] .levelmap__star:not(.is-on) {
+    filter: brightness(0) invert(1);
+    opacity: .45;
 }
 
 /* ---------- 觸覺開關 ---------- */
@@ -198,6 +204,71 @@ input[type="checkbox"]:focus-visible {
     background: #f7fbff;
     border-radius: var(--r-md);
     border: 3px solid var(--accent-warm);
+}
+
+/* 回合視覺圖卡（W2：當題的結構化選項 + 醒目序號） */
+.visual-fallback__cards--round {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    justify-content: center;
+    gap: var(--s-2);
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.visual-fallback__round-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-1);
+    min-width: 96px;
+    min-height: 96px;
+    padding: var(--s-4) var(--s-2) var(--s-2);
+    background: var(--bg-elevated);
+    border: 3px solid var(--border-soft);
+    border-radius: var(--r-md);
+    color: var(--text-primary);
+}
+
+.visual-fallback__round-no {
+    position: absolute;
+    top: var(--s-1);
+    left: var(--s-1);
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    font-size: var(--fs-sm);
+    font-weight: 800;
+    color: var(--c-night-900);
+    background: var(--accent-warm);
+    border-radius: var(--r-full);
+}
+
+.visual-fallback__round-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--s-1);
+}
+
+.visual-fallback__round-art {
+    display: block;
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+}
+
+.visual-fallback__round-label {
+    font-size: var(--fs-md);
+    font-weight: 700;
+    color: var(--text-primary);
+    text-align: center;
 }
 
 /* 節奏脈衝圖示（純 CSS，禁 emoji） */
