@@ -50,6 +50,15 @@
     .app-footer {
         position: fixed;
     }
+
+    /*
+     * Z2：直向時角色層（scene__layer[data-layer="character"]）與中景層
+     * 在垂直方向交界會產生一道明顯的「硬切線」（角色像被地板切斷）。
+     * 將角色層下移 16% 使其下緣自然延伸出畫面底部，徹底消除接縫。
+     */
+    .scene__layer[data-layer="character"] {
+        bottom: -16%;
+    }
 }
 
 /* ---------- 橫向且高度受限：緊湊模式 ---------- */
@@ -85,7 +94,20 @@
      */
     #controls-view {
         padding-right: max(88px, calc(var(--touch-min) + var(--s-6)));
-        padding-bottom: calc(env(safe-area-inset-bottom) + var(--s-2));
+        /*
+         * Z2：橫向時底部需完整保留 safe-area，否則答案鈕會貼齊／溢出瀏海，
+         * 在 iPhone 橫向（底部有 home 指示條）時最後一排按鈕會被切掉。
+         */
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    /*
+     * Z2：橫向緊湊模式下，容器高度改由 100% 決定（min-height: 0），
+     * 否則 flex 子項的 min-content 高度會撐出縱向捲動，導致畫面下半截被切。
+     */
+    #game-container {
+        height: 100%;
+        min-height: 0;
     }
 
     #toolbar {

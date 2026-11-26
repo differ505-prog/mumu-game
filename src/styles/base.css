@@ -366,6 +366,8 @@ body {
     flex: var(--tv-ratio) 1 0;
     min-width: 0;
     overflow: hidden;
+    /* Z2：保持透明，避免底層預設白底在場景層四周露出「白邊」 */
+    background: transparent;
 }
 
 #controls-view {
@@ -375,6 +377,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    /* Z2：保持透明，避免控制區與場景區交界出現白色色塊 */
+    background: transparent;
     /* 隱藏原生白色橫向捲軸（V2）——捲軸改成細窄深色樣式 */
     overflow-y: auto;
     overflow-x: hidden;
@@ -519,7 +523,13 @@ body[data-app-phase="play"] {
 /* 狀態文字 */
 #status-text {
     position: absolute;
-    top: var(--s-4);
+    /*
+     * Z2：原本 top: var(--s-4)（16px）會被頂部 HUD 列（工具列 + safe-area）
+     * 直接壓住 —— 狀態文字疊在按鈕上難以辨識。
+     * 52px = HUD 列高度（safe-area-inset-top + 工具列 44px）+ 呼吸空間，
+     * 確保狀態文字完整落在 HUD 列之下。
+     */
+    top: 52px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 3;

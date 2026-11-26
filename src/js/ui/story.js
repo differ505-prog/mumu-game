@@ -3,8 +3,22 @@
  */
 
 import { applyTheme } from "./parallax.js";
-import { speak } from "../audio/voice.js";
+import { speak, needsVisualFallback } from "../audio/voice.js";
 import { escapeHtml, safeText } from "../core/sanitize-html.js";
+
+/**
+ * 判斷語音朗讀是否真的可用。
+ *
+ * Z4：若語音不可用（不支援 SpeechSynthesis、無可用語音、或已靜音），
+ * `speak()` 的 `onEnd` **永遠不會被觸發**（沒有 utterance 可朗讀）。
+ * 此時若仍把 CTA 寫成「正在說…」，按鈕就會永遠卡在該文案，
+ * 家長／幼兒看不到可用的「繼續」或「關上」按鈕 —— 整個流程死鎖。
+ *
+ * @returns {boolean}
+ */
+function isVoiceUsable() {
+    return !needsVisualFallback();
+}
 
 /**
  * 顯示全屏過場。

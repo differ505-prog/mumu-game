@@ -29,6 +29,10 @@ import { renderParentReport } from "./ui/parent-report.js";
 import { runAssessment, nextPhase } from "./ui/assessment-ui.js";
 import { createAudioSettings } from "./ui/settings-audio.js";
 import { createPreferencesPanel, applyPreferences, showVisualFallback, hideVisualFallback, getPreferences } from "./ui/a11y.js";
+import {
+    describeOption,
+    describeOptions
+} from "./ui/option-visual.js";
 import { createTutorial } from "./ui/tutorial.js";
 import { showLetter as showLetterScene, showStoryScene } from "./ui/story.js";
 import { showPaywall } from "./ui/paywall.js";
@@ -143,28 +147,12 @@ let audioSettings = null;
 let preferencesPanel = null;
 
 /**
- * 回合選項的自繪 SVG 圖示（W2：零 Emoji 原則）。
+ * 回合選項的自繪 SVG 圖示與視覺描述。
  *
- * 3–6 歲幼兒不識字，答案鈕必須有**視覺徽章 + 圖形**才辨識得出差異。
- * 這裡以內嵌 SVG（currentColor）提供 6 種高辨識度剪影，
- * 依序套用於沒有圖片的選項鈕。
- *
- * @type {string[]}
+ * Z4：統一由 `ui/option-visual.js` 提供 ——
+ * 答案鈕（main.js）與視覺圖卡（a11y.js）共用同一份剪影定義與指派邏輯，
+ * 才能保證「看到的圖」與「該按的鈕」永遠 1:1 對應。
  */
-const OPTION_GLYPHS = [
-    // ① 恐龍足跡
-    '<svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-3 0-4 3-4 6 0 2 1 3 1 5s1 4-1 6-3 1-4-1"/><path d="M16 5c2 1 2 3 2 5"/><circle cx="6" cy="16" r="1.6"/><circle cx="18" cy="15" r="1.6"/></svg>',
-    // ② 雪花
-    '<svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M4 7l16 10M20 7L4 17"/><path d="M12 6l2.2-2.2M12 6L9.8 3.8M12 18l2.2 2.2M12 18l-2.2 2.2"/></svg>',
-    // ③ 禮物
-    '<svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M3 12h18M12 8v13"/><path d="M12 8S9.5 8 8.5 6.5 10 3.5 12 8Zm0 0s2.5 0 3.5-1.5S14 3.5 12 8Z"/></svg>',
-    // ④ 星星
-    '<svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.4l5.9-.9z"/></svg>',
-    // ⑤ 樹
-    '<svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l5 7h-3l4 6H6l4-6H7z"/><path d="M12 16v5"/></svg>',
-    // ⑥ 波浪（聲音）
-    '<svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h2l2-6 3 12 3-9 2 5 2-3h2"/></svg>'
-];
 
 /**
  * 將內容型字串轉為可安全置入 HTML 屬性的形式。
@@ -930,7 +918,15 @@ function showLetter(text, onClose) {
  */
 function showCharacterSelect() {
     const overlay = $("character-select-overlay");
-    const list = $("character-options");
+    if (!overlay) return;
+    // 防呆：若靜態容器被清空，先重建再填入，避免整條流程中斷。
+    let list = $("character-options");
+    if (!list) {
+        list = document.createElement("div");
+        list.className = "mode-options";
+        list.id = "character-options";
+        overlay.appendChild(list);
+    }
     const chars = playableCharacters(bundle, 1);
 
     list.innerHTML = chars.map((/** @type {any} */ c) => `
@@ -950,6 +946,8 @@ function showCharacterSelect() {
     });
 
     // F8：角色選擇必須有「返回」路徑（回到序章／開始畫面）
+    // V3：重建前先移除既有節點，避免產生多個同 id 的按鈕。
+    overlay.querySelector("#character-select-back")?.remove();
     const back = document.createElement("button");
     back.className = "level-btn level-btn--secondary overlay__back";
     back.id = "character-select-back";
@@ -995,6 +993,13 @@ function showLevelMap() {
      * W3：關閉所有其他遮罩，避免疊層殘留造成軟鎖（空白天空）。
      * 這些遮罩彼此獨立，逐一隱藏並清空內容，確保地圖是唯一可見層。
      */
+    const STATIC_OVERLAY_IDS = new Set([
+        "audio-settings-root",
+        "a11y-root",
+        "character-select-overlay",
+        "mode-select-overlay"
+    ]);
+
     const otherOverlays = [
         "audio-settings-root",
         "a11y-root",
@@ -1014,7 +1019,9 @@ function showLevelMap() {
         const el = $(id);
         if (!el) continue;
         el.classList.add("hidden");
-        if (id !== "level-up-overlay") el.innerHTML = "";
+        // V3：僅清空「動態內容容器」；靜態結構（角色選擇／模式選擇／設定／無障礙）
+        // 若被清空，會連帶摧毀 #character-options 等節點，導致返回後無法再渲染。
+        if (!STATIC_OVERLAY_IDS.has(id)) el.innerHTML = "";
     }
 
     // 疊層堆疊重置（避免殘留層級造成 closeTopOverlay 誤判）
@@ -1028,6 +1035,8 @@ function showLevelMap() {
     });
 
     // F8：地圖必須有「返回」路徑（回到角色選擇）
+    // 同上：重建前先移除既有節點，避免產生多個同 id 的按鈕。
+    overlay.querySelector("#levelmap-back")?.remove();
     const back = document.createElement("button");
     back.className = "level-btn level-btn--secondary overlay__back";
     back.id = "levelmap-back";
@@ -1653,16 +1662,21 @@ function renderRound() {
     }
 
     // 單選與序列：按鈕網格（序列另加進度指示）
+    //
+    // Z4：選項描述改用共用的 `describeOptions()` ——
+    // 序號、圖片、剪影皆與「視覺圖卡」完全一致，
+    // 幼兒看圖卡即可對到答案鈕（1:1 視覺配對）。
+    const optionViews = describeOptions(options);
     controls.innerHTML = `
         ${kind === "sequence" ? renderSequenceProgress() : ""}
-        <div class="controls-grid grid-3">${options.map((/** @type {any} */ o, /** @type {number} */ i) => `
-        <button class="control-btn control-btn--badge" data-item="${o.id}" type="button"
-                aria-label="${escapeAttr(o.label || o.id)}">
-            <span class="control-btn__no" aria-hidden="true">${i + 1}</span>
-            ${o.image
-                ? `<img class="control-btn__art" src="${escapeAttr(o.image)}" alt="" />`
-                : `<span class="control-btn__glyph" aria-hidden="true">${OPTION_GLYPHS[i % OPTION_GLYPHS.length]}</span>`}
-            ${o.label ? `<span class="control-btn__label">${escapeAttr(o.label)}</span>` : ""}
+        <div class="controls-grid grid-3">${optionViews.map((/** @type {any} */ v) => `
+        <button class="control-btn control-btn--badge" data-item="${escapeAttr(v.id)}" type="button"
+                aria-label="${escapeAttr(v.label || v.id)}">
+            <span class="control-btn__no" aria-hidden="true">${v.no}</span>
+            ${v.hasImage
+                ? `<img class="control-btn__art" src="${escapeAttr(v.image)}" alt="" />`
+                : `<span class="control-btn__glyph" aria-hidden="true">${v.glyph}</span>`}
+            ${v.label ? `<span class="control-btn__label">${escapeAttr(v.label)}</span>` : ""}
         </button>
     `).join("")}</div>
     `;

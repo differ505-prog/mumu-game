@@ -44,29 +44,20 @@ export function renderLevelMap(root, bundle, progress, locale) {
     const page = Math.min(mapPages.get(root) || 0, totalPages - 1);
     mapPages.set(root, page);
 
+    /**
+     * Z1：僅依「當頁切片」渲染 —— 嚴格遞增、不重複、不補章首。
+     *
+     * 舊實作會把各章首關（第 1／5／13／21 關）補進第 2 頁，
+     * 導致第 2 頁出現 1／5／13 等孤立卡片，且關卡 21 被排到 28 之後，
+     * 破壞「關卡號嚴格遞增」的排序契約。
+     * 本頁只渲染 levels[page * SIZE, (page + 1) * SIZE)，
+     * 章節分組僅用於**視覺分區**，不再改變節點集合。
+     */
+    const pageLevels = levels.slice(page * LEVELMAP_PAGE_SIZE, (page + 1) * LEVELMAP_PAGE_SIZE);
+
     /** @type {Map<number, any[]>} */
     const byChapter = new Map();
-    for (const l of levels.slice(page * LEVELMAP_PAGE_SIZE, (page + 1) * LEVELMAP_PAGE_SIZE)) {
-        const list = byChapter.get(l.chapter) || [];
-        list.push(l);
-        byChapter.set(l.chapter, list);
-    }
-
-    // 每章的第一關必須永遠可見（章節過場與搭檔由第一章第一關觸發）——
-    // 將各章首關補進當頁，節點上限仍以 LEVELMAP_PAGE_SIZE 為準。
-    /** @type {Set<number>} */
-    const pageIds = new Set();
-    for (const list of byChapter.values()) {
-        for (const l of list) pageIds.add(l.id);
-    }
-    const firstOfEachChapter = levels.filter((/** @type {any} */ l) => {
-        const list = levels.filter((/** @type {any} */ x) => x.chapter === l.chapter);
-        return list.length && list[0].id === l.id;
-    });
-    for (const l of firstOfEachChapter) {
-        if (pageIds.has(l.id)) continue;
-        if (pageIds.size >= LEVELMAP_PAGE_SIZE) break;
-        pageIds.add(l.id);
+    for (const l of pageLevels) {
         const list = byChapter.get(l.chapter) || [];
         list.push(l);
         byChapter.set(l.chapter, list);

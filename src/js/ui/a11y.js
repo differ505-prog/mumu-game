@@ -6,6 +6,7 @@
 
 import { readJson, writeJson } from "../core/storage.js";
 import { safeText } from "../core/sanitize-html.js";
+import { describeOptions } from "./option-visual.js";
 
 const SETTINGS_KEY = "mumu.a11y";
 
@@ -252,6 +253,10 @@ function buildSequenceCards(steps, activeIndex) {
  * 每張卡帶**醒目序號**與（若有）圖片／標籤，
  * 讓 3–6 歲幼兒不識字也能靠序號與圖像作答。
  *
+ * Z4：改用共用的 `describeOptions()` —— 序號、圖片、剪影皆與
+ * 答案鈕（main.js）**完全相同**，且剪影依選項 id 決定（非索引），
+ * 因此同一個選項在任何排列下都是同一個圖示，幼兒可 1:1 對應。
+ *
  * @param {Array<{label?:string,image?:string,id?:string}>} cards
  * @returns {HTMLElement}
  */
@@ -260,35 +265,39 @@ function buildRoundCards(cards) {
     row.className = "visual-fallback__cards visual-fallback__cards--round";
     row.setAttribute("aria-label", "回合圖卡");
 
-    cards.forEach((card, i) => {
+    describeOptions(cards).forEach((view) => {
         const item = document.createElement("li");
         item.className = "visual-fallback__round-card";
 
         const no = document.createElement("span");
         no.className = "visual-fallback__round-no";
         no.setAttribute("aria-hidden", "true");
-        no.textContent = String(i + 1);
+        no.textContent = String(view.no);
         item.appendChild(no);
 
         const body = document.createElement("span");
         body.className = "visual-fallback__round-body";
 
-        const image = typeof card?.image === "string" ? card.image : "";
-        const label = typeof card?.label === "string" ? card.label : "";
-
-        if (image) {
+        if (view.hasImage) {
             const img = document.createElement("img");
             img.className = "visual-fallback__round-art";
-            img.src = image;
+            img.src = view.image;
             img.alt = "";
             img.loading = "lazy";
             img.decoding = "async";
             body.appendChild(img);
+        } else if (view.glyph) {
+            // Z4：無圖片時顯示與答案鈕相同的自繪 SVG 剪影（內嵌 currentColor）
+            const glyph = document.createElement("span");
+            glyph.className = "visual-fallback__round-glyph";
+            glyph.setAttribute("aria-hidden", "true");
+            glyph.innerHTML = view.glyph;
+            body.appendChild(glyph);
         }
-        if (label) {
+        if (view.label) {
             const text = document.createElement("span");
             text.className = "visual-fallback__round-label";
-            text.textContent = safeText(label);
+            text.textContent = safeText(view.label);
             body.appendChild(text);
         }
         item.appendChild(body);

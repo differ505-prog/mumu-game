@@ -2,11 +2,13 @@
  * 離線優先 Service Worker。
  *
  * - install：逐一快取 PRECACHE（單檔失敗不致整批失敗）
- * - activate：清除非 mumu-v4 快取
- * - fetch：導覽請求 network-first（失敗回退 ./index.html），其餘 cache-first 並背景更新
+ * - activate：清除非 mumu-v5 快取
+ * - fetch：導覽請求 network-first（失敗回退 ./index.html）；
+ *   樣式／腳本（.css／.js）network-first（失敗回退快取）；
+ *   其餘資源 cache-first 並背景更新
  */
 
-const CACHE_NAME = "mumu-v4";
+const CACHE_NAME = "mumu-v5";
 
 /** 預快取清單（Step 129：與磁碟實際檔案完全一致）。 */
 const PRECACHE = [
@@ -250,6 +252,7 @@ const PRECACHE = [
     "./src/js/ui/hud.js",
     "./src/js/ui/levelmap.js",
     "./src/js/ui/motion.js",
+    "./src/js/ui/option-visual.js",
     "./src/js/ui/parallax.js",
     "./src/js/ui/parent-report.js",
     "./src/js/ui/particles.js",
@@ -325,6 +328,29 @@ self.addEventListener("fetch", (event) => {
             } catch {
                 const cache = await caches.open(CACHE_NAME);
                 const cached = await cache.match("./index.html");
+                if (cached) return cached;
+                return new Response("Offline", { status: 503, statusText: "Offline" });
+            }
+        })());
+        return;
+    }
+
+    /**
+     * Z5：樣式／腳本採 network-first —— 回訪用戶首次開啟時
+     * 直接吃到**最新版** CSS／JS（避免舊版樣式快取造成的版面錯亂）；
+     * 離線時回退到快取內容，功能不中斷。
+     */
+    if (/\.(?:css|js)$/i.test(url.pathname)) {
+        event.respondWith((async () => {
+            const cache = await caches.open(CACHE_NAME);
+            try {
+                const fresh = await fetch(req);
+                if (fresh && fresh.ok) {
+                    cache.put(req, fresh.clone());
+                }
+                return fresh;
+            } catch {
+                const cached = await cache.match(req);
                 if (cached) return cached;
                 return new Response("Offline", { status: 503, statusText: "Offline" });
             }

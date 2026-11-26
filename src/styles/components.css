@@ -18,6 +18,15 @@
     overflow-y: auto;
 }
 
+/*
+ * Z3：非遊玩狀態下，遮罩層底部預留頁尾高度（92px ≈ 頁尾實高 + 間距），
+ * 避免「內容最後一列」被固定在底部的頁尾蓋住。
+ * 遊玩中（play）頁尾已隱藏，因此不需要此項留白。
+ */
+body:not([data-app-phase="play"]) .overlay {
+    padding-bottom: calc(var(--s-6) + 92px);
+}
+
 /* 遮罩返回／關上按鈕（置於右上角，任何畫面都回得去） */
 .overlay__back {
     position: absolute;
@@ -364,6 +373,11 @@
     border: 2px solid var(--border-soft);
     border-radius: var(--r-lg);
     box-shadow: var(--mat-border-light), var(--mat-shadow-2);
+    /*
+     * Z4：上緣預留 30px 序號徽章的空間，避免徽章壓住題目圖／圖示。
+     * 徽章為 absolute 定位，必須靠 padding 讓出空間。
+     */
+    padding-top: calc(var(--s-4) + 26px);
 }
 
 .control-btn__no {
@@ -372,8 +386,9 @@
     left: var(--s-1);
     display: grid;
     place-items: center;
-    width: 26px;
-    height: 26px;
+    /* Z4：統一為 30px 圓形徽章 —— 與視覺圖卡的編號徽章 1:1 一致 */
+    width: 30px;
+    height: 30px;
     font-size: var(--fs-xs);
     font-weight: 800;
     color: var(--c-night-900);
@@ -1567,7 +1582,12 @@
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: var(--z-hud);
+    /*
+     * Z3：頁尾原本掛在 --z-hud（低於 --z-overlay），因此啟動畫面／設定面板
+     * 打開時，遮罩層會蓋在頁尾之上，把頁尾文字壓成「灰掉的不可讀」狀態。
+     * 提升至 --z-overlay + 5，確保頁尾永遠浮在遮罩之上、維持可讀與可點。
+     */
+    z-index: calc(var(--z-overlay) + 5);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1866,6 +1886,21 @@ body[data-app-phase="play"] .app-footer {
     scrollbar-color: var(--border-soft) transparent;
 }
 
+/*
+ * Z5：非遊玩狀態下，設定卡最大高度再扣除頁尾占用（92px），
+ * 確保卡片底部不會被固定頁尾壓住 —— 設定面板因此不需要「捲到底才看得到」。
+ */
+body:not([data-app-phase="play"]) .settings-card {
+    max-height: calc(88dvh - var(--s-6) - 92px);
+}
+
+/* Z5：設定卡副標題（區塊說明，例：音量 / Sound） */
+.settings-card__subtitle {
+    margin: calc(var(--s-1) * -1) 0 0;
+    font-size: var(--fs-sm);
+    color: var(--text-secondary);
+}
+
 .settings-card::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -1958,8 +1993,36 @@ body[data-app-phase="play"] .app-footer {
      * W3：為右上角的「返回」鈕（.overlay__back）預留獨立空間，
      * 徹底消除「返回」壓到「家長報告」卡片的重疊。
      * 68px >= 返回鈕高度(var(--touch-min)=64px) + 間距。
+     *
+     * Z1：提升為 84px —— 84px 為 HUD 狀態列（含 safe-area 偏移）高度，
+     * 確保返回鈕與「每日挑戰 / 恐龍圖鑑 / 家長報告」卡片皆不被 HUD 遮住。
      */
-    padding-top: 68px;
+    padding-top: 84px;
+    /* Z1：底部留白，避免最後一列章節卡與頁尾／分頁器重疊 */
+    padding-bottom: var(--s-4);
+}
+
+/*
+ * Z1：地圖容器捲軸改為細暗色樣式。
+ * 桌面版捲軸過寬（預設 15px+）會把卡片往內擠、產生「左右不對稱」的視覺瑕疵；
+ * 此處改為 8px 細軸 + 深色底，並保留左右 padding 讓內容不被裁切。
+ */
+#levelmap-root {
+    scrollbar-width: thin;
+    scrollbar-color: var(--c-night-900, #1b2a4a) transparent;
+}
+
+#levelmap-root::-webkit-scrollbar {
+    width: 8px;
+}
+
+#levelmap-root::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#levelmap-root::-webkit-scrollbar-thumb {
+    background: var(--c-night-900, #1b2a4a);
+    border-radius: var(--r-pill, 999px);
 }
 
 .levelmap__top {
@@ -1984,7 +2047,8 @@ body[data-app-phase="play"] .app-footer {
 
 .levelmap__chapter {
     width: 100%;
-    padding: var(--s-3);
+    /* Z1：下內距加大，讓章節標題與首列節點有呼吸空間，避免節點貼齊框線 */
+    padding: var(--s-3) var(--s-3) var(--s-4);
     background: var(--bg-panel);
     border: 1px solid var(--border-soft);
     border-radius: var(--r-lg);

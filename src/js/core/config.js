@@ -12,7 +12,7 @@ export const APP = {
     /** @type {number} 過關所需回合數 */
     maxScore: 3,
     /** @type {string} Service Worker 快取名稱 */
-    cacheName: "mumu-v3",
+    cacheName: "mumu-v5",
     /** @type {number[]} 免費章節（序章 + 第 1–3 章） */
     freeChapters: [0, 1, 2, 3],
     /** @type {number[]} 付費章節 */

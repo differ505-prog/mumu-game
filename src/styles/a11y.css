@@ -152,16 +152,46 @@ input[type="checkbox"]:focus-visible {
 
 /* ---------- 視覺輔助（無聲可玩）Step 205 ---------- */
 .visual-fallback {
+    /*
+     * Z4：視覺圖卡改為**絕對定位**並置中於 TV 區 ——
+     * 舊版為一般流內元素，會把 #controls-view 的答案鈕往下推，
+     * 導致「圖卡 + 答案鈕」同時可見時畫面溢出、鈕被切掉。
+     * 絕對定位 + 內部捲動可同時滿足「看得到圖卡」與「看得到鈕」。
+     *
+     * top: 92px 需避開 HUD 列（含 safe-area）與 #status-text（top: 52px）。
+     */
+    position: absolute;
+    top: 92px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: var(--s-2);
     padding: var(--s-2);
     margin: 0 auto var(--s-2);
-    max-width: 640px;
+    width: min(640px, calc(100% - var(--s-6)));
+    max-height: calc(100% - 120px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-soft) transparent;
     border-radius: var(--r-md);
     background: rgba(10, 26, 60, 0.72);
     border: 2px solid var(--accent-warm);
+}
+
+.visual-fallback::-webkit-scrollbar {
+    width: 6px;
+}
+
+.visual-fallback::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.visual-fallback::-webkit-scrollbar-thumb {
+    background: var(--border-soft);
+    border-radius: var(--r-full);
 }
 
 .visual-fallback.hidden {
@@ -228,7 +258,12 @@ input[type="checkbox"]:focus-visible {
     gap: var(--s-1);
     min-width: 96px;
     min-height: 96px;
+    /*
+     * Z4：上緣預留 30px 序號徽章空間（與 .control-btn--badge 一致），
+     * 徽章為 absolute 定位，必須靠 padding 讓出空間。
+     */
     padding: var(--s-4) var(--s-2) var(--s-2);
+    padding-top: calc(var(--s-4) + 26px);
     background: var(--bg-elevated);
     border: 3px solid var(--border-soft);
     border-radius: var(--r-md);
@@ -241,6 +276,7 @@ input[type="checkbox"]:focus-visible {
     left: var(--s-1);
     display: grid;
     place-items: center;
+    /* Z4：與答案鈕 .control-btn__no 完全一致的 30px 圓形徽章 */
     width: 30px;
     height: 30px;
     font-size: var(--fs-sm);
@@ -248,6 +284,17 @@ input[type="checkbox"]:focus-visible {
     color: var(--c-night-900);
     background: var(--accent-warm);
     border-radius: var(--r-full);
+}
+
+/*
+ * Z4：選項自繪圖示（SVG）—— 與答案鈕使用**同一組**圖示，
+ * 讓幼兒在「視覺圖卡」與「答案鈕」之間建立 1:1 的對應關係。
+ */
+.visual-fallback__round-glyph {
+    display: block;
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
 }
 
 .visual-fallback__round-body {
